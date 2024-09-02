@@ -1,5 +1,6 @@
-"""
-URL configuration for bands_backend project.
-"""
+from django.urls import path, include
+from bands import urls as bands_urls
 
-urlpatterns = []
+urlpatterns = [
+    path('bands/', include(bands_urls)),
+]

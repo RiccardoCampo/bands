@@ -20,7 +20,8 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = ['bands']
+INSTALLED_APPS = ['bands', 'rest_framework', 'django.contrib.contenttypes',
+                  'django.contrib.auth']
 
 MIDDLEWARE = []
 
@@ -41,3 +42,19 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
     }
 }
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
