@@ -21,7 +21,7 @@ class PositiveTinyIntegerField(models.PositiveSmallIntegerField):
 
 
 class SoftDeleteModel(models.Model):
-    deleted_at = models.DateTimeField()
+    deleted_at = models.DateTimeField(null=True)
 
     field_order = ["id", "deleted_at"]
 
