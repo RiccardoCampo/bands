@@ -1,5 +1,6 @@
 from django.db import models
-from bands.models_extensions import SoftDeleteModel, PositiveAutoField
+
+from bands.models_extensions import PositiveAutoField, SoftDeleteModel
 
 
 class Artist(SoftDeleteModel):

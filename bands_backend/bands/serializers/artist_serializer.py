@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from bands.models.artist import Artist
 
 
