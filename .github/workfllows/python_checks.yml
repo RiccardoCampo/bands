@@ -1,0 +1,54 @@
+name: Style checks
+
+run-name: ${{ github.event.pull_request.title || github.ref_name }}
+on:
+  pull_request:
+    branches-ignore: [main]
+    paths:
+      - bands_backend/**
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python-style-checks:
+    name: Python style checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Setup Virtualenv
+      id: virtualenv-setup
+      run: |
+        export POETRY_VIRTUALENVS_CREATE=true
+        cd bands_backend
+        poetry run python --version
+
+    - name: Cache dependencies
+      id: cache-dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/bands_backend/.cache
+          ~/bands_backend/.venv
+        key: poetry-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      run: |
+        cd bands_backend
+        python --version && poetry --version
+        poetry install --no-ansi --no-interaction --sync --no-root
+
+    - name: Run checks
+      run: |
+        source $(poetry env info --path)/bin/activate
+        make style

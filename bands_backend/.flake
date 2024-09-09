@@ -1,0 +1,15 @@
+[flake8]
+exclude =
+    .linters
+    .env
+    .env.example
+    .gitignore
+    poetry.lock
+    pyproject.toml
+    Makefile
+
+per-file-ignores = __init__.py:F401
+select = C,E,F,W,D,DAR
+docstring-convention = all
+max-complexity = 20
+max-line-length = 119
