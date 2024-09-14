@@ -1,6 +1,6 @@
 <template>
     <svg-icon :iconName="iconName" :width="width" :height="height" :iconColor="iconColor">
-        <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        <circle cx="12" cy="12" r="8"></circle><line x1="22" y1="22" x2="17.65" y2="17.65"></line>
     </svg-icon>
 </template>
 <script>
