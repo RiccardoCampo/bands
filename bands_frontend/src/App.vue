@@ -27,12 +27,8 @@ export default {
 </script>
 
 <style>
-@font-face {
-  font-family: zain;
-  src: url('~/assets/fonts/Zain-Regular.ttf');;
-}
 #app {
-  font-family: zain;
+  font-family: title;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

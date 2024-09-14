@@ -27,6 +27,8 @@ div.search {
 }
 
 input.search {
+  font-family: regular;
+  font-size: 1.6pc;
   background-color: var(--white);
   width: 500px;
   height: 28px;
@@ -34,7 +36,6 @@ input.search {
   border-width: 3px;
   border-color: var(--darkred);
   border-style: solid;
-  font-size: 1.3pc;
   color: var(--grey);
   transition: all 0.2s;
 }
