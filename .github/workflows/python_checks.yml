@@ -31,6 +31,9 @@ jobs:
       with:
         python-version: '3.11'
 
+    - name: Install Poetry
+      run: pip install poetry
+
     - name: Setup Virtualenv
       id: virtualenv-setup
       run: |
