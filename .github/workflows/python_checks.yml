@@ -26,6 +26,11 @@ jobs:
     - name: Checkout
       uses: actions/checkout@main
 
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
     - name: Setup Virtualenv
       id: virtualenv-setup
       run: |
