@@ -1,7 +1,7 @@
 <template>
   <div class="search">
     <input class="search"  v-model="text" placeholder="type an artist...">
-    <button class="search" @click="$emit('searchClicked')"><search-icon height=31 width=31 iconColor="inherit"></search-icon></button>
+    <button class="search" @click="$emit('searchClicked')"><search-icon height=32 width=32 iconColor="inherit"></search-icon></button>
   </div>
 </template>
 
@@ -23,7 +23,7 @@ div.search {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 20px;
+  margin: 20px;
 }
 
 input.search {
@@ -37,6 +37,7 @@ input.search {
   border-color: var(--darkred);
   border-style: solid;
   color: var(--grey);
+  z-index: 1;
   transition: all 0.2s;
 }
 
@@ -48,6 +49,8 @@ button.search {
   background-color: var(--darkred);
   stroke: var(--darkyellow);
   border: none;
+  height: 35.8px;
+  margin-left: -2px;
   transition: all 0.1s;
 }
 
