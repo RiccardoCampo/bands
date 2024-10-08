@@ -14,5 +14,5 @@ class Score(models.Model):
     class Meta:
         db_table = "score"
         constraints = [
-            models.UniqueConstraint("artist_id", "metric_id", name='artist_id_metric_id_unique'),
+            models.UniqueConstraint("artist_id", "metric_id", name="artist_id_metric_id_unique"),
         ]

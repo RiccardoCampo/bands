@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy
 
-from bands.models_extensions import SoftDeleteModel, PositiveAutoField, PositiveTinyIntegerField
+from bands.models_extensions import PositiveAutoField, PositiveTinyIntegerField, SoftDeleteModel
 
 
 class Metric(SoftDeleteModel):
