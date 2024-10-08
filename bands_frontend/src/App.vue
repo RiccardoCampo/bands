@@ -1,26 +1,37 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <header-section :minimized="headerSectionMinimized"></header-section>
+  <search-section @searchClicked=minimizeHeaderSection></search-section>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import HeaderSection from './components/HeaderSection.vue';
+import SearchSection from './components/SearchSection.vue';
 
 export default {
-  name: 'App',
+  name: 'BandsApp',
   components: {
-    HelloWorld
+    'header-section': HeaderSection,
+    'search-section': SearchSection
+  },
+  data()  {
+    return {
+      headerSectionMinimized: false,
+    }
+  },  
+  methods: {
+    minimizeHeaderSection() {
+      this.headerSectionMinimized = true
+    }
   }
 }
 </script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: title;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: var(--black);
 }
 </style>
