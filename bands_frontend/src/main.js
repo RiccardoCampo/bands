@@ -8,6 +8,7 @@ import StarFilledIcon from './components/icons/StarFilledIcon.vue';
 import CheckIcon from './components/icons/CheckIcon.vue';
 import CrossIcon from './components/icons/CrossIcon.vue';
 import ExternalLink from './components/icons/ExternalLink.vue';
+import LoadingIcon from './components/icons/LoadingIcon.vue';
 
 const app = createApp(App)
 
@@ -17,5 +18,6 @@ app.component('star-filled-icon', StarFilledIcon)
 app.component('check-icon', CheckIcon)
 app.component('cross-icon', CrossIcon)
 app.component('external-link', ExternalLink)
+app.component('loading-icon', LoadingIcon)
 
 app.mount('#app')
