@@ -11,7 +11,7 @@ python = "^3.11"
 django = "^5.1"
 mysqlclient = "^2.2.4"
 python-dotenv = "^1.0.1"
-
+django-rest-framework = "^0.1.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.3"
@@ -21,6 +21,7 @@ mypy = "^1.11.2"
 flake8 = "^7.1.1"
 bandit = "^1.7.9"
 django-stubs = "^5.0.4"
+djangorestframework-stubs = "^3.15.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -70,3 +71,7 @@ warn_return_any = true
 disallow_untyped_defs = true
 check_untyped_defs = true
 implicit_reexport = true
+plugins = "mypy_django_plugin.main"
+
+[tool.django-stubs]
+django_settings_module = "bands_backend.settings"
