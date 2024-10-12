@@ -1,17 +1,37 @@
 <template>
   <div class="search">
     <input class="search"  v-model="text" placeholder="type an artist...">
-    <button class="search" @click="$emit('searchClicked')"><search-icon height=32 width=32 iconColor="inherit"></search-icon></button>
+    <button class="search" @click="search" @keyup.enter="search">
+      <loading-icon v-if="loading" height="32" width="32" color="var(--darkyellow)"></loading-icon>
+      <search-icon v-else height=32 width=32 iconColor="inherit"></search-icon>
+    </button>
   </div>
 </template>
 
 <script>
+import { useArtistsList } from '@/store/ArtistsList';
+import { usePageStatus } from '@/store/PageStatus';
+import { mapActions } from 'pinia';
+
 
 export default {
   name: 'SearchSection',
   data () {
     return {
-      text: ""
+      text: "",
+      loading: false,
+    }
+  },
+  methods: {
+    ...mapActions(usePageStatus, ['activateList']),
+    ...mapActions(useArtistsList, ['fetchArtists']),
+    async search () {
+      this.loading = true
+
+      await this.fetchArtists(this.text).catch((error) => {console.log(error)})
+
+      this.activateList()
+      this.loading = false
     }
   }
 }
