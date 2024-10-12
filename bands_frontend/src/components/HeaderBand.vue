@@ -101,7 +101,6 @@ div.band {
     height: v-bind("height");
 }
 div.highlighted {
-    position: a; 
     height: v-bind("highlightedHeight");
     background-color: v-bind("colorDark");
     transition: height 2s;
@@ -112,6 +111,7 @@ div.slider {
     background-color: var(--white);
 }
 div.letter {
+    font-family: title;
     position: relative;
     top: -240px;
     height: 0px;

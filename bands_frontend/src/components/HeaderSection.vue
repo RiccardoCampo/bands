@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <header-band  v-for="(band, position) in bands" :key=position :letter="band.letter" :position="position" :color="band.color" :minimized="minimized"></header-band>
+    <header-band  v-for="(band, position) in bands" :key=position :letter="band.letter" :position="position" :color="band.color" :minimized="headerMinimized"></header-band>
   </div>
 </template>
 
@@ -8,6 +8,8 @@
 <script>
 import HeaderBand from './HeaderBand.vue';
 import {ColorOrder, HeaderBandSize} from '../config';
+import { mapState } from 'pinia';
+import { usePageStatus } from '@/store/PageStatus';
 
 /**
  * Header section, render as many bands are needed to fill in the screen width (add or remove bands when the screen is resized).
@@ -15,22 +17,8 @@ import {ColorOrder, HeaderBandSize} from '../config';
  */
 export default {
   name: 'HeaderSection',
-  data()  {
-    return {
-      screenWidth: document.documentElement.clientWidth,
-    }
-  },
-  props: {
-      minimized: Boolean
-  },
   components: {
     'header-band': HeaderBand,
-  },
-  mounted() {
-    window.addEventListener("resize", this.resizeHandler);
-  },
-  unmounted() {
-    window.removeEventListener("resize", this.resizeHandler);
   },
   methods: {
     resizeHandler() {
@@ -52,12 +40,13 @@ export default {
     },
   },
   computed: {
+    ...mapState(usePageStatus, ['headerMinimized', 'pageSize']),
     /**
      * Get the list of bands. Each band is defined by its letter (empty when no letter) and color.
      */
     bands() {
       let bands = ["b", "a", "n", "d", "s"]
-      let widthToFill = this.screenWidth - this.letteredBandsSize
+      let widthToFill = this.pageSize.width - this.letteredBandsSize
       let addedBands = 0
       while (widthToFill > 0) {
         bands = [""].concat(bands, [""])
@@ -77,10 +66,10 @@ export default {
      * Shrink the bands if the screen gets too tight.
      */
     shouldShrink() {
-      return this.screenWidth < this.letteredBandsSize
+      return this.pageSize.width < this.letteredBandsSize
     },
     bandsPosition () {
-      return (this.minimized ? -240 : -10) + "px"
+      return (this.headerMinimized ? -240 : -10) + "px"
     },
   }
 }

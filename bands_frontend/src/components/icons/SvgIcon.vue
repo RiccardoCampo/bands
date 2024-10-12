@@ -3,7 +3,7 @@
         xmlns="http://www.w3.org/2000/svg"
         :width="width"
         :height="height"
-        viewBox="0 0 24 24" fill="none" :stroke="iconColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+        :viewBox="viewBox" fill="none" :stroke="iconColor" :stroke-width="strokeWidth" stroke-linecap="round" stroke-linejoin="round"
     >
         <title :id="iconName" lang="en">{{ iconName }} icon</title>
         <slot/>
@@ -28,6 +28,23 @@ export default {
         iconColor: {
             type: String,
             default: 'currentColor'
+        },
+        viewBoxWidth: {
+            type: [Number, String],
+            default: 24
+        },
+        viewBoxHeight: {
+            type: [Number, String],
+            default: 24
+        },
+        strokeWidth: {
+            type: [Number, String],
+            default: 2
+        }
+    },
+    computed: {
+        viewBox() {
+            return `0 0 ${this.viewBoxWidth} ${this.viewBoxHeight}`
         }
     }
 }

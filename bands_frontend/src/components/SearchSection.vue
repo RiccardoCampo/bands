@@ -1,17 +1,37 @@
 <template>
   <div class="search">
     <input class="search"  v-model="text" placeholder="type an artist...">
-    <button class="search" @click="$emit('searchClicked')"><search-icon height=31 width=31 iconColor="inherit"></search-icon></button>
+    <button class="search" @click="search" @keyup.enter="search">
+      <loading-icon v-if="loading" height="32" width="32" color="var(--darkyellow)"></loading-icon>
+      <search-icon v-else height=32 width=32 iconColor="inherit"></search-icon>
+    </button>
   </div>
 </template>
 
 <script>
+import { useArtistsList } from '@/store/ArtistsList';
+import { usePageStatus } from '@/store/PageStatus';
+import { mapActions } from 'pinia';
+
 
 export default {
   name: 'SearchSection',
   data () {
     return {
-      text: ""
+      text: "",
+      loading: false,
+    }
+  },
+  methods: {
+    ...mapActions(usePageStatus, ['activateList']),
+    ...mapActions(useArtistsList, ['fetchArtists']),
+    async search () {
+      this.loading = true
+
+      await this.fetchArtists(this.text).catch((error) => {console.log(error)})
+
+      this.activateList()
+      this.loading = false
     }
   }
 }
@@ -23,7 +43,7 @@ div.search {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 20px;
+  margin: 20px;
 }
 
 input.search {
@@ -37,6 +57,7 @@ input.search {
   border-color: var(--darkred);
   border-style: solid;
   color: var(--grey);
+  z-index: 1;
   transition: all 0.2s;
 }
 
@@ -48,6 +69,8 @@ button.search {
   background-color: var(--darkred);
   stroke: var(--darkyellow);
   border: none;
+  height: 35.8px;
+  margin-left: -2px;
   transition: all 0.1s;
 }
 
