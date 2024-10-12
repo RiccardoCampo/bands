@@ -13,7 +13,8 @@ class ScoreSerializer(serializers.ModelSerializer):
     """
 
     metric: Any = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    type: Any = serializers.SlugRelatedField(read_only=True, slug_field="type", source="metric")
+    type: Any = serializers.SerializerMethodField()
+    category: Any = serializers.SerializerMethodField()
 
     class Meta:
         """
@@ -21,5 +22,21 @@ class ScoreSerializer(serializers.ModelSerializer):
         """
 
         model = Score
-        fields = ["metric", "type", "value"]
+        fields = ["metric", "type", "category", "value"]
         ordering = ["metric"]
+
+    @staticmethod
+    def get_type(model: Score) -> str:
+        """
+        Get the metric type.
+        """
+
+        return model.metric.get_type_display()
+
+    @staticmethod
+    def get_category(model: Score) -> str:
+        """
+        Get the metric type.
+        """
+
+        return model.metric.get_category_display()
