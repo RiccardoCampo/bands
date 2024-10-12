@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 
 import '../assets/css/main.css';
@@ -11,6 +12,9 @@ import ExternalLink from './components/icons/ExternalLink.vue';
 import LoadingIcon from './components/icons/LoadingIcon.vue';
 
 const app = createApp(App)
+
+const pinia = createPinia()
+app.use(pinia)
 
 app.component('search-icon', SearchIcon)
 app.component('star-icon', StarIcon)
