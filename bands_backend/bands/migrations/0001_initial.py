@@ -8,6 +8,9 @@ import bands.models_extensions
 
 
 class Migration(migrations.Migration):
+    """
+    Initial migration.
+    """
 
     initial = True
 

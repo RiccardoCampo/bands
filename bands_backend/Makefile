@@ -10,3 +10,6 @@ style-fix:
 	black .
 	ruff check --fix --fix-only .
 	isort .
+
+run:
+	python manage.py runserver

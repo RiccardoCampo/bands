@@ -1,11 +1,19 @@
 from django.db import models
 from django.utils.translation import gettext_lazy
 
-from bands.models_extensions import SoftDeleteModel, PositiveAutoField, PositiveTinyIntegerField
+from bands.models_extensions import PositiveAutoField, PositiveTinyIntegerField, SoftDeleteModel
 
 
 class Metric(SoftDeleteModel):
+    """
+    Metric model.
+    """
+
     class MetricType(models.IntegerChoices):
+        """
+        Metric type enum.
+        """
+
         FLAG = 0, gettext_lazy("flag")
         VALUE = 1, gettext_lazy("value")
 
@@ -14,4 +22,8 @@ class Metric(SoftDeleteModel):
     type = PositiveTinyIntegerField(choices=MetricType)
 
     class Meta:
+        """
+        Settings.
+        """
+
         db_table = "metric"

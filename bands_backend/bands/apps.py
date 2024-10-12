@@ -2,4 +2,8 @@ from django.apps import AppConfig
 
 
 class BandsConfig(AppConfig):
-    name = 'bands'
+    """
+    Bands app config.
+    """
+
+    name = "bands"

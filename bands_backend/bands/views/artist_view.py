@@ -8,7 +8,16 @@ from bands.serializers.artist_serializer import ArtistSerializer
 
 
 class ArtistApiView(APIView):
+    """
+    Artist API.
+    """
+
     def get(self, request: Request) -> Response:
+        """
+        Index.
+
+        Get the paginated list of artist, filter it by name.
+        """
         artists = Artist.objects.all()
 
         if name := self.request.query_params.get("name"):
