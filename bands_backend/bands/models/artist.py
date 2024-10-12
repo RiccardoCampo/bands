@@ -1,8 +1,13 @@
 from django.db import models
-from bands.models_extensions import SoftDeleteModel, PositiveAutoField
+
+from bands.models_extensions import PositiveAutoField, SoftDeleteModel
 
 
 class Artist(SoftDeleteModel):
+    """
+    Artist model.
+    """
+
     id = PositiveAutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
     spotify_url = models.CharField(max_length=2000)
@@ -11,4 +16,8 @@ class Artist(SoftDeleteModel):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        """
+        Settings.
+        """
+
         db_table = "artist"

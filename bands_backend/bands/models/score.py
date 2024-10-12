@@ -6,13 +6,21 @@ from bands.models_extensions import PositiveAutoField, PositiveTinyIntegerField
 
 
 class Score(models.Model):
+    """
+    Score model.
+    """
+
     id = PositiveAutoField(primary_key=True)
-    artist_id = models.ForeignKey(Artist, on_delete=models.CASCADE)
-    metric_id = models.ForeignKey(Metric, on_delete=models.CASCADE)
+    artist = models.ForeignKey(Artist, on_delete=models.CASCADE, db_column="artist_id")
+    metric = models.ForeignKey(Metric, on_delete=models.CASCADE, db_column="metric_id")
     value = PositiveTinyIntegerField(validators=[MinValueValidator(0)])
 
     class Meta:
+        """
+        Settings.
+        """
+
         db_table = "score"
         constraints = [
-            models.UniqueConstraint("artist_id", "metric_id", name='artist_id_metric_id_unique'),
+            models.UniqueConstraint("artist_id", "metric_id", name="artist_id_metric_id_unique"),
         ]
