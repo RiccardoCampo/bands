@@ -4,7 +4,6 @@ Django settings for bands_backend project.
 
 import os
 from pathlib import Path
-from typing import List
 
 from dotenv import load_dotenv
 
@@ -17,14 +16,14 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = True
 
-ALLOWED_HOSTS: List[str] = []
+ALLOWED_HOSTS: list[str] = []
 
 
 # Application definition
 
 INSTALLED_APPS = ["bands", "rest_framework", "django.contrib.contenttypes", "django.contrib.auth"]
 
-MIDDLEWARE: List[str] = []
+MIDDLEWARE: list[str] = []
 
 ROOT_URLCONF = "bands_backend.urls"
 
