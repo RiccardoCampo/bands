@@ -1,7 +1,8 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
 
-from bands.views.artist_view import ArtistApiView
+from bands.views.artist_view import ArtistViewSet
 
-urlpatterns = [
-    path("artist", ArtistApiView.as_view()),
-]
+router = DefaultRouter()
+router.register("artist", ArtistViewSet, basename="artist")
+
+urlpatterns = router.urls
