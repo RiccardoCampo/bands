@@ -1,11 +1,14 @@
+from typing import Any
+
 from django.db.models import QuerySet
 from rest_framework import viewsets
-from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request
 from rest_framework.response import Response
 
 from bands.models import Artist
 from bands.serializers.artist_serializer import ArtistSerializer
+from bands.serializers.requests.artist_create_request_serializer import ArtistCreateRequestSerializer
+from bands.serializers.requests.artist_list_request_serializer import ArtistListRequestSerializer
 
 
 class ArtistViewSet(viewsets.GenericViewSet):
@@ -23,13 +26,17 @@ class ArtistViewSet(viewsets.GenericViewSet):
         Get the paginated list of artist, filter it by name or scores.
         """
 
-        paginator = PageNumberPagination()
+        query_params = ArtistListRequestSerializer(data=self.request.query_params)
+        query_params.is_valid()
 
         serializer = self.get_serializer(
-            paginator.paginate_queryset(queryset=self._filter_artists(), request=request), many=True
+            self.paginator.paginate_queryset(  # type: ignore[union-attr]
+                queryset=self._filter_artists(query_params.data), request=request
+            ),
+            many=True,
         )
 
-        return paginator.get_paginated_response(serializer.data)
+        return self.paginator.get_paginated_response(serializer.data)  # type: ignore[union-attr]
 
     def create(self, request: Request) -> Response:
         """
@@ -38,8 +45,10 @@ class ArtistViewSet(viewsets.GenericViewSet):
         Create a new artists, with data provided in the request payload.
         """
 
-        new_artist = Artist(**request.data)
+        request_payload = ArtistCreateRequestSerializer(data=request.data)
+        request_payload.is_valid(raise_exception=True)
 
+        new_artist = request_payload.artist
         new_artist.save()
 
         return Response(self.get_serializer(new_artist).data)
@@ -51,12 +60,14 @@ class ArtistViewSet(viewsets.GenericViewSet):
         Update an existing artist, edit all the updatable fields found in the request payload.
         """
 
+        request_payload = ArtistCreateRequestSerializer(data=request.data)
+        request_payload.is_valid(raise_exception=True)
+
         artist = self.get_queryset().get(id=pk)
 
-        updates = {key: value for key, value in request.data.items() if key in Artist.updatable_fields}
-        artist.__dict__.update(updates)
+        artist.__dict__.update(request_payload.data)
 
-        artist.save(update_fields=Artist.updatable_fields)
+        artist.save(update_fields=request_payload.data.keys())
 
         return Response(self.get_serializer(artist).data)
 
@@ -71,20 +82,20 @@ class ArtistViewSet(viewsets.GenericViewSet):
 
         return Response("OK")
 
-    def _filter_artists(self) -> QuerySet:
+    def _filter_artists(self, query_params: dict[str, Any]) -> QuerySet:
         """
         Get the query set, apply query string filters.
         """
 
-        artists = self.get_queryset()
+        artists = self.get_queryset().order_by("id")
 
-        for key, value in self.request.query_params.items():
-            if key == "name":
-                artists = artists.filter(name__icontains=value)
-            elif key != "page":
-                if "[" in value:
-                    artists = artists.filter(score__metric__name=key, score__value__range=str(value)[1:-1].split(","))
-                else:
-                    artists = artists.filter(score__metric__name=key, score__value=value)
+        if name := query_params.get("name"):
+            artists = artists.filter(name__icontains=name)
+
+        for metric_name, value in query_params.get("scores", {}).items():
+            if isinstance(value, tuple):
+                artists = artists.filter(score__metric__name=metric_name, score__value__range=value)
+            else:
+                artists = artists.filter(score__metric__name=metric_name, score__value=value)
 
         return artists.distinct()

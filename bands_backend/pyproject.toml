@@ -22,10 +22,18 @@ flake8 = "^7.1.1"
 bandit = "^1.7.9"
 django-stubs = "^5.0.4"
 djangorestframework-stubs = "^3.15.0"
+pytest = "^8.3.3"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests/unit",
+]
 
 [tool.black]
 line-length = "119"

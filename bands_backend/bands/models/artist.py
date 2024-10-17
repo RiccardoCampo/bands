@@ -15,8 +15,6 @@ class Artist(SoftDeleteModel):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    updatable_fields = ["name", "spotify_url", "image_url"]
-
     class Meta:
         """
         Settings.
