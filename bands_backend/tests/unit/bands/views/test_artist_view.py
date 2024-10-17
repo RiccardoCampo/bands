@@ -39,7 +39,8 @@ class TestArtistViewSet:
             pytest.param(
                 {"name": "ciao", "scores": {"some_score": "3"}},
                 f"{BASE_ARTIST_QUERY} {JOINS} WHERE ({WHERE_DELETE_AT} "
-                f"AND `artist`.`name` LIKE %ciao% AND `metric`.`name` = some_score AND `score`.`value` = 3) {ORDER_BY}",
+                f"AND `artist`.`name` LIKE %ciao% AND `metric`.`name` = some_score "
+                f"AND `score`.`value` = 3) {ORDER_BY}",
                 id="score and name",
             ),
             pytest.param(
