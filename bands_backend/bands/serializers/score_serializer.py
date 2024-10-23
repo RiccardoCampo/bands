@@ -1,5 +1,3 @@
-from typing import Any
-
 from rest_framework import serializers
 
 from bands.models.score import Score
@@ -8,13 +6,7 @@ from bands.models.score import Score
 class ScoreSerializer(serializers.ModelSerializer):
     """
     Score model serializer.
-
-    Include the metric name and type.
     """
-
-    metric: Any = serializers.SlugRelatedField(read_only=True, slug_field="name")
-    type: Any = serializers.SerializerMethodField()
-    category: Any = serializers.SerializerMethodField()
 
     class Meta:
         """
@@ -22,21 +14,4 @@ class ScoreSerializer(serializers.ModelSerializer):
         """
 
         model = Score
-        fields = ["metric", "type", "category", "value"]
-        ordering = ["metric"]
-
-    @staticmethod
-    def get_type(model: Score) -> str:
-        """
-        Get the metric type.
-        """
-
-        return model.metric.get_type_display()
-
-    @staticmethod
-    def get_category(model: Score) -> str:
-        """
-        Get the metric type.
-        """
-
-        return model.metric.get_category_display()
+        fields = ["artist", "metric", "value"]
