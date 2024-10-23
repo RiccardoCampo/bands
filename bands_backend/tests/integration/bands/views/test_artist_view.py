@@ -1,11 +1,9 @@
 import json
 from typing import Any
 
-from django.forms import model_to_dict
-from django.test import TestCase
-
 from bands.models import Artist, Metric, Score
 from tests.integration.bands.data import ARTISTS, METRICS, SCORES
+from tests.integration.bands.views.test_case import TestCase
 
 
 class TestArtistViewSet(TestCase):
@@ -39,8 +37,8 @@ class TestArtistViewSet(TestCase):
 
         results = json.loads(response.content)["results"]
         self.assertEqual(len(results), 2)
-        self.assertArtistEqual(results[0], ARTISTS[1])
-        self.assertArtistEqual(results[1], ARTISTS[2])
+        self.assert_artist_equal(results[0], ARTISTS[1])
+        self.assert_artist_equal(results[1], ARTISTS[2])
 
     def test_list_invalid(self) -> None:
         """
@@ -70,7 +68,7 @@ class TestArtistViewSet(TestCase):
         self.assertEqual(Artist.objects.count(), len(ARTISTS) + 1)
 
         test_artist.pop("this-field")
-        self.assertArtistEqual(Artist.objects.order_by("id").last() or {}, test_artist)
+        self.assert_artist_equal(Artist.objects.order_by("id").last() or {}, test_artist)
 
     def test_create_invalid(self) -> None:
         """
@@ -122,7 +120,7 @@ class TestArtistViewSet(TestCase):
         self.assertEqual(Artist.objects.count(), len(ARTISTS))
 
         test_artist_update.pop("this-field")
-        self.assertArtistEqual(Artist.objects.get(id=test_artist_id), test_artist_update)
+        self.assert_artist_equal(Artist.objects.get(id=test_artist_id), test_artist_update)
 
     def test_update_invalid(self) -> None:
         """
@@ -182,7 +180,7 @@ class TestArtistViewSet(TestCase):
         self.assertEqual(json.loads(response.content), {"not_found_error": "Artist matching query does not exist."})
         self.assertEqual(Artist.objects.count(), len(ARTISTS))
 
-    def assertArtistEqual(
+    def assert_artist_equal(
         self,
         actual_artist: dict[str, Any] | Artist,
         expected_artist: dict[str, Any] | Artist,
@@ -192,11 +190,4 @@ class TestArtistViewSet(TestCase):
         Compare two artist dict representation.
         """
 
-        actual_artist_dict = model_to_dict(actual_artist) if isinstance(actual_artist, Artist) else actual_artist
-        expected_artist_dict = (
-            model_to_dict(expected_artist) if isinstance(expected_artist, Artist) else expected_artist
-        )
-
-        self.assertEqual(
-            {key: value for key, value in actual_artist_dict.items() if key not in ignore}, expected_artist_dict
-        )
+        super().assert_model_equal(actual_artist, expected_artist, ignore)
