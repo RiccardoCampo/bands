@@ -1,3 +1,5 @@
+from typing import Type
+
 from django.db import models
 from django.utils.translation import gettext_lazy
 
@@ -29,8 +31,8 @@ class Metric(SoftDeleteModel):
 
     id = PositiveAutoField(primary_key=True)
     name = models.CharField(max_length=255, unique=True)
-    type = PositiveTinyIntegerField(choices=MetricType)
-    category = PositiveTinyIntegerField(choices=MetricCategory)
+    type = PositiveTinyIntegerField(choices=MetricType, default=0)
+    category = PositiveTinyIntegerField(choices=MetricCategory, default=0)
 
     class Meta:
         """
@@ -38,3 +40,11 @@ class Metric(SoftDeleteModel):
         """
 
         db_table = "metric"
+
+    @classmethod
+    def enum_fields(cls) -> dict[str, Type[models.IntegerChoices]]:
+        """
+        Get the enum field and their classes.
+        """
+
+        return {"category": cls.MetricCategory, "type": cls.MetricType}
