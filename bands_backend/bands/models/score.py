@@ -23,9 +23,7 @@ class Score(models.Model):
         """
 
         db_table = "score"
-        constraints = [
-            models.UniqueConstraint("artist_id", "metric_id", name="artist_id_metric_id_unique"),
-        ]
+        unique_together = (("artist_id", "metric_id"),)
 
     @staticmethod
     def clamp_score_value(value: int) -> int:
