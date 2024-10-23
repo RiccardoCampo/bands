@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from bands.models.artist import Artist
-from bands.serializers.score_serializer import ScoreSerializer
+from bands.serializers.score_in_artist_serializer import ScoreInArtistSerializer
 
 
 class ArtistSerializer(serializers.ModelSerializer):
@@ -11,7 +11,7 @@ class ArtistSerializer(serializers.ModelSerializer):
     Includes the list of scores.
     """
 
-    scores = ScoreSerializer(many=True, source="score_set")
+    scores = ScoreInArtistSerializer(many=True, source="score_set")
 
     class Meta:
         """

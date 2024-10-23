@@ -1,7 +1,6 @@
 from typing import Any
 
 from django.db.models import QuerySet
-from rest_framework import viewsets
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -9,15 +8,20 @@ from bands.models import Artist
 from bands.serializers.artist_serializer import ArtistSerializer
 from bands.serializers.requests.artist_create_request_serializer import ArtistCreateRequestSerializer
 from bands.serializers.requests.artist_list_request_serializer import ArtistListRequestSerializer
+from bands.serializers.requests.artist_update_request_serializer import ArtistUpdateRequestSerializer
+from bands.views.model_view import ModelViewSet
 
 
-class ArtistViewSet(viewsets.GenericViewSet):
+class ArtistViewSet(ModelViewSet):
     """
     Artist API.
     """
 
     serializer_class = ArtistSerializer
     queryset = Artist.objects.filter(deleted_at=None)
+    model = Artist
+    create_request_serializer = ArtistCreateRequestSerializer
+    update_request_serializer = ArtistUpdateRequestSerializer
 
     def list(self, request: Request) -> Response:
         """
@@ -37,50 +41,6 @@ class ArtistViewSet(viewsets.GenericViewSet):
         )
 
         return self.paginator.get_paginated_response(serializer.data)  # type: ignore[union-attr]
-
-    def create(self, request: Request) -> Response:
-        """
-        Create.
-
-        Create a new artists, with data provided in the request payload.
-        """
-
-        request_payload = ArtistCreateRequestSerializer(data=request.data)
-        request_payload.is_valid(raise_exception=True)
-
-        new_artist = request_payload.artist
-        new_artist.save()
-
-        return Response(self.get_serializer(new_artist).data)
-
-    def update(self, request: Request, pk: int) -> Response:
-        """
-        Update.
-
-        Update an existing artist, edit all the updatable fields found in the request payload.
-        """
-
-        request_payload = ArtistCreateRequestSerializer(data=request.data)
-        request_payload.is_valid(raise_exception=True)
-
-        artist = self.get_queryset().get(id=pk)
-
-        artist.__dict__.update(request_payload.data)
-
-        artist.save(update_fields=request_payload.data.keys())
-
-        return Response(self.get_serializer(artist).data)
-
-    def destroy(self, _: Request, pk: int) -> Response:
-        """
-        Destroy.
-
-        Soft deletes an existing artist.
-        """
-
-        self.get_queryset().get(id=pk).delete()
-
-        return Response("OK")
 
     def _filter_artists(self, query_params: dict[str, Any]) -> QuerySet:
         """
