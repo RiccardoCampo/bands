@@ -1,19 +1,29 @@
 <script>
 import { ColorOrder } from '@/config';
+import { usePageStatus } from '@/store/PageStatus';
+import { mapState } from 'pinia';
 
 
 export default {
-name: 'ColorsMixin',
-methods: {
-    getColor (index) {
-        return ColorOrder[Math.floor(index) % ColorOrder.length];
+    name: 'ColorsMixin',
+    methods: {
+        getColor (index) {
+            return ColorOrder[Math.floor(index) % ColorOrder.length];
+        },
+        addColors (array) {            
+            return array.map((element, index) => ({...element, color: this.getColor(index + this.colorOffset)}))
+        },
+        addColorsToMap (map) {
+            Object.keys(map).forEach(
+                (key, index) => {map[key]["color"] = this.getColor(index + this.colorOffset)}
+            )
+            
+            return map
+        },
     },
-    addColors (array) {
-        const offset = Math.floor(Math.random() * ColorOrder.length);
-        
-        return array.map((element, index) => ({...element, color: this.getColor(index + offset)}))
-    },
-}
+    computed: {
+        ...mapState(usePageStatus, ['colorOffset']),
+    }
 }
 
 </script>
