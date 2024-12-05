@@ -8,10 +8,10 @@ export const useArtistsList = defineStore('artists-list', {
         query: ""
     }),
     actions: {
-      async fetchArtists(name) {
+      async fetchArtists(name, metrics) {
         try {
           await ArtistsAPIRepository
-            .index(1, name)
+            .index(1, name, metrics)
             .then(response => {
               this.artists = response.data.results
 

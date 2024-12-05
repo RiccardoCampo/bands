@@ -10,6 +10,9 @@ import CheckIcon from './components/icons/CheckIcon.vue';
 import CrossIcon from './components/icons/CrossIcon.vue';
 import ExternalLink from './components/icons/ExternalLink.vue';
 import LoadingIcon from './components/icons/LoadingIcon.vue';
+import ChevronUp from './components/icons/ChevronUp.vue';
+import ChevronDown from './components/icons/ChevronDown.vue';
+import PlusIcon from './components/icons/PlusIcon.vue';
 
 const app = createApp(App)
 
@@ -23,5 +26,8 @@ app.component('check-icon', CheckIcon)
 app.component('cross-icon', CrossIcon)
 app.component('external-link', ExternalLink)
 app.component('loading-icon', LoadingIcon)
+app.component('chevron-up', ChevronUp)
+app.component('chevron-down', ChevronDown)
+app.component('plus-icon', PlusIcon)
 
 app.mount('#app')

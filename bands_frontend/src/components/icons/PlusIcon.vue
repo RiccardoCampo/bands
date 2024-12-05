@@ -1,6 +1,6 @@
 <template>
     <svg-icon :iconName="iconName" :width="width" :height="height" :iconColor="iconColor" viewBoxWidth=32 viewBoxHeight=32 strokeWidth=3>
-        <polyline points="24 10 13 21 8 16"></polyline>
+        <line x1="16" y1="9" x2="16" y2="23"></line><line x1="9" y1="16" x2="23" y2="16"></line>
     </svg-icon>
 </template>
 <script>

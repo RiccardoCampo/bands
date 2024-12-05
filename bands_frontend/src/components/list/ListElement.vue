@@ -14,8 +14,8 @@
         </div>
         <div class="scores">
           <div v-for="score in scores" :key="score" class="score">
-            <value-score v-if="score.type == 'value'" :score="score" :color="score.color"></value-score>
-            <flag-score v-else :score="score"></flag-score>
+            <value-slider v-if="score.type == 'value'" :modelValue="[0, score.value]" :color="score.color" :label="score.metric"></value-slider>
+            <flag-check v-else :modelValue="score.value" :label="score.metric"></flag-check>
           </div>
         </div>
       </div>
@@ -24,9 +24,9 @@
   
 <script>
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
-import FlagScore from './FlagScore.vue';
 import MainScore from './MainScore.vue';
-import ValueScore from './ValueScore.vue';
+import ValueSlider from '../metrics/ValueSlider.vue';
+import FlagCheck from '../metrics/FlagCheck.vue';
 
 
 
@@ -38,8 +38,8 @@ export default {
   },
   components: {
     "main-score": MainScore,
-    "flag-score": FlagScore,
-    "value-score": ValueScore
+    "value-slider": ValueSlider,
+    "flag-check": FlagCheck
   },
   mixins: [ColorsMixin],
   data () {

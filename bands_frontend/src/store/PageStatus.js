@@ -1,7 +1,9 @@
+import { ColorOrder } from '@/config';
 import {defineStore} from 'pinia'
 
 export const usePageStatus = defineStore('page-status', {
     state: () => ({
+        _colorOffset: undefined,
         listActive: false,
         pageSize: {
             width: 0,
@@ -11,6 +13,12 @@ export const usePageStatus = defineStore('page-status', {
     getters: {
         headerMinimized () {
             return this.listActive
+        },
+        colorOffset () {
+            if (this._colorOffset === undefined)
+                this._colorOffset = Math.floor(Math.random() * ColorOrder.length);
+            
+            return this._colorOffset
         }
     },
     actions: {
