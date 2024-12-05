@@ -1,6 +1,6 @@
 <template>
     <svg-icon :iconName="iconName" :width="width" :height="height" :iconColor="iconColor" viewBoxWidth=32 viewBoxHeight=32 strokeWidth=3>
-        <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+        <line x1="22" y1="10" x2="10" y2="22"></line><line x1="10" y1="10" x2="22" y2="22"></line>
     </svg-icon>
 </template>
 <script>
