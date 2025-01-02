@@ -4,13 +4,17 @@
       <input class="search" v-model="text" :oninput="getSuggestedMetrics" placeholder="type an artist or a metric...">
 
       <button class="searchBar" @click="search" @keyup.enter="search">
-        <loading-icon v-if="loading" height="32" width="32" color="var(--darkyellow)"></loading-icon>
+        <loading-icon v-if="loading" height="32" width="32" iconColor="inherit"></loading-icon>
         <search-icon v-else height=32 width=32 iconColor="inherit"></search-icon>
       </button>
       
       <button class="searchBar" @click="toggleMetricsPanel()">
-        <chevron-up v-if="metricsPanelActive" height=32 color="var(--darkyellow)"></chevron-up>
-        <chevron-down v-else height=32 color="var(--darkyellow)"></chevron-down>
+        <chevron-up v-if="metricsPanelActive" height=32 iconColor="inherit"></chevron-up>
+        <chevron-down v-else height=32 iconColor="inherit"></chevron-down>
+      </button>
+
+      <button class="searchBar plusButton" @click="showNewArtist()">
+        <plus-icon height=32 width=28 iconColor="inherit"></plus-icon>
       </button>
     </div>
     
@@ -73,8 +77,8 @@ export default {
     await this.fetchMetrics(this.text).catch((error) => {console.log(error)})
   },
   methods: {
-    ...mapActions(usePageStatus, ['activateList']),
-    ...mapActions(useArtistsList, ['fetchArtists']),
+    ...mapActions(usePageStatus, ['activateList', 'showNewArtist']),
+    ...mapActions(useArtistsList, ['fetchArtists', 'addPartialArtist']),
     ...mapActions(useMetrics, ['fetchMetrics']),
     async search () {
       this.toggleMetricsPanel(false)
@@ -177,9 +181,29 @@ export default {
     transition: all 0.1s;
   }
 
-  button.searchBar:active {
+  button.searchBar:hover {
     background-color: var(--darkyellow);
     stroke: var(--darkred);
+  }
+
+  button.searchBar:active {
+    background-color: var(--darkred);
+    stroke: var(--darkyellow);
+  }
+  
+  button.plusButton {
+    background-color: var(--darkred);
+    stroke: var(--darkyellow);
+  }
+
+  button.plusButton:hover {
+    background-color: var(--lightgreen);
+    stroke: var(--darkgreen);
+  }
+
+  button.plusButton:active {
+    background-color: var(--darkgreen);
+    stroke: var(--lightgreen);
   }
 
   div.selectedMetric {
@@ -190,14 +214,14 @@ export default {
   
   div.suggestedMetricsContainer {
     position: relative;
-    left: -32px;
+    left: -54px;  
     width: 500px;
   }
 
   div.suggestedMetrics {
     position: absolute;
     z-index: 100;
-    background-color: var(--white);
+    background-color: var(--cream);
     box-shadow: 2px 2px 2px var(--darkyellow);
   }
 
@@ -227,7 +251,7 @@ export default {
     justify-content: left;
     border-style: none solid solid solid;
     border-color: var(--darkred);
-    width: 565px;
+    width: 600px;
     flex-wrap: wrap;
     transition: all 0.1s;
   }

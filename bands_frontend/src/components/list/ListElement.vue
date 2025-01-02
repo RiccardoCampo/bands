@@ -48,7 +48,9 @@ export default {
   },
   computed: {
     mainScore () {
-      return this.artist.scores.filter(score => score.category == "main_score")[0].value
+      var mainScore = this.artist.scores.filter(score => score.category == "main_score")[0]
+
+      return mainScore !== undefined ? mainScore.value : 0
     },
     scores () {
       return this.addColors(this.artist.scores.filter(score => score.category !== "main_score"))
