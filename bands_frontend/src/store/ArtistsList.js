@@ -43,6 +43,20 @@ export const useArtistsList = defineStore('artists-list', {
         } catch (error) {
           return Promise.reject(error)
         }
+      },
+      async addArtist(artist) {
+        try {
+          await ArtistsAPIRepository
+            .create(artist)
+            .then(response => {
+              console.log(response.data)
+              this.artists.push(response.data)
+            })
+            
+          return Promise.resolve()
+        } catch (error) {
+          return Promise.reject(error)
+        }
       }
     }
 })

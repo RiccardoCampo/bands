@@ -5,6 +5,7 @@ export const usePageStatus = defineStore('page-status', {
     state: () => ({
         _colorOffset: undefined,
         listActive: false,
+        newArtistActive: false,
         pageSize: {
             width: 0,
             height: 0,
@@ -24,6 +25,13 @@ export const usePageStatus = defineStore('page-status', {
     actions: {
         activateList () {
             this.listActive = true
+        },
+        showNewArtist() {
+            this.newArtistActive = true
+            this.activateList()
+        },
+        hideNewArtist() {
+            this.newArtistActive = false
         },
         updatePageSize (width, height) {
             this.pageSize.width = width
