@@ -17,8 +17,11 @@ export default {
           queryString += `&${metric.name}=${metric.value}`
       });
 
-    console.log(queryString)
-
     return axios.get(`${BASE_URL}?${queryString}`)
+  },
+  async create (artist) {
+    console.log(artist)
+
+    return axios.post(BASE_URL, artist)
   }
 };
