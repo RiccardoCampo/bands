@@ -19,9 +19,13 @@ export default {
 
     return axios.get(`${BASE_URL}?${queryString}`)
   },
+  async retrieve (id) {
+    return axios.get(`${BASE_URL}${id}/`)
+  },
   async create (artist) {
-    console.log(artist)
-
     return axios.post(BASE_URL, artist)
+  },
+  async update (artist) {
+    return axios.put(`${BASE_URL}${artist.id}/`, artist)
   }
 };
