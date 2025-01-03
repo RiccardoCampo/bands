@@ -10,12 +10,12 @@
           <a :href="localArtist.spotify_url" target="_blank" class="link">
             <external-link height="32" width="32"></external-link>
           </a>
-          <main-score :score="mainScore" :color="darkColor"></main-score>
+          <main-score :score="mainScore.value" :color="darkColor"></main-score>
         </div>
         <div class="scores">
           <div v-for="score in scores" :key="score" class="score">
-            <value-slider v-if="score.type == 'value'" :modelValue="[0, score.value]" :color="score.color" :label="score.metric" :active="editing"></value-slider>
-            <flag-check v-else :modelValue="score.value" :label="score.metric" :active="editing"></flag-check>
+            <value-slider v-if="score.type == 'value'" v-model="score.value" :color="score.color" :label="score.metric" :active="editing"></value-slider>
+            <flag-check v-else v-model="score.value" :label="score.metric" :active="editing"></flag-check>
           </div>
         </div>
         <div class="actions">
@@ -32,12 +32,14 @@
       </div>
     </div>
 </template>
-  
+
 <script>
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import MainScore from './MainScore.vue';
 import ValueSlider from '../metrics/ValueSlider.vue';
 import FlagCheck from '../metrics/FlagCheck.vue';
+import { mapActions } from 'pinia';
+import { useArtistsList } from '@/store/ArtistsList';
 
 
 
@@ -56,19 +58,14 @@ export default {
   data () {
     return {
       editing: false,
+      name: this.artist.name,
       localArtist: this.artist,
+      mainScore: {value: 0},
+      scores: [],
       backupArtist: {}
     }
   },
   computed: {
-    mainScore () {
-      var mainScore = this.localArtist.scores.filter(score => score.category == "main_score")[0]
-
-      return mainScore !== undefined ? mainScore.value : 0
-    },
-    scores () {
-      return this.addColors(this.localArtist.scores.filter(score => score.category !== "main_score"))
-    },
     lightColor () {
       return `var(--light${this.color})`
     },
@@ -77,9 +74,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions(useArtistsList, ["updateArtist"]),
     toggleEdit () {
       if (this.editing) {
         this.localArtist = this.backupArtist
+        this.setScores()
       } else {
         this.backupArtist = this.localArtist
       }
@@ -87,12 +86,19 @@ export default {
       this.editing = !this.editing
     },
     edit () {
-      if (this.editing) {
-        console.log("edited")
-        this.toggleEdit()
-      }
+      this.localArtist.scores = [...this.scores, this.mainScore]
+      this.updateArtist(this.localArtist)
+      this.setScores()
+      this.editing = false
+    },
+    setScores () {
+      this.scores = this.addColors(this.localArtist.scores.filter(score => score.category !== "main_score"))
+      this.mainScore = this.localArtist.scores.filter(score => score.category == "main_score")[0]
     }
-  }
+  },
+  mounted () {
+    this.setScores()
+  },
 }
 
 </script>
