@@ -42,6 +42,17 @@ class ArtistViewSet(ModelViewSet):
 
         return self.paginator.get_paginated_response(serializer.data)  # type: ignore[union-attr]
 
+    def retrieve(self, _: Request, pk: int) -> Response:
+        """
+        Retrieve.
+
+        Display an existing model.
+        """
+
+        model = self.get_queryset().get(id=pk)
+
+        return Response(self.get_serializer(model).data)
+
     def _filter_artists(self, query_params: dict[str, Any]) -> QuerySet:
         """
         Get the query set, apply query string filters.

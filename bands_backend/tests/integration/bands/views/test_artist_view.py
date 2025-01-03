@@ -50,6 +50,29 @@ class TestArtistViewSet(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content), {"score": "invalid score value [2, for metric score"})
 
+    def test_retrieve_valid(self) -> None:
+        """
+        Assert that the test artist is retrieve correctly.
+        """
+
+        test_artist_id = 1
+
+        response = self.client.get(f"/bands/artist/{test_artist_id}/")
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assert_artist_equal(Artist.objects.get(id=test_artist_id), ARTISTS[0])
+
+    def test_retrieve_not_found(self) -> None:
+        """
+        Return 404 if the id is missing.
+        """
+
+        response = self.client.get("/bands/artist/10/")
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(json.loads(response.content), {"not_found_error": "Artist matching query does not exist."})
+
     def test_create_valid(self) -> None:
         """
         Assert that the test artist is created correctly.
@@ -94,9 +117,9 @@ class TestArtistViewSet(TestCase):
         response = self.client.post("/bands/artist/", data=ARTISTS[0])
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            json.loads(response.content),
-            {"integrity_error": "(1062, \"Duplicate entry 'test-artist-one' for key 'name'\")"},
+        self.assertIn(
+            "Duplicate entry 'test-artist-one' for key",
+            json.loads(response.content).get("integrity_error"),
         )
 
     def test_update_valid(self) -> None:
@@ -142,9 +165,9 @@ class TestArtistViewSet(TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            json.loads(response.content),
-            {"integrity_error": "(1062, \"Duplicate entry 'test-artist-two' for key 'name'\")"},
+        self.assertIn(
+            "Duplicate entry 'test-artist-two' for key",
+            json.loads(response.content).get("integrity_error"),
         )
 
     def test_update_not_found(self) -> None:

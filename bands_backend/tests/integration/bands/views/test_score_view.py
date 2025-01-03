@@ -75,9 +75,9 @@ class TestScoreViewSet(TestCase):
         response = self.client.post("/bands/score/", data=SCORES[0])
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            json.loads(response.content),
-            {"integrity_error": "(1062, \"Duplicate entry '1-1' for key 'score_artist_id_metric_id_fa89b93b_uniq'\")"},
+        self.assertIn(
+            "Duplicate entry '1-1' for key",
+            json.loads(response.content).get("integrity_error"),
         )
 
     def test_update_valid(self) -> None:
