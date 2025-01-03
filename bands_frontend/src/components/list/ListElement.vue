@@ -1,22 +1,33 @@
 <template>
     <div class="container">
-      <img v-if="artist.image_url" :src="artist.image_url" class="artistThumb">
-      <div v-else class="placeholder" :style="{ 'background-color': darkColor }"></div>
+      <img v-if="localArtist.image_url" :src="localArtist.image_url" class="artistImage">
+      <div v-else class="artistImage" :style="{ 'background-color': darkColor }"></div>
       <div class="details">
         <div class="header">
           <p class="name">
-            {{ artist.name }}
+            {{ localArtist.name }}
           </p>
-          <a :href="artist.spotify_url" target="_blank" class="link">
+          <a :href="localArtist.spotify_url" target="_blank" class="link">
             <external-link height="32" width="32"></external-link>
           </a>
-          <main-score :score="mainScore" :color="darkColor" style="justify-self: left;"></main-score>
+          <main-score :score="mainScore" :color="darkColor"></main-score>
         </div>
         <div class="scores">
           <div v-for="score in scores" :key="score" class="score">
-            <value-slider v-if="score.type == 'value'" :modelValue="[0, score.value]" :color="score.color" :label="score.metric"></value-slider>
-            <flag-check v-else :modelValue="score.value" :label="score.metric"></flag-check>
+            <value-slider v-if="score.type == 'value'" :modelValue="[0, score.value]" :color="score.color" :label="score.metric" :active="editing"></value-slider>
+            <flag-check v-else :modelValue="score.value" :label="score.metric" :active="editing"></flag-check>
           </div>
+        </div>
+        <div class="actions">
+          <button v-if="editing" class="button confirm" @click="edit()">
+            <check-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"></check-icon>
+          </button>
+          <button v-if="editing" class="button discard" @click="toggleEdit()">
+            <cross-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"></cross-icon>
+          </button>
+          <button v-if="!editing" class="button edit" @click="toggleEdit()">
+            <edit-icon :height="26" :width="26"></edit-icon>
+          </button>
         </div>
       </div>
     </div>
@@ -44,22 +55,42 @@ export default {
   mixins: [ColorsMixin],
   data () {
     return {
+      editing: false,
+      localArtist: this.artist,
+      backupArtist: {}
     }
   },
   computed: {
     mainScore () {
-      var mainScore = this.artist.scores.filter(score => score.category == "main_score")[0]
+      var mainScore = this.localArtist.scores.filter(score => score.category == "main_score")[0]
 
       return mainScore !== undefined ? mainScore.value : 0
     },
     scores () {
-      return this.addColors(this.artist.scores.filter(score => score.category !== "main_score"))
+      return this.addColors(this.localArtist.scores.filter(score => score.category !== "main_score"))
     },
     lightColor () {
       return `var(--light${this.color})`
     },
     darkColor () {
       return `var(--dark${this.color})`
+    }
+  },
+  methods: {
+    toggleEdit () {
+      if (this.editing) {
+        this.localArtist = this.backupArtist
+      } else {
+        this.backupArtist = this.localArtist
+      }
+
+      this.editing = !this.editing
+    },
+    edit () {
+      if (this.editing) {
+        console.log("edited")
+        this.toggleEdit()
+      }
     }
   }
 }
@@ -76,10 +107,25 @@ div.container {
   margin-bottom: 10px;
 }
 
+.artistImage {
+  margin: 8px 0px 8px 10px;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  margin-left: 10px;
+  margin-top: 8px;
+}
+
+div.artistImage {
+  flex-shrink: 0;
+  background-color: v-bind("darkColor");
+}
+
 div.details {
   display: flex;
   flex-direction: column;
   flex-grow: 10;
+  margin-left: 20px;
 }
 
 div.header {
@@ -95,7 +141,6 @@ div.scores {
 }
 
 div.score {
-  margin-left: 20px;
   margin-right: 20px;
   margin-top: 0px;
 }
@@ -106,25 +151,7 @@ p.name {
   font-weight: 500;
   margin-top: 0px;
   margin-bottom: 0px;
-  margin-left: 30px;
   max-width: 500px;
-}
-
-img.artistThumb {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  margin-left: 10px;
-  margin-top: 8px;
-}
-
-div.placeholder {
-  width: 180px;
-  height: 180px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  margin-left: 10px;
-  margin-top: 8px;
 }
 
 a.link {
@@ -139,4 +166,61 @@ a.link:active {
   color: v-bind("lightColor")
 }
 
+
+div.actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 4px;
+  margin-bottom: 4px
+}
+
+button.button {
+  border: none;
+  transition: all 0.1s;
+  height: 32px;
+  width: 32px;  
+  background: none;
+  margin-left: 4px;
+  align-items: center;
+}
+
+button.edit {
+  background-color: v-bind("lightColor");
+  color: v-bind("darkColor");
+}
+button.edit:hover {  
+  background-color: v-bind("darkColor");
+  color: v-bind("lightColor");
+} 
+button.edit:active {
+  background-color: v-bind("lightColor");
+  color: v-bind("darkColor")
+}
+
+button.discard {
+  background-color: var(--lightred);
+  color: var(--darkred);
+}
+button.discard:hover {  
+  background-color: var(--darkred);
+  color: var(--lightred);
+} 
+button.discard:active {
+  background-color: var(--lightred);
+  color: var(--darkred)
+}
+
+button.confirm {
+  background-color: var(--lightgreen);
+  color: var(--darkgreen);
+}
+button.confirm:hover {  
+  background-color: var(--darkgreen);
+  color: var(--lightgreen);
+} 
+button.confirm:active {
+  background-color: var(--lightgreen);
+  color: var(--darkgreen);
+}
 </style>
