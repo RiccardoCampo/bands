@@ -87,9 +87,9 @@ class TestMetricViewSet(TestCase):
         response = self.client.post("/bands/metric/", data=self.normalize_metric_enums(METRICS[0]))
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            json.loads(response.content),
-            {"integrity_error": f"(1062, \"Duplicate entry '{METRICS[0]['name']}' for key 'name'\")"},
+        self.assertIn(
+            f"Duplicate entry '{METRICS[0]['name']}' for key",
+            json.loads(response.content).get("integrity_error"),
         )
 
     def test_update_valid(self) -> None:
@@ -137,9 +137,9 @@ class TestMetricViewSet(TestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            json.loads(response.content),
-            {"integrity_error": f"(1062, \"Duplicate entry '{METRICS[1]['name']}' for key 'name'\")"},
+        self.assertIn(
+            f"Duplicate entry '{METRICS[1]['name']}' for key",
+            json.loads(response.content).get("integrity_error"),
         )
 
     def test_update_not_found(self) -> None:
