@@ -1,19 +1,25 @@
 import ArtistsAPIRepository from '@/services/API/ArtistsAPIRepository'
+import ScoresAPIRepository from '@/services/API/ScoresAPIRepository'
 import {defineStore} from 'pinia'
 
 export const useArtistsList = defineStore('artists-list', {
     state: () => ({
-        artists: [],
+        artistsMap: new Map(),
         page: 1,
         query: ""
     }),
+    getters: {
+      artists: (state) => Array.from(state.artistsMap.values()),
+    },
     actions: {
       async fetchArtists(name, metrics) {
         try {
           await ArtistsAPIRepository
             .index(1, name, metrics)
             .then(response => {
-              this.artists = response.data.results
+              response.data.results.forEach((artist) => {this.artistsMap.set(artist.id, artist)})
+
+              console.log(response.data.results)
 
               this.page = response.data.next === null ? null : 2 
             })
@@ -34,7 +40,7 @@ export const useArtistsList = defineStore('artists-list', {
           await ArtistsAPIRepository
             .index(this.page, this.query)
             .then(response => {
-              this.artists.push(...response.data.results)
+              response.data.results.forEach((artist) => {this.artistsMap.set(artist.id, artist)})
               
               this.page = response.data.next === null ? null : this.page + 1 
             })
@@ -46,12 +52,34 @@ export const useArtistsList = defineStore('artists-list', {
       },
       async addArtist(artist) {
         try {
+          var artistId
+
           await ArtistsAPIRepository
             .create(artist)
             .then(response => {
-              console.log(response.data)
-              this.artists.push(response.data)
+              artistId = response.data.id
             })
+
+          await ScoresAPIRepository.create(artistId, 1, 1)
+
+          await ArtistsAPIRepository.retrieve(artistId).then(response => {
+            this.artistsMap.set(artistId, response.data)
+          })
+            
+          return Promise.resolve()
+        } catch (error) {
+          return Promise.reject(error)
+        }
+      },
+      async updateArtist(artist) {
+        try {
+          await ArtistsAPIRepository.update(artist)
+  
+          artist.scores.forEach(async score => {
+            await ScoresAPIRepository.update(score.id, score.value)
+          }); 
+  
+          this.artistsMap.set(artist.id, artist)
             
           return Promise.resolve()
         } catch (error) {
