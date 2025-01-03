@@ -234,7 +234,6 @@ export default {
   button.suggestedMetric {
     border: none;
     transition: all 0.1s;
-    border-radius: 25%;
     background: none;
   }
 
@@ -259,9 +258,7 @@ export default {
   button.selectedMetric {
     border: none;
     transition: all 0.1s;
-    border-radius: 25%;
     margin-left: 85px;
-    margin-bottom: -20px;
     height: 20px;
     width: 20px;
     background: none;

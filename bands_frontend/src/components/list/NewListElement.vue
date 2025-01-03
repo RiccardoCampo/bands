@@ -140,7 +140,6 @@ div.buttons {
 button.button {
   border: none;
   transition: all 0.1s;
-  border-radius: 25%;
   height: 32px;
   width: 32px;
   background: none;
