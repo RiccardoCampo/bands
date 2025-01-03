@@ -36,7 +36,7 @@
         <button class="selectedMetric" @click="removeMetric(metric)">
           <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"></cross-icon>
         </button>
-        <value-slider v-if="metric.type == 'value'" v-model="metric.value" :label="metric.name" :color="metric.color" :active="true"></value-slider>
+        <value-slider v-if="metric.type == 'value'" v-model="metric.value" :label="metric.name" :color="metric.color" :active="true" :range="true"></value-slider>
         <flag-check v-else v-model="metric.value" :label="metric.name" :color="metric.color" :active="true"></flag-check>
       </div>
     </div>  
