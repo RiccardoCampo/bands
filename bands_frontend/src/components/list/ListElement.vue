@@ -10,7 +10,7 @@
           <a :href="localArtist.spotify_url" target="_blank" class="link">
             <external-link height="32" width="32"></external-link>
           </a>
-          <main-score :score="mainScore.value" :color="darkColor"></main-score>
+          <main-score v-model="mainScore.value" :color="darkColor" :active="editing"></main-score>
         </div>
         <div class="scores">
           <div v-for="score in scores" :key="score" class="score">
@@ -94,9 +94,10 @@ export default {
     setScores () {
       this.scores = this.addColors(this.localArtist.scores.filter(score => score.category !== "main_score"))
       this.mainScore = this.localArtist.scores.filter(score => score.category == "main_score")[0]
+      console.log(this.mainScore.value)
     }
   },
-  mounted () {
+  mounted () {  
     this.setScores()
   },
 }
