@@ -4,13 +4,22 @@
       <div v-else class="artistImage" :style="{ 'background-color': darkColor }"></div>
       <div class="details">
         <div class="header">
-          <p class="name">
+          <p class="name" v-if="!editing">
             {{ localArtist.name }}
           </p>
-          <a :href="localArtist.spotify_url" target="_blank" class="link">
+          <input v-else class="input name" v-model="localArtist.name">
+          <a v-if="!editing" :href="localArtist.spotify_url" target="_blank" class="link">
             <external-link height="32" width="32"></external-link>
           </a>
           <main-score v-model="mainScore.value" :color="darkColor" :active="editing"></main-score>
+        </div>
+        <div v-if="editing" class="link">
+          <span class="link">Image URL</span>
+          <input class="input link" v-model="localArtist.image_url">
+        </div>
+        <div v-if="editing" class="link">
+          <span class="link">Spotify URL</span>
+          <input class="input link" v-model="localArtist.spotify_url">
         </div>
         <div class="scores">
           <div v-for="score in scores" :key="score" class="score">
@@ -40,6 +49,7 @@ import ValueSlider from '../metrics/ValueSlider.vue';
 import FlagCheck from '../metrics/FlagCheck.vue';
 import { mapActions } from 'pinia';
 import { useArtistsList } from '@/store/ArtistsList';
+import { usePageStatus } from '@/store/PageStatus';
 
 
 
@@ -48,6 +58,7 @@ export default {
   props: {
       artist: Object,
       color: String,
+      new: Boolean,
   },
   components: {
     "main-score": MainScore,
@@ -58,9 +69,9 @@ export default {
   data () {
     return {
       editing: false,
-      name: this.artist.name,
-      localArtist: this.artist,
-      mainScore: {value: 0},
+      name: "",
+      localArtist: "",
+      mainScore: {},
       scores: [],
       backupArtist: {}
     }
@@ -74,8 +85,14 @@ export default {
     }
   },
   methods: {
-    ...mapActions(useArtistsList, ["updateArtist"]),
+    ...mapActions(usePageStatus, ["hideNewArtist"]),
+    ...mapActions(useArtistsList, ["addArtist", "updateArtist"]),
     toggleEdit () {
+      if (this.new) {
+        this.hideNewArtist()
+        return
+      }
+
       if (this.editing) {
         this.localArtist = this.backupArtist
         this.setScores()
@@ -85,19 +102,28 @@ export default {
 
       this.editing = !this.editing
     },
-    edit () {
-      this.localArtist.scores = [...this.scores, this.mainScore]
-      this.updateArtist(this.localArtist)
-      this.setScores()
-      this.editing = false
+    async edit () {
+      if (this.new) {
+        await this.addArtist(this.localArtist)
+        this.hideNewArtist()
+      }
+      else {
+        this.localArtist.scores = [...this.scores, this.mainScore]
+        await this.updateArtist(this.localArtist)
+        this.setScores()
+        this.editing = false
+      }
     },
     setScores () {
       this.scores = this.addColors(this.localArtist.scores.filter(score => score.category !== "main_score"))
       this.mainScore = this.localArtist.scores.filter(score => score.category == "main_score")[0]
-      console.log(this.mainScore.value)
     }
   },
-  mounted () {  
+  mounted () {
+    // TODO properly get first metric id.
+    this.localArtist = this.new ? {name: "New Artist", scores: [{value: 1, type: 1, category: "main_score", metricId: 1}]} : this.artist
+    this.name = this.localArtist.name
+    this.editing = this.new
     this.setScores()
   },
 }
@@ -160,6 +186,44 @@ p.name {
   margin-bottom: 0px;
   max-width: 500px;
 }
+
+input.input  {
+  font-family: regular;
+  color: var(--black);
+  text-align: left;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  border: none;
+  border-bottom: 2px solid v-bind("lightColor");
+}
+input.input:focus {
+  outline: none;
+  border-bottom-color: v-bind("darkColor");
+}
+
+input.name {
+  font-size: 4pc;
+  font-weight: 500;
+  width: 430px;
+}
+
+div.link {
+  margin-right: auto;
+}
+
+input.link {
+  font-size: 1.5pc;
+  width: 340px;
+}
+
+span.link {
+  display: inline-block;
+  text-align: left;
+  min-width: 90px;
+  font-weight: 500;
+  font-size: 1.2pc;
+}
+
 
 a.link {
   color: var(--black);

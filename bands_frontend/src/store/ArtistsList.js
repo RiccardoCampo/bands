@@ -60,7 +60,9 @@ export const useArtistsList = defineStore('artists-list', {
               artistId = response.data.id
             })
 
-          await ScoresAPIRepository.create(artistId, 1, 1)
+          for (const score of artist.scores) {
+            await ScoresAPIRepository.create(artistId, score.metricId, score.value)
+          }
 
           await ArtistsAPIRepository.retrieve(artistId).then(response => {
             this.artistsMap.set(artistId, response.data)
@@ -74,10 +76,10 @@ export const useArtistsList = defineStore('artists-list', {
       async updateArtist(artist) {
         try {
           await ArtistsAPIRepository.update(artist)
-  
-          artist.scores.forEach(async score => {
+          
+          for (const score of artist.scores) {
             await ScoresAPIRepository.update(score.id, score.value)
-          }); 
+          }
   
           this.artistsMap.set(artist.id, artist)
             

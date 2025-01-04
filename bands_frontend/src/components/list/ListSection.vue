@@ -1,7 +1,7 @@
 <template>
   <div v-if="this.hasResults" class="listContainer" @scroll="onScroll">
     <div class="list">
-      <new-list-element v-if="newArtistActive"></new-list-element>
+      <list-element v-if="newArtistActive" :new="true" color="green"></list-element>
       <list-element v-for="artist in displayArtists" :key="artist" :artist="artist" :color="artist.color"></list-element>
     </div>
   </div>
@@ -14,14 +14,12 @@ import ListElement from './ListElement.vue';
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import { usePageStatus } from '@/store/PageStatus';
 import { useArtistsList } from '@/store/ArtistsList';
-import NewListElement from './NewListElement.vue';
 
 
 export default {
   name: 'ListSection',
   components: {
     'list-element': ListElement,
-    'new-list-element': NewListElement,
   },
   mixins: [ColorsMixin],
   computed: {
