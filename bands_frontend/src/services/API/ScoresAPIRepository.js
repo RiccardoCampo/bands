@@ -8,5 +8,8 @@ export default {
   },
   async update (id, value) {
     return axios.put(`${BASE_URL}${id}/`, {"value": value})
+  },
+  async destroy (id) {
+    return axios.delete(`${BASE_URL}${id}/`)
   }
 };
