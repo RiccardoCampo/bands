@@ -9,7 +9,12 @@
             <span v-if="isSliding">{{ this.maxValue }}</span>
         </div>
     </div>
-    <p style="font-size: 1.4pc; margin-top: 7px; margin-bottom: 7px">{{ label }}</p>
+    <div class="labels">
+        <p class="label">{{ label }}</p>
+        <button v-if="active" class="discard" @click="discard">
+          <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"/>
+        </button>
+    </div>
 </template>
   
 <script>
@@ -144,6 +149,9 @@ export default {
         },
         emit () {
             this.$emit('update:modelValue', this.range ? [this.minValue, this.maxValue] : this.maxValue)
+        },
+        discard ()  {
+            this.$emit("discardMetric", this.label)
         }
     }
 }
@@ -196,6 +204,31 @@ span {
     bottom: -15px;
     left: -2px;
 }
+div.labels {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: -20px 0 7px 0;
 
+}
+p.label {
+    font-size: 1.4pc;
+}
+
+button.discard {
+    border: none;
+    transition: all 0.1s;
+    margin-left: auto;
+    height: 20px;
+    width: 20px;
+    background: none;
+}
+
+button.discard:hover {  
+    background-color: var(--lightred);
+}
+button.discard:active {
+    background-color: var(--cream);
+}
 </style>
   

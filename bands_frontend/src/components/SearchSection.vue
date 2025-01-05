@@ -22,11 +22,8 @@
 
     <div v-if="metricsPanelActive" class="metricsPanel">
       <div class="selectedMetric" v-for="metric in addColorsToMap(selectedMetrics)" :key="metric">
-        <button class="selectedMetric" @click="removeMetric(metric)">
-          <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"></cross-icon>
-        </button>
-        <value-slider v-if="metric.type == 'value'" v-model="metric.value" :label="metric.name" :color="metric.color" :active="true" :range="true"/>
-        <flag-check v-else v-model="metric.value" :label="metric.name" :color="metric.color" :active="true"/>
+        <value-slider v-if="metric.type == 'value'" v-model="metric.value" :label="metric.name" :color="metric.color" :active="true" :range="true" @discardMetric="removeMetric(metric)"/>
+        <flag-check v-else v-model="metric.value" :label="metric.name" :color="metric.color" :active="true" @discardMetric="removeMetric(metric)"/>
       </div>
     </div>  
   </div>
@@ -212,22 +209,6 @@ export default {
     width: 600px;
     flex-wrap: wrap;
     transition: all 0.1s;
-  }
-
-  button.selectedMetric {
-    border: none;
-    transition: all 0.1s;
-    margin-left: 85px;
-    height: 20px;
-    width: 20px;
-    background: none;
-  }
-
-  button.selectedMetric:hover {  
-    background-color: var(--lightred);
-  }
-  button.selectedMetric:active {
-    background-color: var(--cream);
   }
 
 </style>
