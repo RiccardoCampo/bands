@@ -13,31 +13,20 @@
         <chevron-down v-else height=32 iconColor="inherit"></chevron-down>
       </button>
 
-      <button class="searchBar plusButton" @click="showNewArtist()">
+      <button class="searchBar plusButton" @click="showNewArtist()">  
         <plus-icon height=32 width=28 iconColor="inherit"></plus-icon>
       </button>
     </div>
     
-    <div class="suggestedMetricsContainer">
-      <div class="suggestedMetrics" v-if="showSuggestionsPanel">
-        <div class="suggestedMetric" v-for="metric in suggestedMetrics" :key="metric">
-          <span style="text-align: left; font-size: 1.3pc; flex-grow: 1;">
-            {{ metric.name }}
-          </span>
-          <button class="suggestedMetric" @click="addMetric(metric)">
-            <plus-icon height=28 width=28 iconColor="var(--darkgreen)"></plus-icon>
-          </button>
-        </div>  
-      </div>
-    </div>
+    <metrics-selector v-if="showSuggestionsPanel" width="500px" color="var(--darkyellow)" style="left: -54px" :metrics="suggestedMetrics" @metricSelected="addMetric"/>
 
     <div v-if="metricsPanelActive" class="metricsPanel">
       <div class="selectedMetric" v-for="metric in addColorsToMap(selectedMetrics)" :key="metric">
         <button class="selectedMetric" @click="removeMetric(metric)">
           <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"></cross-icon>
         </button>
-        <value-slider v-if="metric.type == 'value'" v-model="metric.value" :label="metric.name" :color="metric.color" :active="true" :range="true"></value-slider>
-        <flag-check v-else v-model="metric.value" :label="metric.name" :color="metric.color" :active="true"></flag-check>
+        <value-slider v-if="metric.type == 'value'" v-model="metric.value" :label="metric.name" :color="metric.color" :active="true" :range="true"/>
+        <flag-check v-else v-model="metric.value" :label="metric.name" :color="metric.color" :active="true"/>
       </div>
     </div>  
   </div>
@@ -52,6 +41,7 @@ import { mapActions, mapState } from 'pinia';
 import ValueSlider from './metrics/ValueSlider.vue';
 import FlagCheck from './metrics/FlagCheck.vue';
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
+import MetricsSelector from './MetricsSelector.vue';
 
 
 export default {
@@ -67,14 +57,15 @@ export default {
     }
   },
   components: {
+    "metrics-selector": MetricsSelector,
     "value-slider": ValueSlider,
-    "flag-check": FlagCheck
+    "flag-check": FlagCheck,
   },
   mixins: [
     ColorsMixin,
   ],
   async mounted () {
-    await this.fetchMetrics(this.text).catch((error) => {console.log(error)})
+    await this.fetchMetrics().catch((error) => {console.log(error)})
   },
   methods: {
     ...mapActions(usePageStatus, ['activateList', 'showNewArtist']),
@@ -212,38 +203,6 @@ export default {
     margin-bottom: 0px;
   }
   
-  div.suggestedMetricsContainer {
-    position: relative;
-    left: -54px;  
-    width: 500px;
-  }
-
-  div.suggestedMetrics {
-    position: absolute;
-    z-index: 100;
-    background-color: var(--cream);
-    box-shadow: 2px 2px 2px var(--darkyellow);
-  }
-
-  div.suggestedMetric {
-    display: flex;
-    width: 500px;
-    margin-left: 10px;
-  }
-
-  button.suggestedMetric {
-    border: none;
-    transition: all 0.1s;
-    background: none;
-  }
-
-  button.suggestedMetric:hover {  
-    background-color: var(--lightgreen);
-  }
-  button.suggestedMetric:active {
-    background-color: var(--cream);
-  }
-
   div.metricsPanel {
     display: flex;
     align-items: center;
