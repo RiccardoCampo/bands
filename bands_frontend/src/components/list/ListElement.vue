@@ -27,14 +27,18 @@
             <flag-check v-else v-model="score.value" :label="score.metric" :active="editing"></flag-check>
           </div>
         </div>
+        <button v-if="editing" class="button edit" @click="toggleMetricsPanel">
+          <plus-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+        </button>
+        <metric-selector v-if="editing && metricsPanelActive" width="300px" :color="lightColor" :metrics="newMetrics" @metricSelected="addScore" />
         <div class="actions">
-          <button v-if="editing" class="button confirm" @click="edit()">
+          <button v-if="editing" class="button confirm" @click="edit">
             <check-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"></check-icon>
           </button>
-          <button v-if="editing" class="button discard" @click="toggleEdit()">
+          <button v-if="editing" class="button discard" @click="toggleEdit">
             <cross-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"></cross-icon>
           </button>
-          <button v-if="!editing" class="button edit" @click="toggleEdit()">
+          <button v-if="!editing" class="button edit" @click="toggleEdit">
             <edit-icon :height="26" :width="26"></edit-icon>
           </button>
         </div>
@@ -47,9 +51,11 @@ import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import MainScore from './MainScore.vue';
 import ValueSlider from '../metrics/ValueSlider.vue';
 import FlagCheck from '../metrics/FlagCheck.vue';
-import { mapActions } from 'pinia';
+import { mapActions, mapState } from 'pinia';
 import { useArtistsList } from '@/store/ArtistsList';
 import { usePageStatus } from '@/store/PageStatus';
+import MetricsSelector from '../MetricsSelector.vue';
+import { useMetrics } from '@/store/Metrics';
 
 
 
@@ -63,7 +69,8 @@ export default {
   components: {
     "main-score": MainScore,
     "value-slider": ValueSlider,
-    "flag-check": FlagCheck
+    "flag-check": FlagCheck,
+    "metric-selector": MetricsSelector,
   },
   mixins: [ColorsMixin],
   data () {
@@ -73,10 +80,13 @@ export default {
       localArtist: "",
       mainScore: {},
       scores: [],
-      backupArtist: {}
+      backupArtist: {},
+      metricsPanelActive: false,
+      newMetrics: []
     }
   },
   computed: {
+    ...mapState(useMetrics, ['metrics']),
     lightColor () {
       return `var(--light${this.color})`
     },
@@ -117,11 +127,22 @@ export default {
     setScores () {
       this.scores = this.addColors(this.localArtist.scores.filter(score => score.category !== "main_score"))
       this.mainScore = this.localArtist.scores.filter(score => score.category == "main_score")[0]
+    },
+    toggleMetricsPanel() {
+      this.metricsPanelActive = !this.metricsPanelActive
+
+      if (this.metricsPanelActive) {{
+        const currentMetrics = [...this.scores.map(score => score.metric), this.mainScore.metric]
+        this.newMetrics = this.metrics.filter((metric) => {return !currentMetrics.includes(metric.name)})
+      }}
+    },  
+    addScore(metric) {
+      this.scores.push({metric: metric.name, value: 1, metricId: metric.id, type: metric.type})
+      this.toggleMetricsPanel()
     }
   },
   mounted () {
-    // TODO properly get first metric id.
-    this.localArtist = this.new ? {name: "New Artist", scores: [{value: 1, type: 1, category: "main_score", metricId: 1}]} : this.artist
+    this.localArtist = this.new ? {name: "New Artist", scores: [{value: 1, type: 1, category: "main_score", metricId: this.metrics[0].id}]} : this.artist
     this.name = this.localArtist.name
     this.editing = this.new
     this.setScores()
