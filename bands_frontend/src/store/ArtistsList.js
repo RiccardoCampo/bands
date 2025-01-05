@@ -73,7 +73,7 @@ export const useArtistsList = defineStore('artists-list', {
           return Promise.reject(error)
         }
       },
-      async updateArtist(artist) {
+      async updateArtist(artist, scoreIdsToDelete) {
         try {
           await ArtistsAPIRepository.update(artist)
           
@@ -82,6 +82,10 @@ export const useArtistsList = defineStore('artists-list', {
               await ScoresAPIRepository.update(score.id, score.value)
             else
               await ScoresAPIRepository.create(artist.id, score.metricId, score.value)
+          }
+
+          for (const scoreId of scoreIdsToDelete) {
+            await ScoresAPIRepository.destroy(scoreId)
           }
   
           this.artistsMap.set(artist.id, artist)
