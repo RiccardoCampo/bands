@@ -1,10 +1,8 @@
 <template>
     <div class="mainScoreContainer" @mouseleave="resetScore()">
-        <button class="score" v-for="index in displayScore" :key="index" @click="setScore(index)" @mouseover="setDisplayScore(index)">
-            <star-filled-icon :height="24" :width="24" :iconColor="color"></star-filled-icon>
-        </button>
-        <button class="score" v-for="index in (5 - displayScore)" :key="index" @click="setScore(index + displayScore)" @mouseenter="setDisplayScore(index + displayScore)">
-            <star-icon :height="24" :width="24" :iconColor="color"></star-icon>
+        <button class="score" v-for="index in 5" :key="index" @click="setScore(index)" @mouseenter="setDisplayScore(index)">
+          <star-filled-icon v-if="index <= displayScore" :height="24" :width="24" :iconColor="color"></star-filled-icon>
+          <star-icon v-else :height="24" :width="24" :iconColor="color"></star-icon>
         </button>
     </div>
 </template>
@@ -21,12 +19,8 @@ export default {
   data () {
     return {
         score: this.modelValue,
-        displayScore: 4,
+        displayScore: this.modelValue,
     }
-  },
-  updated () {
-    this.score = this.modelValue
-    this.displayScore = this.score
   },
   methods: {
     setScore(value) {
@@ -44,6 +38,12 @@ export default {
     resetScore() {
         if (this.active)
             this.displayScore = this.score
+    }
+  },
+  watch: {
+    modelValue(newValue) {
+      this.score = newValue
+      this.displayScore = this.score
     }
   }
 }
