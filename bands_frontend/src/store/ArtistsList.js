@@ -78,7 +78,10 @@ export const useArtistsList = defineStore('artists-list', {
           await ArtistsAPIRepository.update(artist)
           
           for (const score of artist.scores) {
-            await ScoresAPIRepository.update(score.id, score.value)
+            if (score.id !== undefined)
+              await ScoresAPIRepository.update(score.id, score.value)
+            else
+              await ScoresAPIRepository.create(artist.id, score.metricId, score.value)
           }
   
           this.artistsMap.set(artist.id, artist)
