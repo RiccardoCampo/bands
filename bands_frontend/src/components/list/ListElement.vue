@@ -23,8 +23,8 @@
         </div>
         <div class="scores">
           <div v-for="score in scores" :key="score" class="score">
-            <value-slider v-if="score.type == 'value'" v-model="score.value" :color="score.color" :label="score.metric" :active="editing"></value-slider>
-            <flag-check v-else v-model="score.value" :label="score.metric" :active="editing"></flag-check>
+            <value-slider v-if="score.type == 'value'" v-model="score.value" :color="score.color" :label="score.metric" :active="editing" @discardMetric="removeScore(score)"></value-slider>
+            <flag-check v-else v-model="score.value" :label="score.metric" :active="editing" @discardMetric="removeScore(score)"></flag-check>
           </div>
         </div>
         <button v-if="editing" class="button edit" @click="toggleMetricsPanel">
@@ -82,7 +82,8 @@ export default {
       scores: [],
       backupArtist: {},
       metricsPanelActive: false,
-      newMetrics: []
+      newMetrics: [],
+      scoresToRemove: [],
     }
   },
   computed: {
@@ -119,7 +120,7 @@ export default {
       }
       else {
         this.localArtist.scores = [...this.scores, this.mainScore]
-        await this.updateArtist(this.localArtist)
+        await this.updateArtist(this.localArtist, this.scoresToRemove)
         this.setScores()
         this.editing = false
       }
@@ -127,6 +128,7 @@ export default {
     setScores () {
       this.scores = this.addColors(this.localArtist.scores.filter(score => score.category !== "main_score"))
       this.mainScore = this.localArtist.scores.filter(score => score.category == "main_score")[0]
+      this.scoresToRemove = []
     },
     toggleMetricsPanel() {
       this.metricsPanelActive = !this.metricsPanelActive
@@ -139,6 +141,12 @@ export default {
     addScore(metric) {
       this.scores.push({metric: metric.name, value: 1, metricId: metric.id, type: metric.type})
       this.toggleMetricsPanel()
+    },
+    removeScore(score) {
+      if (score.id != undefined)
+        this.scoresToRemove.push(score.id)
+
+      this.scores = this.scores.filter((checkScore) => { return checkScore.metric !== score.metric })
     }
   },
   mounted () {
