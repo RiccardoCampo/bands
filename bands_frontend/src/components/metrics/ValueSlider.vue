@@ -1,27 +1,35 @@
 <template>
-    <div class="container" ref="container" :onmouseup="moveSlider" :onmouseleave="stopSliding" :onmousemove="slide">
-        <div class="backFill"></div>
-        <div v-if="active" class="thumb" :onmousedown="startSlidingLeft">
-            <span v-if="isSliding">{{ this.minValue + 1 }}</span>
+    <div class="mainContainer">
+        <div class="sliderContainer" ref="container" :onmouseup="moveSlider" :onmouseleave="stopSliding" :onmousemove="slide">
+            <div class="backFill"></div>
+            <div v-if="active & range" class="thumb" :onmousedown="startSlidingLeft">
+                <span class="scoreTooltip" v-if="isSliding">{{ this.minValue + 1 }}</span>
+            </div>
+            <div class="fill"></div>
+            <div class="thumb" :onmousedown="startSlidingRight">
+                <span class="scoreTooltip" v-if="isSliding">{{ this.maxValue }}</span>
+            </div>
         </div>
-        <div class="fill"></div>
-        <div class="thumb" :onmousedown="startSlidingRight">
-            <span v-if="isSliding">{{ this.maxValue }}</span>
+        <div class="labels">
+            <span class="label">{{ label }}</span>
+            <button v-if="active" class="discard" @click="discard">
+                <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"/>
+            </button>
         </div>
     </div>
-    <p style="font-size: 1.4pc; margin-top: 7px; margin-bottom: 7px">{{ label }}</p>
 </template>
   
 <script>
 
 export default {
     name: 'ValueSlider',
+    emits: ["discardMetric", "update:modelValue"],
     props: {
         label: {
             type: String
         },
         modelValue: {
-            type: Array,
+            type: [Array, Number],
             default: () => {return [0, 1]}
         },
         color: {
@@ -39,6 +47,10 @@ export default {
         active: {
             type: Boolean,
             default: false
+        },
+        range: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -52,7 +64,7 @@ export default {
     },
     mounted () {
         this.sliderPosition = this.$refs["container"].getBoundingClientRect().x
-        this.maxValue = Math.max(this.modelValue[1], 1)
+        this.maxValue = this.range ? Math.max(this.modelValue[1], 1) : this.modelValue
         this.emit()
     },
     computed: {
@@ -89,10 +101,10 @@ export default {
     },
     methods: {
         startSlidingRight () {
-            this.slidingRight = this.active && true
+            this.slidingRight = this.active
         },
         startSlidingLeft () {
-            this.slidingLeft = this.active && true
+            this.slidingLeft = this.active & this.range
         },
         stopSliding (event) {
             if (this.active && this.slidingRight) {
@@ -122,11 +134,15 @@ export default {
                 } else if (this.slidingRight) {
                     this.updateMaxValueFromPosition(position)
                     this.slidingRight = false
-                // If the cursor stands from the first half of the selected bar or left of the left thumb.
-                } else if (position - (this.maxValue - this.minValue) / 2 * this.stepWidth < this.sliderPosition + this.minValue * this.stepWidth) {
-                    this.updateMinValueFromPosition(position)
+                } else if (this.range) {
+                    // If the cursor stands from the first half of the selected bar or left of the left thumb.
+                    if (position - (this.maxValue - this.minValue) / 2 * this.stepWidth < this.sliderPosition + this.minValue * this.stepWidth)
+                        this.updateMinValueFromPosition(position)
+                    else 
+                        this.updateMaxValueFromPosition(position)
                 } else {
-                    this.updateMaxValueFromPosition(position)
+                    if (position < this.sliderPosition + 5 * this.stepWidth)
+                        this.updateMaxValueFromPosition(position)
                 }
             }
         },
@@ -139,7 +155,10 @@ export default {
             this.emit()
         },
         emit () {
-            this.$emit('update:modelValue', [this.minValue, this.maxValue])
+            this.$emit('update:modelValue', this.range ? [this.minValue, this.maxValue] : this.maxValue)
+        },
+        discard ()  {
+            this.$emit("discardMetric", this.label)
         }
     }
 }
@@ -148,7 +167,12 @@ export default {
 
 <style scoped>
 
-div.container {
+div.mainContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+div.sliderContainer {
     margin: 5px;
     display: flex;
     height: v-bind("sliderHeight");
@@ -185,13 +209,37 @@ div.thumb:hover {
     background-color: v-bind("thumbHoverColor");
 }
 
-span {
+span.scoreTooltip {
     user-select: none;
     color: var(--grey);
     position: relative;
     bottom: -15px;
     left: -2px;
 }
+div.labels {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 2px 0 7px 0;
+}
+span.label {
+    font-size: 1.4pc;
+}
 
+button.discard {
+    border: none;
+    transition: all 0.1s;
+    margin-left: auto;
+    height: 20px;
+    width: 20px;
+    background: none;
+}
+
+button.discard:hover {  
+    background-color: var(--lightred);
+}
+button.discard:active {
+    background-color: var(--cream);
+}
 </style>
   

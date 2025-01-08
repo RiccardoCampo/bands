@@ -4,9 +4,14 @@
             <check-icon v-if="value" :height="height" :width="width" iconColor="var(--darkgreen)"></check-icon>
             <cross-icon v-else :height="height" :width="width" iconColor="var(--darkred)"></cross-icon>
         </div>
+    </div>    
+    <div class="labels">
+        <p class="label">{{ label }}</p>
+        <button v-if="active" class="discard" @click="discard">
+          <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"/>
+        </button>
     </div>
-    <p style="font-size: 1.4pc; margin-top: -5px; margin-bottom: 7px">{{ label }}</p>
-</template>
+</template> 
   
 <script>
 
@@ -65,7 +70,10 @@ export default {
         },
         emit () {
             this.$emit('update:modelValue', this.value ? 1: 0)
-        }
+        },
+        discard ()  {
+            this.$emit("discardMetric", this.label)
+        },
     }
 }
 
@@ -90,5 +98,30 @@ div.outline:hover {
     background-color: v-bind("hoverColor");
 }
 
+div.labels {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: -27px 0 7px 0;
+}
+p.label {
+    font-size: 1.4pc;
+}
+
+button.discard {
+    border: none;
+    transition: all 0.1s;
+    margin-left: auto;
+    height: 20px;
+    width: 20px;
+    background: none;
+}
+
+button.discard:hover {  
+    background-color: var(--lightred);
+}
+button.discard:active {
+    background-color: var(--cream);
+}
 </style>
   
