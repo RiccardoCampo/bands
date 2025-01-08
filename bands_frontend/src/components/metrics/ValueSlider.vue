@@ -12,7 +12,7 @@
         </div>
         <div class="labels">
             <span class="label">{{ label }}</span>
-            <button v-if="active" class="discard" @click="discard">
+            <button v-if="active" class="discard" @click="discard" title="Discard Metric">
                 <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"/>
             </button>
         </div>

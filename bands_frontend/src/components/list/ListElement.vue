@@ -27,18 +27,18 @@
             <flag-check v-else v-model="score.value" :label="score.metric" :active="editing" @discardMetric="removeScore(score)"></flag-check>
           </div>
         </div>
-        <button v-if="editing" class="button edit" @click="toggleMetricsPanel">
+        <button v-if="editing" class="button edit" @click="toggleMetricsPanel" title="Add Score">
           <plus-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
         </button>
         <metric-selector v-if="editing && metricsPanelActive" width="300px" :color="color" :metrics="newMetrics" :allowNewMetric="true" @metricSelected="addScore" />
         <div class="actions">
-          <button v-if="editing" class="button confirm" @click="edit">
+          <button v-if="editing" class="button confirm" @click="edit" title="Confirm Changes">
             <check-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
           </button>
-          <button v-if="editing" class="button discard" @click="toggleEdit">
+          <button v-if="editing" class="button discard" @click="toggleEdit" title="Discard Changes">
             <cross-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
           </button>
-          <button v-if="!editing" class="button edit" @click="toggleEdit">
+          <button v-if="!editing" class="button edit" @click="toggleEdit" title="Edit Artist">
             <edit-icon :height="26" :width="26"/>
           </button>
         </div>
