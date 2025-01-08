@@ -18,7 +18,7 @@
       </button>
     </div>
     
-    <metrics-selector v-if="showSuggestionsPanel" width="500px" color="var(--darkyellow)" style="left: -54px" :metrics="suggestedMetrics" @metricSelected="addMetric"/>
+    <metrics-selector v-if="showSuggestionsPanel" width="500px" color="yellow" style="left: -54px" :metrics="suggestedMetrics" @metricSelected="addMetric"/>
 
     <div v-if="metricsPanelActive" class="metricsPanel">
       <div class="selectedMetric" v-for="metric in addColorsToMap(selectedMetrics)" :key="metric">
