@@ -224,6 +224,7 @@ input.input  {
   margin-bottom: 0px;
   border: none;
   border-bottom: 2px solid v-bind("lightColor");
+  background-color: var(--white);
 }
 input.input:focus {
   outline: none;
