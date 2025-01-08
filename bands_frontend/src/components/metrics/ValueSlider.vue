@@ -1,19 +1,21 @@
 <template>
-    <div class="container" ref="container" :onmouseup="moveSlider" :onmouseleave="stopSliding" :onmousemove="slide">
-        <div class="backFill"></div>
-        <div v-if="active & range" class="thumb" :onmousedown="startSlidingLeft">
-            <span v-if="isSliding">{{ this.minValue + 1 }}</span>
+    <div class="mainContainer">
+        <div class="sliderContainer" ref="container" :onmouseup="moveSlider" :onmouseleave="stopSliding" :onmousemove="slide">
+            <div class="backFill"></div>
+            <div v-if="active & range" class="thumb" :onmousedown="startSlidingLeft">
+                <span class="scoreTooltip" v-if="isSliding">{{ this.minValue + 1 }}</span>
+            </div>
+            <div class="fill"></div>
+            <div class="thumb" :onmousedown="startSlidingRight">
+                <span class="scoreTooltip" v-if="isSliding">{{ this.maxValue }}</span>
+            </div>
         </div>
-        <div class="fill"></div>
-        <div class="thumb" :onmousedown="startSlidingRight">
-            <span v-if="isSliding">{{ this.maxValue }}</span>
+        <div class="labels">
+            <span class="label">{{ label }}</span>
+            <button v-if="active" class="discard" @click="discard">
+                <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"/>
+            </button>
         </div>
-    </div>
-    <div class="labels">
-        <p class="label">{{ label }}</p>
-        <button v-if="active" class="discard" @click="discard">
-          <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"/>
-        </button>
     </div>
 </template>
   
@@ -21,12 +23,13 @@
 
 export default {
     name: 'ValueSlider',
+    emits: ["discardMetric", "update:modelValue"],
     props: {
         label: {
             type: String
         },
         modelValue: {
-            type: Array,
+            type: [Array, Number],
             default: () => {return [0, 1]}
         },
         color: {
@@ -98,10 +101,10 @@ export default {
     },
     methods: {
         startSlidingRight () {
-            this.slidingRight = this.active & this.range
+            this.slidingRight = this.active
         },
         startSlidingLeft () {
-            this.slidingLeft = this.active
+            this.slidingLeft = this.active & this.range
         },
         stopSliding (event) {
             if (this.active && this.slidingRight) {
@@ -131,11 +134,15 @@ export default {
                 } else if (this.slidingRight) {
                     this.updateMaxValueFromPosition(position)
                     this.slidingRight = false
-                // If the cursor stands from the first half of the selected bar or left of the left thumb.
-                } else if (this.range && (position - (this.maxValue - this.minValue) / 2 * this.stepWidth < this.sliderPosition + this.minValue * this.stepWidth)) {
-                    this.updateMinValueFromPosition(position)
+                } else if (this.range) {
+                    // If the cursor stands from the first half of the selected bar or left of the left thumb.
+                    if (position - (this.maxValue - this.minValue) / 2 * this.stepWidth < this.sliderPosition + this.minValue * this.stepWidth)
+                        this.updateMinValueFromPosition(position)
+                    else 
+                        this.updateMaxValueFromPosition(position)
                 } else {
-                    this.updateMaxValueFromPosition(position)
+                    if (position < this.sliderPosition + 5 * this.stepWidth)
+                        this.updateMaxValueFromPosition(position)
                 }
             }
         },
@@ -160,7 +167,12 @@ export default {
 
 <style scoped>
 
-div.container {
+div.mainContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+div.sliderContainer {
     margin: 5px;
     display: flex;
     height: v-bind("sliderHeight");
@@ -197,7 +209,7 @@ div.thumb:hover {
     background-color: v-bind("thumbHoverColor");
 }
 
-span {
+span.scoreTooltip {
     user-select: none;
     color: var(--grey);
     position: relative;
@@ -208,10 +220,9 @@ div.labels {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: -20px 0 7px 0;
-
+    margin: 2px 0 7px 0;
 }
-p.label {
+span.label {
     font-size: 1.4pc;
 }
 
