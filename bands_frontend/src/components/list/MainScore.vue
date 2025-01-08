@@ -1,8 +1,8 @@
 <template>
     <div class="mainScoreContainer" @mouseleave="resetScore()">
         <button class="score" v-for="index in 5" :key="index" @click="setScore(index)" @mouseenter="setDisplayScore(index)">
-          <star-filled-icon v-if="index <= displayScore" :height="24" :width="24" :iconColor="color"></star-filled-icon>
-          <star-icon v-else :height="24" :width="24" :iconColor="color"></star-icon>
+          <star-filled-icon v-if="index <= displayScore" :height="24" :width="24" :iconColor="color"/>
+          <star-icon v-else :height="24" :width="24" :iconColor="color"/>
         </button>
     </div>
 </template>

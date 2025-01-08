@@ -1,8 +1,8 @@
 <template>
     <div class="box" :onclick="toggle">
         <div class="outline">
-            <check-icon v-if="value" :height="height" :width="width" iconColor="var(--darkgreen)"></check-icon>
-            <cross-icon v-else :height="height" :width="width" iconColor="var(--darkred)"></cross-icon>
+            <check-icon v-if="value" :height="height" :width="width" iconColor="var(--darkgreen)"/>
+            <cross-icon v-else :height="height" :width="width" iconColor="var(--darkred)"/>
         </div>
     </div>    
     <div class="labels">

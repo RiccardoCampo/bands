@@ -4,8 +4,8 @@
       <input class="search" v-model="text" :oninput="getSuggestedMetrics" placeholder="type an artist or a metric...">
 
       <button class="searchBar" @click="search" @keyup.enter="search">
-        <loading-icon v-if="loading" height="32" width="32" iconColor="inherit"></loading-icon>
-        <search-icon v-else height=32 width=32 iconColor="inherit"></search-icon>
+        <loading-icon v-if="loading" height="32" width="32" iconColor="inherit"/>
+        <search-icon v-else height=32 width=32 iconColor="inherit"/>
       </button>
       
       <button class="searchBar" @click="toggleMetricsPanel()">
@@ -14,7 +14,7 @@
       </button>
 
       <button class="searchBar plusButton" @click="showNewArtist()">  
-        <plus-icon height=32 width=28 iconColor="inherit"></plus-icon>
+        <plus-icon height=32 width=28 iconColor="inherit"/>
       </button>
     </div>
     

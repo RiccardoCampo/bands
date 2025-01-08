@@ -33,13 +33,13 @@
         <metric-selector v-if="editing && metricsPanelActive" width="300px" :color="color" :metrics="newMetrics" :allowNewMetric="true" @metricSelected="addScore" />
         <div class="actions">
           <button v-if="editing" class="button confirm" @click="edit">
-            <check-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"></check-icon>
+            <check-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
           </button>
           <button v-if="editing" class="button discard" @click="toggleEdit">
-            <cross-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"></cross-icon>
+            <cross-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
           </button>
           <button v-if="!editing" class="button edit" @click="toggleEdit">
-            <edit-icon :height="26" :width="26"></edit-icon>
+            <edit-icon :height="26" :width="26"/>
           </button>
         </div>
       </div>
