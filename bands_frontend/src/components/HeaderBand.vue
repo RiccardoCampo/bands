@@ -10,6 +10,7 @@
 
 
 <script>
+import WithColorMixin from '@/mixins/WithColorMixin.vue';
 import {HeaderSliderMaxHeight, HeaderSliderMinHeight, HeaderSliderMinimizedHeight, HeaderBandSize} from '../config';
 
 /**
@@ -21,10 +22,10 @@ export default {
     name: 'HeaderBand',
     props: {
         letter: String,
-        color: String,
         position: Number,
         minimized: Boolean
     },
+    mixins: [WithColorMixin],
     data () {
         return {
             sliderPosition: 240,
@@ -49,12 +50,6 @@ export default {
         sliderHeight () {
             return (this.minimized ? 0 : 10) + "px"
         },
-        colorLight () {
-            return `var(--light${this.color})`
-        },
-        colorDark () {
-            return `var(--dark${this.color})`
-        }
     },
     methods: {
         /**
@@ -94,7 +89,7 @@ export default {
 <style scoped>
 div.band {
     flex: v-bind("flex");
-    background-color: v-bind("colorLight");
+    background-color: v-bind("lightColor");
     flex-grow: 0;
     flex-shrink: 1;
     min-width: 110px;
@@ -102,7 +97,7 @@ div.band {
 }
 div.highlighted {
     height: v-bind("highlightedHeight");
-    background-color: v-bind("colorDark");
+    background-color: v-bind("darkColor");
     transition: height 2s;
 }
 div.slider {

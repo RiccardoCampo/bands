@@ -56,6 +56,7 @@ import { useArtistsList } from '@/store/ArtistsList';
 import { usePageStatus } from '@/store/PageStatus';
 import MetricsSelector from '../MetricsSelector.vue';
 import { useMetrics } from '@/store/Metrics';
+import WithColorMixin from '@/mixins/WithColorMixin.vue';
 
 
 
@@ -63,7 +64,6 @@ export default {
   name: 'ListElement',
   props: {
       artist: Object,
-      color: String,
       new: Boolean,
   },
   components: {
@@ -72,7 +72,7 @@ export default {
     "flag-check": FlagCheck,
     "metric-selector": MetricsSelector,
   },
-  mixins: [ColorsMixin],
+  mixins: [ColorsMixin, WithColorMixin],
   data () {
     return {
       editing: false,
@@ -88,12 +88,6 @@ export default {
   },
   computed: {
     ...mapState(useMetrics, ['metrics']),
-    lightColor () {
-      return `var(--light${this.color})`
-    },
-    darkColor () {
-      return `var(--dark${this.color})`
-    }
   },
   methods: {
     ...mapActions(usePageStatus, ["hideNewArtist"]),
@@ -139,10 +133,16 @@ export default {
       }}
     },  
     addScore(metric) {
-      this.scores.push({metric: metric.name, value: 1, metricId: metric.id, type: metric.type})
+      this.scores.push({
+        metric: metric.name,
+        value: 1,
+        metricId: metric.id,
+        type: metric.type,
+        color: this.getColor(this.colorOffset + this.scores.length - 1)
+      })
       this.toggleMetricsPanel()
     },
-    removeScore(score) {
+    removeScore(score) {  
       if (score.id != undefined)
         this.scoresToRemove.push(score.id)
 

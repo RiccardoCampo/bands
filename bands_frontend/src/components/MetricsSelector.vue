@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import WithColorMixin from '@/mixins/WithColorMixin.vue';
 import { useMetrics } from '@/store/Metrics';
 import { mapActions } from 'pinia';
 
@@ -30,14 +31,14 @@ import { mapActions } from 'pinia';
 export default {
     name: 'MetricsSelector',
     props: {
-        metrics: Array,
+        metrics: Object,
         width: String,
-        color: String,
         allowNewMetric: {
             type: Boolean,
             default: false
         }
     },
+    mixins: [WithColorMixin],
     data () {
         return {
           localMetric: this.metrics,
@@ -70,14 +71,6 @@ export default {
             category: "score",
           }
         }
-    },
-    computed: {
-      lightColor () {
-        return `var(--light${this.color})`
-      },
-      darkColor () {
-        return `var(--dark${this.color})`
-      }
     }
 }
 </script>
