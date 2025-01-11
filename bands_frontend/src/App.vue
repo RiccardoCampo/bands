@@ -21,6 +21,7 @@ export default {
   mounted() {
     this.updateSize();
     window.addEventListener("resize", this.updateSize);
+    document.title = 'bands';
   },
   unmounted() {
     window.removeEventListener("resize", this.updateSize);

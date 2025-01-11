@@ -1,7 +1,9 @@
 <template>
   <div class="searchContainer">
     <div class="search">
-      <input class="search" v-model="text" :oninput="getSuggestedMetrics" placeholder="type an artist or a metric...">
+      <div class="searchInputOutline">
+        <input class="search" v-model="text" :oninput="getSuggestedMetrics" placeholder="type an artist or a metric..." @focus="toggleInputActive" @blur="toggleInputActive">
+      </div>
 
       <button class="searchBar" @click="search" @keyup.enter="search" title="Search">
         <loading-icon v-if="loading" height="32" width="32" iconColor="inherit"/>
@@ -18,7 +20,7 @@
       </button>
     </div>
     
-    <metrics-selector v-if="showSuggestionsPanel" width="500px" color="yellow" style="left: -54px" :metrics="suggestedMetrics" @metricSelected="addMetric"/>
+    <metrics-selector v-if="showSuggestionsPanel" width="496px" color="yellow" style="left: -56px" :metrics="suggestedMetrics" @metricSelected="addMetric"/>
 
     <div v-if="metricsPanelActive" class="metricsPanel">
       <div class="selectedMetric" v-for="metric in addColorsToMap(selectedMetrics)" :key="metric">
@@ -50,7 +52,8 @@ export default {
       metricsPanelActive: false,
       suggestionsPanelActive: true,
       selectedMetrics: {},
-      suggestedMetrics: {}
+      suggestedMetrics: {},
+      inputIsActive: false,
     }
   },
   components: {
@@ -115,11 +118,17 @@ export default {
       if (Object.keys(this.selectedMetrics).length <= 0)
         this.toggleMetricsPanel(false)
     },
+    toggleInputActive () {
+      this.inputIsActive = !this.inputIsActive
+    }
   },
   computed: {
     ...mapState(useMetrics, ['metrics']),
     showSuggestionsPanel() {
       return this.suggestionsPanelActive & this.text !== ""
+    },
+    searchOutlineColor() {
+      return this.inputIsActive ? "var(--darkyellow)" : "var(--darkred)"
     }
   }
 }
@@ -148,24 +157,28 @@ export default {
     width: 500px;
     height: 28px;
     outline: none;
-    border-width: 3px;
-    border-color: var(--darkred);
-    border-style: solid;
+    border-style: none;
     color: var(--grey);
-    z-index: 1;
+    z-index: 1; 
     transition: all 0.2s;
+    margin-top: 3px;
   }
+
+  div.searchInputOutline {
+    background-color: v-bind(searchOutlineColor);
+    width: 510px; 
+    height: 36px;
+  } 
 
   input.search:focus {
     border-color: var(--darkyellow);
   }
 
   button.searchBar {
-    background-color: var(--darkred);
+    background-color: var(--darkred); 
     stroke: var(--darkyellow);
     border: none;
-    height: 35.8px;
-    margin-left: -2px;
+    height: 36px;
     transition: all 0.1s;
   }
 
@@ -201,12 +214,12 @@ export default {
   }
   
   div.metricsPanel {
-    display: flex;
+    display: flex;  
     align-items: center;
     justify-content: left;
     border-style: none solid solid solid;
     border-color: var(--darkred);
-    width: 600px;
+    width: 606px;
     flex-wrap: wrap;
     transition: all 0.1s;
   }
