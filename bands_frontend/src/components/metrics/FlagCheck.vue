@@ -17,6 +17,7 @@
 
 export default {
     name: 'FlagCheck',
+    emits: ["discardMetric", "update:modelValue"],
     props: {
         label: {
             type: String
