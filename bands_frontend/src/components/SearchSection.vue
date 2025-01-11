@@ -3,18 +3,18 @@
     <div class="search">
       <input class="search" v-model="text" :oninput="getSuggestedMetrics" placeholder="type an artist or a metric...">
 
-      <button class="searchBar" @click="search" @keyup.enter="search">
-        <loading-icon v-if="loading" height="32" width="32" iconColor="inherit"></loading-icon>
-        <search-icon v-else height=32 width=32 iconColor="inherit"></search-icon>
+      <button class="searchBar" @click="search" @keyup.enter="search" title="Search">
+        <loading-icon v-if="loading" height="32" width="32" iconColor="inherit"/>
+        <search-icon v-else height=32 width=32 iconColor="inherit"/>
       </button>
       
-      <button class="searchBar" @click="toggleMetricsPanel()">
+      <button class="searchBar" @click="toggleMetricsPanel()" title="Show Metric Filters">
         <chevron-up v-if="metricsPanelActive" height=32 iconColor="inherit"></chevron-up>
         <chevron-down v-else height=32 iconColor="inherit"></chevron-down>
       </button>
 
-      <button class="searchBar plusButton" @click="showNewArtist()">  
-        <plus-icon height=32 width=28 iconColor="inherit"></plus-icon>
+      <button class="searchBar plusButton" @click="showNewArtist()" title="Add New Artist">  
+        <plus-icon height=32 width=28 iconColor="inherit"/>
       </button>
     </div>
     

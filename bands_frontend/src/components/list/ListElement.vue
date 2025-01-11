@@ -27,19 +27,19 @@
             <flag-check v-else v-model="score.value" :label="score.metric" :active="editing" @discardMetric="removeScore(score)"></flag-check>
           </div>
         </div>
-        <button v-if="editing" class="button edit" @click="toggleMetricsPanel">
+        <button v-if="editing" class="button edit" @click="toggleMetricsPanel" title="Add Score">
           <plus-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
         </button>
         <metric-selector v-if="editing && metricsPanelActive" width="300px" :color="color" :metrics="newMetrics" :allowNewMetric="true" @metricSelected="addScore" />
         <div class="actions">
-          <button v-if="editing" class="button confirm" @click="edit">
-            <check-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"></check-icon>
+          <button v-if="editing" class="button confirm" @click="edit" title="Confirm Changes">
+            <check-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
           </button>
-          <button v-if="editing" class="button discard" @click="toggleEdit">
-            <cross-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"></cross-icon>
+          <button v-if="editing" class="button discard" @click="toggleEdit" title="Discard Changes">
+            <cross-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
           </button>
-          <button v-if="!editing" class="button edit" @click="toggleEdit">
-            <edit-icon :height="26" :width="26"></edit-icon>
+          <button v-if="!editing" class="button edit" @click="toggleEdit" title="Edit Artist">
+            <edit-icon :height="26" :width="26"/>
           </button>
         </div>
       </div>
@@ -56,6 +56,7 @@ import { useArtistsList } from '@/store/ArtistsList';
 import { usePageStatus } from '@/store/PageStatus';
 import MetricsSelector from '../MetricsSelector.vue';
 import { useMetrics } from '@/store/Metrics';
+import WithColorMixin from '@/mixins/WithColorMixin.vue';
 
 
 
@@ -63,7 +64,6 @@ export default {
   name: 'ListElement',
   props: {
       artist: Object,
-      color: String,
       new: Boolean,
   },
   components: {
@@ -72,7 +72,7 @@ export default {
     "flag-check": FlagCheck,
     "metric-selector": MetricsSelector,
   },
-  mixins: [ColorsMixin],
+  mixins: [ColorsMixin, WithColorMixin],
   data () {
     return {
       editing: false,
@@ -88,12 +88,6 @@ export default {
   },
   computed: {
     ...mapState(useMetrics, ['metrics']),
-    lightColor () {
-      return `var(--light${this.color})`
-    },
-    darkColor () {
-      return `var(--dark${this.color})`
-    }
   },
   methods: {
     ...mapActions(usePageStatus, ["hideNewArtist"]),
@@ -139,10 +133,16 @@ export default {
       }}
     },  
     addScore(metric) {
-      this.scores.push({metric: metric.name, value: 1, metricId: metric.id, type: metric.type})
+      this.scores.push({
+        metric: metric.name,
+        value: 1,
+        metricId: metric.id,
+        type: metric.type,
+        color: this.getColor(this.colorOffset + this.scores.length - 1)
+      })
       this.toggleMetricsPanel()
     },
-    removeScore(score) {
+    removeScore(score) {  
       if (score.id != undefined)
         this.scoresToRemove.push(score.id)
 

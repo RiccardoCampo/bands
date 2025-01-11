@@ -12,7 +12,7 @@
         </div>
         <div class="labels">
             <span class="label">{{ label }}</span>
-            <button v-if="active" class="discard" @click="discard">
+            <button v-if="active" class="discard" @click="discard" title="Discard Metric">
                 <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"/>
             </button>
         </div>
@@ -20,6 +20,8 @@
 </template>
   
 <script>
+import WithColorMixin from '@/mixins/WithColorMixin.vue';
+
 
 export default {
     name: 'ValueSlider',
@@ -31,10 +33,6 @@ export default {
         modelValue: {
             type: [Array, Number],
             default: () => {return [0, 1]}
-        },
-        color: {
-            type: String,
-            default: "red"
         },
         width: {
             type: Number,
@@ -53,6 +51,7 @@ export default {
             default: false
         }
     },
+    mixins: [WithColorMixin],
     data () {
         return {
             minValue: 0,
@@ -85,12 +84,6 @@ export default {
         },
         thumbHeigth () {
             return this.height + 2 + "px"
-        },
-        mainColor () {
-            return `var(--dark${this.color})`
-        },
-        offColor () {
-            return `var(--light${this.color})`
         },
         thumbHoverColor () {
             return this.active ? "var(--cream)" : "var(--white)"
@@ -177,23 +170,23 @@ div.sliderContainer {
     display: flex;
     height: v-bind("sliderHeight");
     width: v-bind("sliderWidth");
-    background-color: v-bind("offColor");
+    background-color: v-bind("lightColor");
     outline: solid;
     outline-width: 2px;
-    outline-color: v-bind("mainColor");
+    outline-color: v-bind("darkColor");
 }
 
 div.backFill {
     height: v-bind("sliderHeight");
     width: v-bind("backFillWidth");
-    background-color: v-bind("offColor");
+    background-color: v-bind("lightColor");
     transition: width 0.3s;
 }
 
 div.fill {
     height: v-bind("sliderHeight");
     width: v-bind("fillWidth");
-    background-color: v-bind("mainColor");
+    background-color: v-bind("darkColor");
     transition: width 0.3s;
 }
 

@@ -1,13 +1,13 @@
 <template>
     <div class="box" :onclick="toggle">
         <div class="outline">
-            <check-icon v-if="value" :height="height" :width="width" iconColor="var(--darkgreen)"></check-icon>
-            <cross-icon v-else :height="height" :width="width" iconColor="var(--darkred)"></cross-icon>
+            <check-icon v-if="value" :height="height" :width="width" iconColor="var(--darkgreen)"/>
+            <cross-icon v-else :height="height" :width="width" iconColor="var(--darkred)"/>
         </div>
     </div>    
     <div class="labels">
         <p class="label">{{ label }}</p>
-        <button v-if="active" class="discard" @click="discard">
+        <button v-if="active" class="discard" @click="discard" title="Discard Metric">
           <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"/>
         </button>
     </div>
@@ -17,6 +17,7 @@
 
 export default {
     name: 'FlagCheck',
+    emits: ["discardMetric", "update:modelValue"],
     props: {
         label: {
             type: String

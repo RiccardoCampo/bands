@@ -1,5 +1,5 @@
 <template>
-    <svg-icon :iconName="iconName" :width="width" :height="height" :iconColor="iconColor">
+    <svg-icon :width="width" :height="height" :iconColor="iconColor">
         <line id="line1" x1="12" y1="2" x2="12" y2="6"></line>
         <line id="line2" x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
         <line id="line3" x1="18" y1="12" x2="22" y2="12"></line>
@@ -16,10 +16,6 @@ import SvgIcon from './SvgIcon.vue';
 
 export default {
   props: {
-      iconName: {
-          type: String,
-          default: 'box'
-      },
       width: {
           type: [Number, String],
           default: 18

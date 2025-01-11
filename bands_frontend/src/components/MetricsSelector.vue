@@ -5,16 +5,16 @@
           <span class="metric">
             {{ metric.name }}
           </span>
-          <button class="metric" @click="selectMetric(metric)">
+          <button class="metric" @click="selectMetric(metric)" title="Select Metric">
             <plus-icon height=28 width=28 />
           </button>
         </div>
         <div v-if="allowNewMetric" class="metric" style="justify-content: space-between; margin-bottom: 10px;">
           <input class="input" v-model="newMetric.name"/>
-          <button class="metricType" @click="toggleNewMetricType">
+          <button class="metricType" @click="toggleNewMetricType" title="Switch Metric Type">
             <span>{{ this.newMetric.type }}</span>
           </button>
-          <button class="metric" @click="addNewMetric" :disabled="newMetric.name === 'New Metric'">
+          <button class="metric" @click="addNewMetric" :disabled="newMetric.name === 'New Metric'" title="Add New Metric">
             <check-icon height=28 width=28 />
           </button>
         </div>  
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import WithColorMixin from '@/mixins/WithColorMixin.vue';
 import { useMetrics } from '@/store/Metrics';
 import { mapActions } from 'pinia';
 
@@ -30,14 +31,14 @@ import { mapActions } from 'pinia';
 export default {
     name: 'MetricsSelector',
     props: {
-        metrics: Array,
+        metrics: Object,
         width: String,
-        color: String,
         allowNewMetric: {
             type: Boolean,
             default: false
         }
     },
+    mixins: [WithColorMixin],
     data () {
         return {
           localMetric: this.metrics,
@@ -70,14 +71,6 @@ export default {
             category: "score",
           }
         }
-    },
-    computed: {
-      lightColor () {
-        return `var(--light${this.color})`
-      },
-      darkColor () {
-        return `var(--dark${this.color})`
-      }
     }
 }
 </script>
