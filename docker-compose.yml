@@ -10,7 +10,7 @@ services:
       - DATABASE_APP_USERNAME=${DATABASE_APP_USERNAME}
       - DATABASE_APP_USER_PASSWORD=${DATABASE_APP_USER_PASSWORD}
     ports:
-      - 3306:${DATABASE_PORT}
+      - ${DATABASE_PORT}:3306
     volumes:
       - db_data:/var/lib/mysql
       - ./bands_db/init.sh:/docker-entrypoint-initdb.d/init_db.sh
@@ -20,7 +20,7 @@ services:
     container_name: backend
     build: ./bands_backend
     ports:
-      - 8000:${BACKEND_APP_PORT}
+      - ${BACKEND_APP_PORT}:8000
     depends_on:
       - db
     environment:
@@ -38,14 +38,14 @@ services:
     env_file:
       - .env
     entrypoint: ["./entrypoint.sh"]
-#  frontend:
-#    build:
-#      dockerfile: docker/Dockerfile
-#    ports:
-#      - 8080:80
-#      - 1080:1080
-#      - 1025:1025
-#    volumes:
-#      - ./dsp:/var/www/html/
+  frontend:
+    build: ./bands_frontend
+    container_name: bands-app
+    ports:
+      - ${FRONTEND_APP_PORT}:80
+    depends_on:
+      - backend
+    environment:
+      VUE_APP_BANDS_API_URL: http://backend:${BACKEND_APP_PORT}/bands
 volumes:
   db_data:
