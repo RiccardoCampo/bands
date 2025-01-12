@@ -1,0 +1,51 @@
+name: bands
+
+services:
+  db:
+    container_name: db
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DATABASE_NAME}
+      - DATABASE_APP_USERNAME=${DATABASE_APP_USERNAME}
+      - DATABASE_APP_USER_PASSWORD=${DATABASE_APP_USER_PASSWORD}
+    ports:
+      - 3306:${DATABASE_PORT}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./bands_db/init.sh:/docker-entrypoint-initdb.d/init_db.sh
+    env_file:
+      - .env
+  backend:
+    container_name: backend
+    build: ./bands_backend
+    ports:
+      - 8000:${BACKEND_APP_PORT}
+    depends_on:
+      - db
+    environment:
+      APP_ENVIRONMENT: "PRODUCTION"
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY}
+      DEBUG: ${DEBUG}
+      DJANGO_LOGLEVEL: ${DJANGO_LOGLEVEL}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS}
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_APP_USERNAME: ${DATABASE_APP_USERNAME}
+      DATABASE_APP_USER_PASSWORD: ${DATABASE_APP_USER_PASSWORD}
+      DATABASE_HOST: ${DATABASE_HOST}
+      DATABASE_PORT: ${DATABASE_PORT}
+      DATABASE_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    env_file:
+      - .env
+    entrypoint: ["./entrypoint.sh"]
+#  frontend:
+#    build:
+#      dockerfile: docker/Dockerfile
+#    ports:
+#      - 8080:80
+#      - 1080:1080
+#      - 1025:1025
+#    volumes:
+#      - ./dsp:/var/www/html/
+volumes:
+  db_data:

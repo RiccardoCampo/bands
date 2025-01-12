@@ -5,18 +5,21 @@ Django settings for bands_backend project.
 import os
 from pathlib import Path
 
-from dotenv import load_dotenv
+APP_ENVIRONMENT = os.environ.get("APP_ENVIRONMENT", "LOCAL")
 
-load_dotenv()
+if APP_ENVIRONMENT == "LOCAL":
+    from dotenv import load_dotenv
+
+    load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 
-DEBUG = True
+DEBUG = bool(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS: list[str] = []
+ALLOWED_HOSTS: list[str] = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1").split(",")
 
 
 # Application definition
@@ -35,11 +38,11 @@ WSGI_APPLICATION = "bands_backend.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "NAME": os.getenv("DB_NAME"),
+        "HOST": os.getenv("DATABASE_HOST"),
+        "PORT": os.getenv("DATABASE_PORT"),
+        "USER": os.getenv("DATABASE_USERNAME"),
+        "PASSWORD": os.getenv("DATABASE_PASSWORD"),
+        "NAME": os.getenv("DATABASE_NAME"),
     }
 }
 
