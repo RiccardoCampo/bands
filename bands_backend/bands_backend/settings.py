@@ -24,9 +24,17 @@ ALLOWED_HOSTS: list[str] = os.environ.get("DJANGO_ALLOWED_HOSTS", "127.0.0.1").s
 
 # Application definition
 
-INSTALLED_APPS = ["bands", "rest_framework", "django.contrib.contenttypes", "django.contrib.auth"]
+INSTALLED_APPS = [
+    "bands",
+    "rest_framework",
+    "django.contrib.contenttypes",
+    "django.contrib.auth",
+    'corsheaders',
+]
 
-MIDDLEWARE: list[str] = []
+MIDDLEWARE: list[str] = ['corsheaders.middleware.CorsMiddleware']
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "bands_backend.urls"
 

@@ -12,6 +12,7 @@ mysqlclient = "^2.2.4"
 python-dotenv = "^1.0.1"
 django-rest-framework = "^0.1.0"
 gunicorn = "^23.0.0"
+django-cors-headers = "^4.6.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.3"
