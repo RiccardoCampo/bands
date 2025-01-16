@@ -29,10 +29,10 @@ INSTALLED_APPS = [
     "rest_framework",
     "django.contrib.contenttypes",
     "django.contrib.auth",
-    'corsheaders',
+    "corsheaders",
 ]
 
-MIDDLEWARE: list[str] = ['corsheaders.middleware.CorsMiddleware']
+MIDDLEWARE: list[str] = ["corsheaders.middleware.CorsMiddleware"]
 
 CORS_ALLOW_ALL_ORIGINS = True
 
