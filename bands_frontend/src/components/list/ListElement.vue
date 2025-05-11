@@ -88,8 +88,8 @@ export default {
   computed: {
     ...mapState(useMetrics, ['metrics']),
     newMetrics () {
-      const currentMetrics = [...this.scores.map(score => score.metric), this.mainScore.metric]
-      return this.metrics.filter((metric) => {return !currentMetrics.includes(metric.name)})
+      const currentMetrics = this.scores.map(score => score.metric)
+      return this.metrics.filter((metric) => {return metric.name !== "score" && !currentMetrics.includes(metric.name)})
     }
   },
   methods: {
