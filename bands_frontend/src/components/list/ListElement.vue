@@ -111,12 +111,12 @@ export default {
       this.editing = !this.editing
     },
     async edit () {
+      this.localArtist.scores = [...this.scores, this.mainScore]
       if (this.new) {
         await this.addArtist(this.localArtist)
         this.hideNewArtist()
       }
       else {
-        this.localArtist.scores = [...this.scores, this.mainScore]
         await this.updateArtist(this.localArtist, this.scoresToRemove)
         this.setScores()
         this.editing = false
