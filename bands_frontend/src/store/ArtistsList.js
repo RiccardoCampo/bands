@@ -19,8 +19,6 @@ export const useArtistsList = defineStore('artists-list', {
             .then(response => {
               response.data.results.forEach((artist) => {this.artistsMap.set(artist.id, artist)})
 
-              console.log(response.data.results)
-
               this.page = response.data.next === null ? null : 2 
             })
 

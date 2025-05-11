@@ -58,9 +58,9 @@ export default {
         },
         addNewMetric() {
           if (this.allowNewMetric) {
-            this.addMetric(this.newMetric)
+            const createdMetric = this.addMetric(this.newMetric)
 
-            this.localMetric.push(this.newMetric)
+            this.localMetric.push(createdMetric)
             this.resetNewMetric()
           }
         },

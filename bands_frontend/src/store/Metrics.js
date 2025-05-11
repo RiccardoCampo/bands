@@ -27,7 +27,7 @@ export const useMetrics = defineStore('metrics', {
               this.metrics.push(response.data)
             })
             
-          return Promise.resolve()
+          return this.metrics[this.metrics.length - 1]
         } catch (error) {
           return Promise.reject(error)
         }

@@ -82,12 +82,15 @@ export default {
       scores: [],
       backupArtist: {},
       metricsPanelActive: false,
-      newMetrics: [],
       scoresToRemove: [],
     }
   },
   computed: {
     ...mapState(useMetrics, ['metrics']),
+    newMetrics () {
+      const currentMetrics = [...this.scores.map(score => score.metric), this.mainScore.metric]
+      return this.metrics.filter((metric) => {return !currentMetrics.includes(metric.name)})
+    }
   },
   methods: {
     ...mapActions(usePageStatus, ["hideNewArtist"]),
@@ -126,11 +129,6 @@ export default {
     },
     toggleMetricsPanel() {
       this.metricsPanelActive = !this.metricsPanelActive
-
-      if (this.metricsPanelActive) {{
-        const currentMetrics = [...this.scores.map(score => score.metric), this.mainScore.metric]
-        this.newMetrics = this.metrics.filter((metric) => {return !currentMetrics.includes(metric.name)})
-      }}
     },  
     addScore(metric) {
       this.scores.push({
