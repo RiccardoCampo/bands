@@ -17,6 +17,7 @@ export const useArtistsList = defineStore('artists-list', {
           await ArtistsAPIRepository
             .index(1, name, metrics)
             .then(response => {
+              this.artistsMap = new Map()
               response.data.results.forEach((artist) => {this.artistsMap.set(artist.id, artist)})
 
               this.page = response.data.next === null ? null : 2 
