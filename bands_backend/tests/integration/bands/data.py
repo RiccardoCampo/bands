@@ -21,12 +21,6 @@ ARTISTS: list[dict[str, str | int]] = [
 
 METRICS: list[dict[str, str | int]] = [
     {
-        "id": 1,
-        "name": "score",
-        "type": 1,
-        "category": 1,
-    },
-    {
         "id": 2,
         "name": "test-genre-1",
         "type": 1,

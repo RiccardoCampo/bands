@@ -31,6 +31,6 @@ class MetricCreateRequestSerializer(serializers.Serializer):
 
         for enum_key, enum_class in Metric.enum_fields().items():
             if (enum_value := metric_dict.get(enum_key)) is not None:
-                metric_dict[enum_key] = str(enum_class[enum_value.upper()].value)
+                metric_dict[enum_key] = enum_class[enum_value.upper()].value  # type: ignore
 
         return metric_dict

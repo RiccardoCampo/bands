@@ -74,6 +74,7 @@ export default {
     async search () {
       this.toggleMetricsPanel(false)
       this.loading = true
+      console.log(this.selectedMetrics)
 
       await this.fetchArtists(this.text, Object.values(this.selectedMetrics)).catch((error) => {console.log(error)})
 

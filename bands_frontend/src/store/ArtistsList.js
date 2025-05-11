@@ -6,7 +6,8 @@ export const useArtistsList = defineStore('artists-list', {
     state: () => ({
         artistsMap: new Map(),
         page: 1,
-        query: ""
+        query: "",
+        metrics: undefined
     }),
     getters: {
       artists: (state) => Array.from(state.artistsMap.values()),
@@ -17,14 +18,14 @@ export const useArtistsList = defineStore('artists-list', {
           await ArtistsAPIRepository
             .index(1, name, metrics)
             .then(response => {
+              this.artistsMap = new Map()
               response.data.results.forEach((artist) => {this.artistsMap.set(artist.id, artist)})
-
-              console.log(response.data.results)
 
               this.page = response.data.next === null ? null : 2 
             })
 
           this.query = name
+          this.metrics = metrics
             
           return Promise.resolve()
         } catch (error) {
@@ -38,7 +39,7 @@ export const useArtistsList = defineStore('artists-list', {
 
         try {
           await ArtistsAPIRepository
-            .index(this.page, this.query)
+            .index(this.page, this.query, this.metrics)
             .then(response => {
               response.data.results.forEach((artist) => {this.artistsMap.set(artist.id, artist)})
               
