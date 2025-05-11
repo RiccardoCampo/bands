@@ -6,7 +6,8 @@ export const useArtistsList = defineStore('artists-list', {
     state: () => ({
         artistsMap: new Map(),
         page: 1,
-        query: ""
+        query: "",
+        metrics: undefined
     }),
     getters: {
       artists: (state) => Array.from(state.artistsMap.values()),
@@ -24,6 +25,7 @@ export const useArtistsList = defineStore('artists-list', {
             })
 
           this.query = name
+          this.metrics = metrics
             
           return Promise.resolve()
         } catch (error) {
@@ -37,7 +39,7 @@ export const useArtistsList = defineStore('artists-list', {
 
         try {
           await ArtistsAPIRepository
-            .index(this.page, this.query)
+            .index(this.page, this.query, this.metrics)
             .then(response => {
               response.data.results.forEach((artist) => {this.artistsMap.set(artist.id, artist)})
               
