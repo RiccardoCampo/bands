@@ -63,6 +63,7 @@ export default {
     },
     mounted () {
         this.sliderPosition = this.$refs["container"].getBoundingClientRect().x
+        this.minValue = this.range ? Math.max(this.modelValue[0] - 1, 0) : 0
         this.maxValue = this.range ? Math.max(this.modelValue[1], 1) : this.modelValue
         this.emit()
     },
@@ -148,7 +149,7 @@ export default {
             this.emit()
         },
         emit () {
-            this.$emit('update:modelValue', this.range ? [this.minValue, this.maxValue] : this.maxValue)
+            this.$emit('update:modelValue', this.range ? [this.minValue + 1, this.maxValue] : this.maxValue)
         },
         discard ()  {
             this.$emit("discardMetric", this.label)
