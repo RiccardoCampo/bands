@@ -1,6 +1,6 @@
 style:
 	black --diff --fast --check --no-color .
-	bandit --recursive --quiet -x test .
+	bandit -c pyproject.toml --recursive --quiet .
 	mypy .
 	flake8 --config .flake .
 	ruff check .

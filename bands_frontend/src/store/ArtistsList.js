@@ -79,12 +79,21 @@ export const useArtistsList = defineStore('artists-list', {
         try {
           await ArtistsAPIRepository.update(artist)
           
+          let updates = []
           for (const score of artist.scores) {
             if (score.id !== undefined)
-              await ScoresAPIRepository.update(score.id, score.value)
+              updates.push({
+                id: score.id,
+                value: score.value
+              })
             else
-              await ScoresAPIRepository.create(artist.id, score.metricId, score.value)
+              updates.push({
+                metric_id: score.metricId,
+                artist_id: artist.id,
+                value: score.value
+              })
           }
+          await ScoresAPIRepository.updateBulk(updates)
 
           for (const scoreId of scoreIdsToDelete) {
             await ScoresAPIRepository.destroy(scoreId)
