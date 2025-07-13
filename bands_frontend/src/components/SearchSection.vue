@@ -93,9 +93,9 @@ export default {
     },
     getSuggestedMetrics() {
       this.suggestionsPanelActive = true
-
       debounce(
         () => {
+          this.suggestedMetrics = {}
           this.metrics.forEach(
             (metric) => {
               if (metric.name.includes(this.text) & !(metric.name in this.selectedMetrics) & metric.name != "score")
@@ -114,8 +114,6 @@ export default {
     },
     removeMetric(metric) {
       delete this.selectedMetrics[metric.name]
-      console.log(this.suggestedMetrics)
-      console.log(Object.keys(this.selectedMetrics).length)
       if (Object.keys(this.selectedMetrics).length <= 0)
         this.toggleMetricsPanel(false)
     },
