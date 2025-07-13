@@ -6,10 +6,14 @@ from bands.models import Score
 
 class ScoreBulkUpsertRequestSerializer(serializers.Serializer):
     """
-    Serializer for the Score bulk update request payload.
+    Serializer for the Score bulk upsert request payload.
     """
 
     class ScoreUpsertSerializer(serializers.Serializer):
+        """
+        Serializer for a single score bulk upsert.
+        """
+
         id = serializers.IntegerField(required=False)
         metric_id = serializers.IntegerField(required=False)
         artist_id = serializers.IntegerField(required=False)
