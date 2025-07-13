@@ -2,7 +2,7 @@
   <div class="searchContainer">
     <div class="search">
       <div class="searchInputOutline">
-        <input class="search" v-model="text" :oninput="getSuggestedMetrics" placeholder="type an artist or a metric..." @focus="toggleInputActive" @blur="toggleInputActive">
+        <input class="search" v-model="text" :oninput="getSuggestedMetrics" placeholder="type an artist or a metric..." @focus="activateSuggestedMetricsPanel" @blur="deactivateSuggestedMetricsPanel">
       </div>
 
       <button class="searchBar" @click="search" @keyup.enter="search" title="Search">
@@ -80,7 +80,7 @@ export default {
 
       this.activateList()
       this.loading = false
-      this.suggestionsPanelActive = false
+      this.deactivateSuggestedMetricsPanel()
     },
     toggleMetricsPanel(value) {
       // When the selected metrics is empty the panel can only be switched off.
@@ -92,7 +92,7 @@ export default {
       }
     },
     getSuggestedMetrics() {
-      this.suggestionsPanelActive = true
+      this.activateSuggestedMetricsPanel()
       debounce(
         () => {
           this.suggestedMetrics = {}
@@ -119,7 +119,19 @@ export default {
     },
     toggleInputActive () {
       this.inputIsActive = !this.inputIsActive
-    }
+    },
+    activateSuggestedMetricsPanel () {
+      
+      this.suggestionsPanelActive = true
+    },
+    deactivateSuggestedMetricsPanel () {
+      debounce(
+        () => {
+          this.suggestionsPanelActive = false
+        },
+        100
+      )()
+    },
   },
   computed: {
     ...mapState(useMetrics, ['metrics']),
@@ -127,7 +139,7 @@ export default {
       return this.suggestionsPanelActive & this.text !== ""
     },
     searchOutlineColor() {
-      return this.inputIsActive ? "var(--darkyellow)" : "var(--darkred)"
+      return this.suggestionsPanelActive ? "var(--darkyellow)" : "var(--darkred)"
     }
   }
 }
