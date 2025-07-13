@@ -17,7 +17,10 @@
           <button class="metric" @click="addNewMetric" :disabled="newMetric.name === 'New Metric'" title="Add New Metric">
             <check-icon height=28 width=28 />
           </button>
-        </div>  
+        </div>
+        <div class="metric" v-else-if="Object.keys(this.metrics).length === 0">
+            <span class="emptySearch">No metrics found</span>
+        </div>
       </div>
     </div>
 </template>
@@ -154,5 +157,9 @@ button.metricType:hover {
 button.metricType:active {
   color: var(--black);
   background-color: var(--cream);
+}
+
+span.emptySearch {
+  font-size: 1.5pc;
 }
 </style>
