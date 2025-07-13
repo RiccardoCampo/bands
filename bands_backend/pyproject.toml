@@ -84,3 +84,6 @@ plugins = "mypy_django_plugin.main"
 
 [tool.django-stubs]
 django_settings_module = "bands_backend.settings"
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv", "conftest.py"]
