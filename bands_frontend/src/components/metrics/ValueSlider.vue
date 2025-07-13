@@ -56,13 +56,11 @@ export default {
         return {
             minValue: 0,
             maxValue: 1,
-            sliderPosition: 0,
             slidingLeft: false,
             slidingRight: false
         }
     },
     mounted () {
-        this.sliderPosition = this.$refs["container"].getBoundingClientRect().x
         this.minValue = this.range ? Math.max(this.modelValue[0] - 1, 0) : 0
         this.maxValue = this.range ? Math.max(this.modelValue[1], 1) : this.modelValue
         this.emit()
@@ -91,6 +89,9 @@ export default {
         },
         isSliding () {
             return this.slidingLeft || this.slidingRight
+        },
+        sliderPosition() {
+            return this.$refs["container"].getBoundingClientRect().x
         }
     },
     methods: {

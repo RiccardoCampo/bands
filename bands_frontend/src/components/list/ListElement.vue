@@ -57,6 +57,7 @@ import { usePageStatus } from '@/store/PageStatus';
 import MetricsSelector from '../MetricsSelector.vue';
 import { useMetrics } from '@/store/Metrics';
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
+import { ArtistAlreadyExistsError } from '@/store/Exceptions';
 
 
 
@@ -114,7 +115,14 @@ export default {
       this.localArtist.scores = [...this.scores, this.mainScore]
       if (this.new) {
         await this.addArtist(this.localArtist)
-        this.hideNewArtist()
+                  .then(() => { this.hideNewArtist() })
+                  .catch(
+                    (error) => {
+                      if (error instanceof ArtistAlreadyExistsError) {
+                        console.log(error.message)
+                      }
+                    }
+                  )
       }
       else {
         await this.updateArtist(this.localArtist, this.scoresToRemove)

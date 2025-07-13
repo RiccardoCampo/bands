@@ -1,6 +1,7 @@
 import ArtistsAPIRepository from '@/services/API/ArtistsAPIRepository'
 import ScoresAPIRepository from '@/services/API/ScoresAPIRepository'
 import {defineStore} from 'pinia'
+import { ArtistAlreadyExistsError } from './Exceptions'
 
 export const useArtistsList = defineStore('artists-list', {
     state: () => ({
@@ -52,27 +53,27 @@ export const useArtistsList = defineStore('artists-list', {
         }
       },
       async addArtist(artist) {
-        try {
-          var artistId
+        var artistId
 
-          await ArtistsAPIRepository
-            .create(artist)
-            .then(response => {
-              artistId = response.data.id
-            })
-
-          for (const score of artist.scores) {
-            await ScoresAPIRepository.create(artistId, score.metricId, score.value)
-          }
-
-          await ArtistsAPIRepository.retrieve(artistId).then(response => {
-            this.artistsMap.set(artistId, response.data)
+        await ArtistsAPIRepository
+          .create(artist)
+          .then(response => {
+            artistId = response.data.id
+          }).catch((error) => {
+            if (error?.response?.data?.integrity_error !== undefined)
+              throw new ArtistAlreadyExistsError("An artist with this name already exist")
+            return Promise.reject(error)
           })
-            
-          return Promise.resolve()
-        } catch (error) {
-          return Promise.reject(error)
+
+        for (const score of artist.scores) {
+          await ScoresAPIRepository.create(artistId, score.metricId, score.value)
         }
+
+        await ArtistsAPIRepository.retrieve(artistId).then(response => {
+          this.artistsMap.set(artistId, response.data)
+        })
+          
+        return Promise.resolve()
       },
       async updateArtist(artist, scoreIdsToDelete) {
         try {
