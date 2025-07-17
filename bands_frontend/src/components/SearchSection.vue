@@ -5,6 +5,7 @@
         <input class="search" v-model="text" :oninput="getSuggestedMetrics" placeholder="type an artist or a metric..." @focus="activateSuggestedMetricsPanel" @blur="deactivateSuggestedMetricsPanel">
       </div>
 
+      <keyboard-events @keyupEnter="searchOnEnter"></keyboard-events>
       <button class="searchBar" @click="search" @keyup.enter="search" title="Search">
         <loading-icon v-if="loading" height="32" width="32" iconColor="inherit"/>
         <search-icon v-else height=32 width=32 iconColor="inherit"/>
@@ -41,6 +42,7 @@ import ValueSlider from './metrics/ValueSlider.vue';
 import FlagCheck from './metrics/FlagCheck.vue';
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import MetricsSelector from './MetricsSelector.vue';
+import KeyboardEvents from './helpers/KeyboardEvents.vue';
 
 
 export default {
@@ -53,13 +55,13 @@ export default {
       suggestionsPanelActive: true,
       selectedMetrics: {},
       suggestedMetrics: {},
-      inputIsActive: false,
     }
   },
   components: {
     "metrics-selector": MetricsSelector,
     "value-slider": ValueSlider,
     "flag-check": FlagCheck,
+    "keyboard-events": KeyboardEvents,
   },
   mixins: [
     ColorsMixin,
@@ -74,13 +76,16 @@ export default {
     async search () {
       this.toggleMetricsPanel(false)
       this.loading = true
-      console.log(this.selectedMetrics)
 
       await this.fetchArtists(this.text, Object.values(this.selectedMetrics)).catch((error) => {console.log(error)})
 
       this.activateList()
       this.loading = false
       this.deactivateSuggestedMetricsPanel()
+    },
+    async searchOnEnter() {
+      if (!this.headerMinimized || this.suggestionsPanelActive)
+        await this.search()
     },
     toggleMetricsPanel(value) {
       // When the selected metrics is empty the panel can only be switched off.
@@ -117,11 +122,7 @@ export default {
       if (Object.keys(this.selectedMetrics).length <= 0)
         this.toggleMetricsPanel(false)
     },
-    toggleInputActive () {
-      this.inputIsActive = !this.inputIsActive
-    },
     activateSuggestedMetricsPanel () {
-      
       this.suggestionsPanelActive = true
     },
     deactivateSuggestedMetricsPanel () {
@@ -135,6 +136,7 @@ export default {
   },
   computed: {
     ...mapState(useMetrics, ['metrics']),
+    ...mapState(usePageStatus, ['headerMinimized']),
     showSuggestionsPanel() {
       return this.suggestionsPanelActive & this.text !== ""
     },
