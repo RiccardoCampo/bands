@@ -15,7 +15,8 @@
             <span>{{ this.newMetric.type }}</span>
           </button>
           <button class="metric" @click="addNewMetric" :disabled="newMetric.name === 'New Metric'" title="Add New Metric">
-            <check-icon height=28 width=28 />
+            <loading-icon v-if="loading" height="28" width="28"/>
+            <check-icon v-else height=28 width=28 />
           </button>
         </div>
         <div class="metric" v-else-if="Object.keys(this.metrics).length === 0">
@@ -45,7 +46,8 @@ export default {
     data () {
         return {
           localMetric: this.metrics,
-          newMetric: {}
+          newMetric: {},
+          loading: false
         }
     },
     mounted () {
@@ -59,9 +61,11 @@ export default {
         toggleNewMetricType () {
           this.newMetric.type = this.newMetric.type === "value" ? "flag" : "value"
         },
-        addNewMetric() {
+        async addNewMetric() {
           if (this.allowNewMetric) {
-            const createdMetric = this.addMetric(this.newMetric)
+            this.loading = true
+            await new Promise(r => setTimeout(r, 2000));
+            const createdMetric = await this.addMetric(this.newMetric).finally(() => { this.loading = false })
 
             this.localMetric.push(createdMetric)
             this.resetNewMetric()
