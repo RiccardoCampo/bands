@@ -33,10 +33,12 @@
         <metric-selector v-if="editing && metricsPanelActive" width="300px" :color="color" :metrics="newMetrics" :allowNewMetric="true" @metricSelected="addScore" />
         <div class="actions">
           <button v-if="editing" class="button confirm" @click="edit" title="Confirm Changes">
-            <check-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+            <loading-icon v-if="loading" style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+            <check-icon v-else style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
           </button>
           <button v-if="editing" class="button discard" @click="toggleEdit" title="Discard Changes">
-            <cross-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+            <loading-icon v-if="loading" style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+            <cross-icon v-else style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
           </button>
           <button v-if="!editing" class="button edit" @click="toggleEdit" title="Edit Artist">
             <edit-icon :height="26" :width="26"/>
@@ -84,6 +86,7 @@ export default {
       backupArtist: {},
       metricsPanelActive: false,
       scoresToRemove: [],
+      loading: false,
     }
   },
   computed: {
@@ -97,6 +100,9 @@ export default {
     ...mapActions(usePageStatus, ["hideNewArtist"]),
     ...mapActions(useArtistsList, ["addArtist", "updateArtist"]),
     toggleEdit () {
+      if (this.loading)
+        return
+
       if (this.new) {
         this.hideNewArtist()
         return
@@ -112,22 +118,29 @@ export default {
       this.editing = !this.editing
     },
     async edit () {
+      if (this.loading)
+        return
       this.localArtist.scores = [...this.scores, this.mainScore]
-      if (this.new) {
-        await this.addArtist(this.localArtist)
-                  .then(() => { this.hideNewArtist() })
-                  .catch(
-                    (error) => {
-                      if (error instanceof ArtistAlreadyExistsError) {
-                        console.log(error.message)
+      this.loading = true
+      try {
+        if (this.new) {
+          await this.addArtist(this.localArtist)
+                    .then(() => { this.hideNewArtist() })
+                    .catch(
+                      (error) => {
+                        if (error instanceof ArtistAlreadyExistsError) {
+                          console.log(error.message)
+                        }
                       }
-                    }
-                  )
-      }
-      else {
-        await this.updateArtist(this.localArtist, this.scoresToRemove)
-        this.setScores()
-        this.editing = false
+                    )
+        }
+        else {
+          await this.updateArtist(this.localArtist, this.scoresToRemove)
+          this.setScores()
+          this.editing = false
+        }
+      } finally {
+        this.loading = false
       }
     },
     setScores () {

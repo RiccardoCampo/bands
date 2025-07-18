@@ -67,13 +67,17 @@ export default {
     ColorsMixin,
   ],
   async mounted () {
-    await this.fetchMetrics().catch((error) => {console.log(error)})
+    this.loading = true
+    await this.fetchMetrics().catch((error) => {console.log(error)}).finally(() => { this.loading = false })
   },
   methods: {
     ...mapActions(usePageStatus, ['activateList', 'showNewArtist']),
     ...mapActions(useArtistsList, ['fetchArtists', 'addPartialArtist']),
     ...mapActions(useMetrics, ['fetchMetrics']),
     async search () {
+      if (this.loading)
+        return
+
       this.toggleMetricsPanel(false)
       this.loading = true
 
