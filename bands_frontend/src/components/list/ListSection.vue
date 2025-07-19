@@ -24,7 +24,7 @@ export default {
   mixins: [ColorsMixin],
   computed: {
     ...mapState(usePageStatus, ['pageSize', 'newArtistActive']),
-    ...mapState(useArtistsList, ['artists']),
+    ...mapState(useArtistsList, ['artists', 'page']),
     ...mapActions(useArtistsList, ['fetchArtistsPage']),
     hasResults() {
       return this.artists.length > 0 || this.newArtistActive
@@ -38,7 +38,9 @@ export default {
   },
   methods: {
     async onScroll({ target: { scrollTop, clientHeight, scrollHeight }}) {
-      if (scrollTop + clientHeight >= scrollHeight) {
+      // When page is 1 it will fetch the next page when half the scroll size is reached, when page is 2 at 3/4, page 3 at 5/6, etc.
+      const toLoadRatio = 1 - 1 / this.page * 2
+      if (scrollTop + clientHeight >= scrollHeight * toLoadRatio) {
         await this.fetchArtistsPage.catch((error) => {console.log(error)})
       }
     }
