@@ -9,3 +9,4 @@ class ArtistCreateRequestSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255, required=True)
     spotify_url = serializers.URLField(required=False, allow_blank=True)
     image_url = serializers.URLField(required=False, allow_blank=True)
+    rating = serializers.IntegerField(required=False, default=1)

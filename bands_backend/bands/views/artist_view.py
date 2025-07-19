@@ -69,4 +69,10 @@ class ArtistViewSet(ModelViewSet):
             else:
                 artists = artists.filter(score__metric__name=metric_name, score__value=value)
 
+        if rating := query_params.get("rating"):
+            if isinstance(rating, tuple):
+                artists = artists.filter(rating__range=rating)
+            else:
+                artists = artists.filter(rating=rating)
+
         return artists.distinct()
