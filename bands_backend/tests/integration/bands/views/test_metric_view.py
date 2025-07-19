@@ -32,9 +32,9 @@ class TestMetricViewSet(TestCase):
         self.assertEqual(response.status_code, 200)
 
         results = json.loads(response.content)
-        self.assertEqual(len(results), len(METRICS) + 1)
+        self.assertEqual(len(results), len(METRICS))
         # Skip the main score.
-        for idx, actual_metric in enumerate(results[1:]):
+        for idx, actual_metric in enumerate(results):
             self.assert_metric_equal(actual_metric, self.normalize_metric_enums(METRICS[idx]))
 
     def test_create_valid(self) -> None:
@@ -52,7 +52,7 @@ class TestMetricViewSet(TestCase):
         response = self.client.post("/bands/metric/", data=test_metric)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Metric.objects.count(), len(METRICS) + 1 + 1)
+        self.assertEqual(Metric.objects.count(), len(METRICS) + 1)
 
         test_metric.pop("this-field")
         self.assert_metric_equal(Metric.objects.order_by("id").last() or {}, test_metric)
@@ -111,7 +111,7 @@ class TestMetricViewSet(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Metric.objects.count(), len(METRICS) + 1)
+        self.assertEqual(Metric.objects.count(), len(METRICS))
 
         test_metric_update.pop("this-field")
         self.assert_metric_equal(Metric.objects.get(id=test_metric_id), test_metric_update)
@@ -165,8 +165,8 @@ class TestMetricViewSet(TestCase):
         response = self.client.delete(f"/bands/metric/{test_id}/")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Metric.objects.count(), len(METRICS) + 1)  # soft delete
-        self.assertEqual(Metric.objects.filter(deleted_at=None).count(), len(METRICS) + 1 - 1)
+        self.assertEqual(Metric.objects.count(), len(METRICS))  # soft delete
+        self.assertEqual(Metric.objects.filter(deleted_at=None).count(), len(METRICS) - 1)
         self.assertIsNotNone(Metric.objects.get(id=test_id).deleted_at)
 
     def test_delete_not_found(self) -> None:
@@ -178,7 +178,7 @@ class TestMetricViewSet(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(json.loads(response.content), {"not_found_error": "Metric matching query does not exist."})
-        self.assertEqual(Metric.objects.count(), len(METRICS) + 1)
+        self.assertEqual(Metric.objects.count(), len(METRICS))
 
     def assert_metric_equal(
         self,

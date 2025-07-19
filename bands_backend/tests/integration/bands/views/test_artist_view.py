@@ -31,7 +31,7 @@ class TestArtistViewSet(TestCase):
         Check that the list endpoint respond without errors, returning the expected number of artists.
         """
 
-        response = self.client.get("/bands/artist/?page=1&name=artist-t&score=[3,]")
+        response = self.client.get("/bands/artist/?page=1&name=artist-t&rating=[3,]")
 
         self.assertEqual(response.status_code, 200)
 
@@ -82,6 +82,7 @@ class TestArtistViewSet(TestCase):
             "name": "test-artist-four",
             "spotify_url": "https://test-artist-4.com",
             "image_url": "https://test-artist-4-image.com",
+            "rating": 4,
             "this-field": "is-ignored",
         }
 
@@ -131,6 +132,7 @@ class TestArtistViewSet(TestCase):
             "name": "test-artist-modified",
             "spotify_url": "https://test-artist-1234.com",
             "image_url": "https://test-artist-1234-image.com",
+            "rating": 1,
             "this-field": "is-ignored",
         }
         test_artist_id = 1
