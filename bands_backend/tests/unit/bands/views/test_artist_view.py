@@ -12,7 +12,7 @@ class TestArtistViewSet:
 
     BASE_ARTIST_QUERY: str = (
         "SELECT DISTINCT `artist`.`deleted_at`, `artist`.`id`, `artist`.`name`, `artist`.`spotify_url`, "
-        "`artist`.`image_url`, `artist`.`created_at`, `artist`.`updated_at` FROM `artist`"
+        "`artist`.`image_url`, `artist`.`created_at`, `artist`.`updated_at`, `artist`.`rating` FROM `artist`"
     )
     JOINS: str = (
         "INNER JOIN `score` ON (`artist`.`id` = `score`.`artist_id`) "
@@ -29,6 +29,16 @@ class TestArtistViewSet:
                 {"name": "ciao"},
                 f"{BASE_ARTIST_QUERY} WHERE ({WHERE_DELETE_AT} AND `artist`.`name` LIKE %ciao%) {ORDER_BY}",
                 id="name",
+            ),
+            pytest.param(
+                {"rating": 1},
+                f"{BASE_ARTIST_QUERY} WHERE ({WHERE_DELETE_AT} AND `artist`.`rating` = 1) {ORDER_BY}",
+                id="rating - value",
+            ),
+            pytest.param(
+                {"rating": (1, 3)},
+                f"{BASE_ARTIST_QUERY} WHERE ({WHERE_DELETE_AT} AND `artist`.`rating` BETWEEN 1 AND 3) {ORDER_BY}",
+                id="rating - range",
             ),
             pytest.param(
                 {"scores": {"some_score": 3}},

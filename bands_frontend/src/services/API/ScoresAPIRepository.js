@@ -9,6 +9,9 @@ export default {
   async update (id, value) {
     return axios.put(`${BASE_URL}${id}/`, {"value": value})
   },
+  async upsertBulk (updates) {
+    return axios.put(`${BASE_URL}bulk-upsert/`, {"updates": updates})
+  },
   async destroy (id) {
     return axios.delete(`${BASE_URL}${id}/`)
   }

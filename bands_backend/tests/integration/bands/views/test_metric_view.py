@@ -33,6 +33,7 @@ class TestMetricViewSet(TestCase):
 
         results = json.loads(response.content)
         self.assertEqual(len(results), len(METRICS))
+        # Skip the main score.
         for idx, actual_metric in enumerate(results):
             self.assert_metric_equal(actual_metric, self.normalize_metric_enums(METRICS[idx]))
 
@@ -148,7 +149,7 @@ class TestMetricViewSet(TestCase):
         """
 
         response = self.client.put(
-            f"/bands/metric/{len(METRICS) + 1}/", data={"name": "test"}, content_type="application/json"
+            f"/bands/metric/{len(METRICS) + 1 + 1}/", data={"name": "test"}, content_type="application/json"
         )
 
         self.assertEqual(response.status_code, 404)
@@ -173,7 +174,7 @@ class TestMetricViewSet(TestCase):
         Return 404 if the id is missing.
         """
 
-        response = self.client.delete(f"/bands/metric/{len(METRICS) + 1}/")
+        response = self.client.delete(f"/bands/metric/{len(METRICS) + 1 + 1}/")
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(json.loads(response.content), {"not_found_error": "Metric matching query does not exist."})

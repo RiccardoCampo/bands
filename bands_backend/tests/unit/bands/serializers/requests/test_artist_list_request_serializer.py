@@ -90,4 +90,14 @@ class TestArtistListRequestSerializer:
         serializer = ArtistListRequestSerializer(data={"test-metric-1": "1", "test-metric-2": "[1,3]"})
         serializer.is_valid()
 
-        assert serializer.data == {"scores": {"test-metric-1": 1, "test-metric-2": (1, 3)}}
+        assert serializer.data == {"rating": None, "scores": {"test-metric-1": 1, "test-metric-2": (1, 3)}}
+
+    def test_get_rating(self) -> None:
+        """
+        Assert that the rating is serialized correctly.
+        """
+
+        serializer = ArtistListRequestSerializer(data={"rating": "[1,3]"})
+        serializer.is_valid()
+
+        assert serializer.data == {"rating": (1, 3), "scores": {}}

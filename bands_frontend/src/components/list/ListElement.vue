@@ -11,7 +11,7 @@
           <a v-if="!editing" :href="localArtist.spotify_url" target="_blank" class="link">
             <external-link height="32" width="32"></external-link>
           </a>
-          <main-score v-model="mainScore.value" :color="darkColor" :active="editing"></main-score>
+          <artist-rating v-model="rating" :color="darkColor" :active="editing"></artist-rating>
         </div>
         <div v-if="editing" class="link">
           <span class="link">Image URL</span>
@@ -33,10 +33,12 @@
         <metric-selector v-if="editing && metricsPanelActive" width="300px" :color="color" :metrics="newMetrics" :allowNewMetric="true" @metricSelected="addScore" />
         <div class="actions">
           <button v-if="editing" class="button confirm" @click="edit" title="Confirm Changes">
-            <check-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+            <loading-icon v-if="loading" style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+            <check-icon v-else style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
           </button>
           <button v-if="editing" class="button discard" @click="toggleEdit" title="Discard Changes">
-            <cross-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+            <loading-icon v-if="loading" style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+            <cross-icon v-else style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
           </button>
           <button v-if="!editing" class="button edit" @click="toggleEdit" title="Edit Artist">
             <edit-icon :height="26" :width="26"/>
@@ -48,7 +50,7 @@
 
 <script>
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
-import MainScore from './MainScore.vue';
+import ArtistRating from './ArtistRating.vue';
 import ValueSlider from '../metrics/ValueSlider.vue';
 import FlagCheck from '../metrics/FlagCheck.vue';
 import { mapActions, mapState } from 'pinia';
@@ -68,7 +70,7 @@ export default {
       new: Boolean,
   },
   components: {
-    "main-score": MainScore,
+    "artist-rating": ArtistRating,
     "value-slider": ValueSlider,
     "flag-check": FlagCheck,
     "metric-selector": MetricsSelector,
@@ -79,11 +81,12 @@ export default {
       editing: false,
       name: "",
       localArtist: "",
-      mainScore: {},
+      rating: 1,
       scores: [],
       backupArtist: {},
       metricsPanelActive: false,
       scoresToRemove: [],
+      loading: false,
     }
   },
   computed: {
@@ -97,6 +100,9 @@ export default {
     ...mapActions(usePageStatus, ["hideNewArtist"]),
     ...mapActions(useArtistsList, ["addArtist", "updateArtist"]),
     toggleEdit () {
+      if (this.loading)
+        return
+
       if (this.new) {
         this.hideNewArtist()
         return
@@ -112,27 +118,34 @@ export default {
       this.editing = !this.editing
     },
     async edit () {
-      this.localArtist.scores = [...this.scores, this.mainScore]
-      if (this.new) {
-        await this.addArtist(this.localArtist)
-                  .then(() => { this.hideNewArtist() })
-                  .catch(
-                    (error) => {
-                      if (error instanceof ArtistAlreadyExistsError) {
-                        console.log(error.message)
+      if (this.loading)
+        return
+      this.localArtist.scores = this.scores
+      this.loading = true
+      try {
+        if (this.new) {
+          await this.addArtist(this.localArtist)
+                    .then(() => { this.hideNewArtist() })
+                    .catch(
+                      (error) => {
+                        if (error instanceof ArtistAlreadyExistsError) {
+                          console.log(error.message)
+                        }
                       }
-                    }
-                  )
-      }
-      else {
-        await this.updateArtist(this.localArtist, this.scoresToRemove)
-        this.setScores()
-        this.editing = false
+                    )
+        }
+        else {
+          await this.updateArtist(this.localArtist, this.scoresToRemove)
+          this.setScores()
+          this.editing = false
+        }
+      } finally {
+        this.loading = false
       }
     },
     setScores () {
-      this.scores = this.addColors(this.localArtist.scores.filter(score => score.category !== "main_score"))
-      this.mainScore = this.localArtist.scores.filter(score => score.category == "main_score")[0]
+      this.scores = this.addColors(this.localArtist.scores)
+      this.rating = this.localArtist.rating
       this.scoresToRemove = []
     },
     toggleMetricsPanel() {
@@ -156,7 +169,7 @@ export default {
     }
   },
   mounted () {
-    this.localArtist = this.new ? {name: "New Artist", scores: [{value: 1, type: 1, category: "main_score", metricId: this.metrics[0].id}]} : this.artist
+    this.localArtist = this.new ? {name: "New Artist", scores: [], rating: 1} : this.artist
     this.name = this.localArtist.name
     this.editing = this.new
     this.setScores()
