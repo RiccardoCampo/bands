@@ -20,4 +20,3 @@ class ArtistSerializer(serializers.ModelSerializer):
 
         model = Artist
         fields = ["id", "name", "spotify_url", "image_url", "rating", "created_at", "scores"]
-        ordering = ["-rating", "name"]
