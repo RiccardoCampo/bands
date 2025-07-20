@@ -11,7 +11,7 @@
           <a v-if="!editing" :href="localArtist.spotify_url" target="_blank" class="link">
             <external-link height="32" width="32"></external-link>
           </a>
-          <main-score v-model="mainScore.value" :color="darkColor" :active="editing"></main-score>
+          <artist-rating v-model="rating" :color="darkColor" :active="editing"></artist-rating>
         </div>
         <div v-if="editing" class="link">
           <span class="link">Image URL</span>
@@ -50,7 +50,7 @@
 
 <script>
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
-import MainScore from './MainScore.vue';
+import ArtistRating from './ArtistRating.vue';
 import ValueSlider from '../metrics/ValueSlider.vue';
 import FlagCheck from '../metrics/FlagCheck.vue';
 import { mapActions, mapState } from 'pinia';
@@ -70,7 +70,7 @@ export default {
       new: Boolean,
   },
   components: {
-    "main-score": MainScore,
+    "artist-rating": ArtistRating,
     "value-slider": ValueSlider,
     "flag-check": FlagCheck,
     "metric-selector": MetricsSelector,
@@ -81,7 +81,7 @@ export default {
       editing: false,
       name: "",
       localArtist: "",
-      mainScore: {},
+      rating: 1,
       scores: [],
       backupArtist: {},
       metricsPanelActive: false,
@@ -120,7 +120,7 @@ export default {
     async edit () {
       if (this.loading)
         return
-      this.localArtist.scores = [...this.scores, this.mainScore]
+      this.localArtist.scores = this.scores
       this.loading = true
       try {
         if (this.new) {
@@ -144,8 +144,8 @@ export default {
       }
     },
     setScores () {
-      this.scores = this.addColors(this.localArtist.scores.filter(score => score.category !== "main_score"))
-      this.mainScore = this.localArtist.scores.filter(score => score.category == "main_score")[0]
+      this.scores = this.addColors(this.localArtist.scores)
+      this.rating = this.localArtist.rating
       this.scoresToRemove = []
     },
     toggleMetricsPanel() {
@@ -169,7 +169,7 @@ export default {
     }
   },
   mounted () {
-    this.localArtist = this.new ? {name: "New Artist", scores: [{value: 1, type: 1, category: "main_score", metricId: this.metrics[0].id}]} : this.artist
+    this.localArtist = this.new ? {name: "New Artist", scores: [], rating: 1} : this.artist
     this.name = this.localArtist.name
     this.editing = this.new
     this.setScores()

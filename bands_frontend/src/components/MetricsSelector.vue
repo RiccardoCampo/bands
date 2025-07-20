@@ -64,7 +64,6 @@ export default {
         async addNewMetric() {
           if (this.allowNewMetric) {
             this.loading = true
-            await new Promise(r => setTimeout(r, 2000));
             const createdMetric = await this.addMetric(this.newMetric).finally(() => { this.loading = false })
 
             this.localMetric.push(createdMetric)

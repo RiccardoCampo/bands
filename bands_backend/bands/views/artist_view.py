@@ -58,7 +58,7 @@ class ArtistViewSet(ModelViewSet):
         Get the query set, apply query string filters.
         """
 
-        artists = self.get_queryset().order_by("id")
+        artists = self.get_queryset().order_by("-rating", "name")
 
         if name := query_params.get("name"):
             artists = artists.filter(name__icontains=name)
@@ -68,5 +68,11 @@ class ArtistViewSet(ModelViewSet):
                 artists = artists.filter(score__metric__name=metric_name, score__value__range=value)
             else:
                 artists = artists.filter(score__metric__name=metric_name, score__value=value)
+
+        if rating := query_params.get("rating"):
+            if isinstance(rating, tuple):
+                artists = artists.filter(rating__range=rating)
+            else:
+                artists = artists.filter(rating=rating)
 
         return artists.distinct()

@@ -4,7 +4,7 @@ from typing import Any
 from rest_framework import serializers
 from rest_framework.exceptions import ErrorDetail, ValidationError
 
-from bands.models import Score
+from bands.models import Artist, Score
 
 
 class ArtistListRequestSerializer(serializers.Serializer):
@@ -14,6 +14,7 @@ class ArtistListRequestSerializer(serializers.Serializer):
 
     name = serializers.CharField(max_length=255, required=False)
     page = serializers.IntegerField(min_value=1, required=False)
+    rating = serializers.SerializerMethodField()
     scores = serializers.SerializerMethodField()
 
     def is_valid(self, *, raise_exception: bool = True) -> bool:
@@ -33,6 +34,9 @@ class ArtistListRequestSerializer(serializers.Serializer):
                     self._errors[key] = ErrorDetail(f"invalid metric name {key}")
                 if not self._validate_score_value(value):
                     self._errors[key] = ErrorDetail(f"invalid score value {value} for metric {key}")
+            if key == "rating":
+                if not self._validate_score_value(value):
+                    self._errors[key] = ErrorDetail(f"invalid rating value {value}")
 
         if self._errors and raise_exception:
             raise ValidationError(self.errors)
@@ -54,6 +58,17 @@ class ArtistListRequestSerializer(serializers.Serializer):
                     scores_params[key] = Score.clamp_score_value(int(value))
 
         return scores_params
+
+    def get_rating(self, _: Any) -> None | int | tuple[int, int]:
+        """
+        Get the scores request parameters.
+        """
+
+        raw_rating = self.initial_data.get("rating")
+
+        if raw_rating:
+            return self._get_score_bounds(raw_rating) if "[" in raw_rating else Artist.clamp_rating(int(raw_rating))
+        return None
 
     @staticmethod
     def _validate_score_value(score_value: Any) -> bool:

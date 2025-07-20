@@ -31,7 +31,7 @@ class TestScoreViewSet(TestCase):
         """
 
         test_score = {
-            "artist_id": 2,
+            "artist_id": 1,
             "metric_id": 2,
             "value": 3,
             "this-field": "is-ignored",
@@ -160,7 +160,7 @@ class TestScoreViewSet(TestCase):
             "updates": [
                 {"id": test_score_1_id, "value": test_score_1_new_value},
                 {"id": test_score_2_id, "value": test_score_2_new_value},
-                {"artist_id": 2, "metric_id": 2, "value": 2},
+                {"artist_id": 1, "metric_id": 2, "value": 1},
             ]
         }
 
@@ -221,7 +221,7 @@ class TestScoreViewSet(TestCase):
         self.assertEqual(json.loads(response.content), {"not_found_error": "Score matching query does not exist."})
 
         test_score_1_id = 1
-        test_score_1_new_value = 3
+        test_score_1_new_value = 5
         test_score_2_id = 20000
         test_score_2_new_value = 4
         test_score_updates = {
