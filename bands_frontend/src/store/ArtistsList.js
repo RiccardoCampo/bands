@@ -64,10 +64,16 @@ export const useArtistsList = defineStore('artists-list', {
               throw new ArtistAlreadyExistsError("An artist with this name already exist")
             return Promise.reject(error)
           })
-
+        
+        let scores = []
         for (const score of artist.scores) {
-          await ScoresAPIRepository.create(artistId, score.metricId, score.value)
+          scores.push({
+            metric_id: score.metricId,
+            artist_id: artistId,
+            value: score.value
+          })
         }
+        await ScoresAPIRepository.upsertBulk(scores)
 
         await ArtistsAPIRepository.retrieve(artistId).then(response => {
           this.artistsMap.set(artistId, response.data)
@@ -93,7 +99,7 @@ export const useArtistsList = defineStore('artists-list', {
                 value: score.value
               })
           }
-          await ScoresAPIRepository.updateBulk(updates)
+          await ScoresAPIRepository.upsertBulk(updates)
 
           for (const scoreId of scoreIdsToDelete) {
             await ScoresAPIRepository.destroy(scoreId)
