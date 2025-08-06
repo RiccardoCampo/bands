@@ -121,6 +121,7 @@ export default {
       if (this.loading)
         return
       this.localArtist.scores = this.scores
+      this.localArtist.rating = this.rating
       this.loading = true
       try {
         if (this.new) {
