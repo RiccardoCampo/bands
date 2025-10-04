@@ -88,7 +88,7 @@ export default {
       this.deactivateSuggestedMetricsPanel()
     },
     async searchOnEnter() {
-      if (!this.headerMinimized || this.suggestionsPanelActive)
+      if (!this.headerMinimized || this.suggestionsPanelActive || this.metricsPanelActive)
         await this.search()
     },
     toggleMetricsPanel(value) {
