@@ -1,0 +1,47 @@
+name: Style checks
+
+run-name: ${{ github.event.pull_request.title || github.ref_name }}
+on:
+  pull_request:
+    branches-ignore: [main]
+    paths:
+      - bands_frontend/**
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  typescript-style-checks:
+    name: Typescript style checks
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Cache dependencies
+      id: cache-dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/bands_frontend/.cache
+          ~/bands_frontend/node_modules
+        key: npm-${{ hashFiles('**/package-lock.json') }}
+
+    - name: Install Dependencies
+      run: npm install
+
+    - name: Run checks
+      run: npm run lint
