@@ -2,12 +2,12 @@
     <div class="mainContainer">
         <div class="sliderContainer" ref="container" :onmouseup="moveSlider" :onmouseleave="stopSliding" :onmousemove="slide">
             <div class="backFill"></div>
-            <div v-if="active & range" class="thumb" :onmousedown="startSlidingLeft">
-                <span class="scoreTooltip" v-if="isSliding">{{ this.minValue + 1 }}</span>
+            <div v-if="active && range" class="thumb" :onmousedown="startSlidingLeft">
+                <span class="scoreTooltip" v-if="isSliding">{{ minValue + 1 }}</span>
             </div>
             <div class="fill"></div>
             <div class="thumb" :onmousedown="startSlidingRight">
-                <span class="scoreTooltip" v-if="isSliding">{{ this.maxValue }}</span>
+                <span class="scoreTooltip" v-if="isSliding">{{ maxValue }}</span>
             </div>
         </div>
         <div class="labels">
@@ -19,11 +19,14 @@
     </div>
 </template>
   
-<script>
+<script lang="ts">
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
+import { FilterValues } from '@/types/score';
+import { PropType } from 'vue';
+import { defineComponent } from 'vue';
 
 
-export default {
+export default defineComponent({
     name: 'ValueSlider',
     emits: ["discardMetric", "update:modelValue"],
     props: {
@@ -31,8 +34,8 @@ export default {
             type: String
         },
         modelValue: {
-            type: [Array, Number],
-            default: () => {return [0, 1]}
+            type: [Object, Number] as PropType<FilterValues | number>,
+            default: () => {return {minValue: 0, maxValue: 1}}
         },
         width: {
             type: Number,
@@ -61,37 +64,42 @@ export default {
         }
     },
     mounted () {
-        this.minValue = this.range ? Math.max(this.modelValue[0] - 1, 0) : 0
-        this.maxValue = this.range ? Math.max(this.modelValue[1], 1) : this.modelValue
+        if (typeof this.modelValue === "number") {
+            this.minValue = 0
+            this.maxValue = this.modelValue
+        } else {
+            this.minValue = Math.max(this.modelValue.minValue - 1, 0)
+            this.maxValue = Math.max(this.modelValue.maxValue, 1)
+        }
         this.emit()
     },
     computed: {
-        stepWidth () {
+        stepWidth (): number {
             return (this.width / 5)
         },
-        sliderWidth () {
+        sliderWidth (): string {
             return this.width + "px"
         },
-        sliderHeight () {
+        sliderHeight (): string {
             return this.height + "px"
         },
-        backFillWidth () {
+        backFillWidth (): string {
             return this.stepWidth * (this.minValue) + "px"
         },
-        fillWidth () {
+        fillWidth (): string {
             return this.stepWidth * (this.maxValue - this.minValue) + "px"
         },
-        thumbHeigth () {
+        thumbHeigth (): string {
             return this.height + 2 + "px"
         },
-        thumbHoverColor () {
+        thumbHoverColor (): string {
             return this.active ? "var(--cream)" : "var(--white)"
         },
-        isSliding () {
+        isSliding (): boolean {
             return this.slidingLeft || this.slidingRight
         },
-        sliderPosition() {
-            return this.$refs["container"].getBoundingClientRect().x
+        sliderPosition(): number {
+            return (this.$refs["container"] as any).getBoundingClientRect().x
         }
     },
     methods: {
@@ -99,9 +107,9 @@ export default {
             this.slidingRight = this.active
         },
         startSlidingLeft () {
-            this.slidingLeft = this.active & this.range
+            this.slidingLeft = this.active && this.range
         },
-        stopSliding (event) {
+        stopSliding (event: any) {
             if (this.active && this.slidingRight) {
                 this.updateMaxValueFromPosition(event.pageX)
                 this.slidingRight = false
@@ -111,7 +119,7 @@ export default {
                 this.slidingLeft = false
             }
         },
-        slide (event) {
+        slide (event: any) {
             if (this.active && this.slidingRight) {
                 this.updateMaxValueFromPosition(event.pageX)
             }
@@ -119,7 +127,7 @@ export default {
                 this.updateMinValueFromPosition(event.pageX)
             }
         },
-        moveSlider (event) {
+        moveSlider (event: any) {
             const position = event.pageX
 
             if (this.active) {
@@ -141,22 +149,22 @@ export default {
                 }
             }
         },
-        updateMaxValueFromPosition(position) {
+        updateMaxValueFromPosition(position: number) {
             this.maxValue = Math.max(Math.floor((position - this.sliderPosition - this.stepWidth / 2) / this.stepWidth) + 1, this.minValue + 1)
             this.emit()
         },
-        updateMinValueFromPosition(position) {
+        updateMinValueFromPosition(position: number) {
             this.minValue = Math.min(Math.floor((position - this.sliderPosition - this.stepWidth / 2) / this.stepWidth) + 1, this.maxValue - 1)
             this.emit()
         },
         emit () {
-            this.$emit('update:modelValue', this.range ? [this.minValue + 1, this.maxValue] : this.maxValue)
+            this.$emit('update:modelValue', this.range ? {minValue: this.minValue + 1, maxValue: this.maxValue} : this.maxValue)
         },
         discard ()  {
             this.$emit("discardMetric", this.label)
         }
     }
-}
+});
 
 </script>
 

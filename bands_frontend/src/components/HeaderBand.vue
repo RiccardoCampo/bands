@@ -9,16 +9,17 @@
 </template>
 
 
-<script>
+<script lang="ts">
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
 import {HeaderSliderMaxHeight, HeaderSliderMinHeight, HeaderSliderMinimizedHeight, HeaderBandSize} from '../config';
+import { defineComponent } from 'vue';
 
 /**
  * Header band component. If the band has a letter, also render the slider.
  * 
  * The slider randomly moves up and down between limits.
  */
-export default {
+export default defineComponent({
     name: 'HeaderBand',
     props: {
         letter: String,
@@ -35,19 +36,19 @@ export default {
         /**
          * The slider is only visible for lettered bands.
          */
-        displaySlider () {
+        displaySlider (): boolean {
             return Boolean(this.letter)
         },
-        flex () {
+        flex (): string {
             return `0 ${HeaderBandSize.WIDTH}px`
         },
-        height () {
+        height (): string {
             return HeaderBandSize.HEIGHT + "px"
         },
-        highlightedHeight () {
+        highlightedHeight (): string {
             return (this.minimized ? HeaderSliderMinimizedHeight : this.sliderPosition) + "px"
         },
-        sliderHeight () {
+        sliderHeight (): string {
             return (this.minimized ? 0 : 10) + "px"
         },
     },
@@ -70,7 +71,7 @@ export default {
         /**
          * Start the movement timeout, on timeout: move the slider and set the next movement.
          */
-        startMoveTimeout(milliseconds) {
+        startMoveTimeout(milliseconds: number) {
             setTimeout(() => {
                 this.moveSlider();
 
@@ -83,7 +84,7 @@ export default {
             this.startMoveTimeout(this.getNextSliderMoveTime(1000));
         }
     },
-}
+});
 </script>
 
 <style scoped>

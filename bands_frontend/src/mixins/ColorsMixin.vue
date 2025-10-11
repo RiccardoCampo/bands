@@ -1,19 +1,21 @@
-<script>
+<script lang="ts">
 import { ColorOrder } from '@/config';
-import { usePageStatus } from '@/store/PageStatus';
+import { usePageStatus } from '@/store/pageStatus';
 import { mapState } from 'pinia';
+import { defineComponent } from 'vue';
 
 
-export default {
+export default defineComponent({
     name: 'ColorsMixin',
     methods: {
-        getColor (index) {
+        getColor (index: number) {
             return ColorOrder[Math.floor(index) % ColorOrder.length];
         },
-        addColors (array) {            
+        addColors (array: any[]) {            
             return array.map((element, index) => ({...element, color: this.getColor(index + this.colorOffset)}))
         },
-        addColorsToMap (map) {
+        // TODO add correct typing for map.
+        addColorsToMap (map: any) {
             Object.keys(map).forEach(
                 (key, index) => {map[key]["color"] = this.getColor(index + this.colorOffset)}
             )
@@ -24,7 +26,7 @@ export default {
     computed: {
         ...mapState(usePageStatus, ['colorOffset']),
     }
-}
+});
 
 </script>
   

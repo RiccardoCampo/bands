@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-      <img v-if="localArtist.image_url" :src="localArtist.image_url" class="artistImage">
+      <img v-if="localArtist.imageUrl" :src="localArtist.imageUrl" class="artistImage">
       <div v-else class="artistImage" :style="{ 'background-color': darkColor }"></div>
       <div class="details">
         <div class="header">
@@ -8,23 +8,23 @@
             {{ localArtist.name }}
           </p>
           <input v-else class="input name" v-model="localArtist.name">
-          <a v-if="!editing" :href="localArtist.spotify_url" target="_blank" class="link">
+          <a v-if="!editing" :href="localArtist.spotifyUrl ?? ''" target="_blank" class="link">
             <external-link height="32" width="32"></external-link>
           </a>
           <artist-rating v-model="rating" :color="darkColor" :active="editing"></artist-rating>
         </div>
         <div v-if="editing" class="link">
           <span class="link">Image URL</span>
-          <input class="input link" v-model="localArtist.image_url">
+          <input class="input link" v-model="localArtist.imageUrl">
         </div>
         <div v-if="editing" class="link">
           <span class="link">Spotify URL</span>
-          <input class="input link" v-model="localArtist.spotify_url">
+          <input class="input link" v-model="localArtist.spotifyUrl">
         </div>
         <div class="scores">
-          <div v-for="score in scores" :key="score" class="score">
-            <value-slider v-if="score.type == 'value'" v-model="score.value" :color="score.color" :label="score.metric" :active="editing" @discardMetric="removeScore(score)"></value-slider>
-            <flag-check v-else v-model="score.value" :label="score.metric" :active="editing" @discardMetric="removeScore(score)"></flag-check>
+          <div v-for="score in scores" :key="score.metric.name" class="score">
+            <value-slider v-if="isValue(score)" v-model="score.score.value" :color="score.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></value-slider>
+            <flag-check v-else v-model="score.score.value" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></flag-check>
           </div>
         </div>
         <button v-if="editing" class="button edit" @click="toggleMetricsPanel" title="Add Score">
@@ -48,25 +48,41 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import ArtistRating from './ArtistRating.vue';
 import ValueSlider from '../metrics/ValueSlider.vue';
 import FlagCheck from '../metrics/FlagCheck.vue';
 import { mapActions, mapState } from 'pinia';
-import { useArtistsList } from '@/store/ArtistsList';
-import { usePageStatus } from '@/store/PageStatus';
+import { useArtistsList } from '@/store/artistsList';
+import { usePageStatus } from '@/store/pageStatus';
 import MetricsSelector from '../MetricsSelector.vue';
-import { useMetrics } from '@/store/Metrics';
+import { useMetrics } from '@/store/metrics';
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
-import { ArtistAlreadyExistsError } from '@/store/Exceptions';
+import { ArtistAlreadyExistsError } from '@/exceptions';
+import { PropType } from 'vue';
+import { NewScore, Score } from '@/types/score';
+import { MetricType, Metric } from '@/types/metrics';
+import { Artist } from '@/types/artist';
+import { defineComponent } from 'vue';
 
 
+type ArtistScore = {
+  score: Score | NewScore
+  metric: ArtistScoreMetric
+  color: string
+}
 
-export default {
+type ArtistScoreMetric = {
+  name: string
+  type: MetricType
+}
+
+
+export default defineComponent({
   name: 'ListElement',
   props: {
-      artist: Object,
+      artist: Object as PropType<Artist>,
       new: Boolean,
   },
   components: {
@@ -80,20 +96,20 @@ export default {
     return {
       editing: false,
       name: "",
-      localArtist: "",
+      localArtist: {} as Artist,
       rating: 1,
-      scores: [],
-      backupArtist: {},
+      scores: [] as ArtistScore[],
+      backupArtist: {} as Artist,
       metricsPanelActive: false,
-      scoresToRemove: [],
+      scoresToRemove: [] as number [],
       loading: false,
     }
   },
   computed: {
     ...mapState(useMetrics, ['metrics']),
-    newMetrics () {
-      const currentMetrics = this.scores.map(score => score.metric)
-      return this.metrics.filter((metric) => {return metric.name !== "score" && !currentMetrics.includes(metric.name)})
+    newMetrics (): Metric[] {
+      const currentMetrics = this.scores.map(score => score.metric.name)
+      return this.metrics.filter((metric: Metric) => {return !currentMetrics.includes(metric.name)})
     }
   },
   methods: {
@@ -120,7 +136,8 @@ export default {
     async edit () {
       if (this.loading)
         return
-      this.localArtist.scores = this.scores
+      this.localArtist.scores = this.scores.map(score => score.score)
+      this.localArtist.rating = this.rating
       this.loading = true
       try {
         if (this.new) {
@@ -144,37 +161,49 @@ export default {
       }
     },
     setScores () {
-      this.scores = this.addColors(this.localArtist.scores)
+      this.scores = this.addColors(
+        this.localArtist.scores.map(
+          (score: Score | NewScore) => {
+            if ("id" in score)
+              return {score: score, metric: {type: score.type, name: score.metric}}
+          }
+        )
+      )
       this.rating = this.localArtist.rating
       this.scoresToRemove = []
     },
     toggleMetricsPanel() {
       this.metricsPanelActive = !this.metricsPanelActive
     },  
-    addScore(metric) {
+    addScore(metric: Metric) {
       this.scores.push({
-        metric: metric.name,
-        value: 1,
-        metricId: metric.id,
-        type: metric.type,
+        score: {
+          metricId: metric.id,
+          value: 1,
+        },
+        metric: metric,
         color: this.getColor(this.colorOffset + this.scores.length - 1)
       })
       this.toggleMetricsPanel()
     },
-    removeScore(score) {  
-      if (score.id != undefined)
-        this.scoresToRemove.push(score.id)
+    removeScore(score: ArtistScore) {  
+      if ("id" in score.score)
+        this.scoresToRemove.push(score.score.id)
 
       this.scores = this.scores.filter((checkScore) => { return checkScore.metric !== score.metric })
+    },
+    isValue(score: ArtistScore) {
+      return score.metric.type === MetricType.value
     }
   },
   mounted () {
-    this.localArtist = this.new ? {name: "New Artist", scores: [], rating: 1} : this.artist
+    const newArtist = {name: "New Artist", scores: [] as Score[], rating: 1}
+    this.localArtist = this.new ? newArtist : this.artist ?? newArtist
     this.name = this.localArtist.name
     this.editing = this.new
     this.setScores()
   },
-}
+});
 
 </script>
 

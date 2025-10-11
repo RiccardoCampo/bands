@@ -2,7 +2,7 @@
   <div class="searchContainer">
     <div class="search">
       <div class="searchInputOutline">
-        <input class="search" v-model="text" :oninput="getSuggestedMetrics" placeholder="type an artist or a metric..." @focus="activateSuggestedMetricsPanel" @blur="deactivateSuggestedMetricsPanel">
+        <input class="search" v-model="text" :oninput="getSuggestedFilters" placeholder="type an artist or a metric..." @focus="activateSuggestedMetricsPanel" @blur="deactivateSuggestedMetricsPanel">
       </div>
 
       <keyboard-events @keyupEnter="searchOnEnter"></keyboard-events>
@@ -11,8 +11,8 @@
         <search-icon v-else height=32 width=32 iconColor="inherit"/>
       </button>
       
-      <button class="searchBar" @click="toggleMetricsPanel()" title="Show Metric Filters">
-        <chevron-up v-if="metricsPanelActive" height=32 iconColor="inherit"></chevron-up>
+      <button class="searchBar" @click="toggleFiltersPanel()" title="Show Score Filters">
+        <chevron-up v-if="filtersPanelActive" height=32 iconColor="inherit"></chevron-up>
         <chevron-down v-else height=32 iconColor="inherit"></chevron-down>
       </button>
 
@@ -21,21 +21,21 @@
       </button>
     </div>
     
-    <metrics-selector v-if="showSuggestionsPanel" width="496px" color="yellow" style="left: -56px" :metrics="suggestedMetrics" @metricSelected="addMetric"/>
+    <metrics-selector v-if="showSuggestedMetricsPanel" width="496px" color="yellow" style="left: -56px" :metrics="Object.values(suggestedMetrics)" @metricSelected="addFilter"/>
 
-    <div v-if="metricsPanelActive" class="metricsPanel">
-      <div class="selectedMetric" v-for="metric in addColorsToMap(selectedMetrics)" :key="metric">
-        <value-slider v-if="metric.type == 'value'" v-model="metric.value" :label="metric.name" :color="metric.color" :active="true" :range="true" @discardMetric="removeMetric(metric)"/>
-        <flag-check v-else v-model="metric.value" :label="metric.name" :color="metric.color" :active="true" @discardMetric="removeMetric(metric)"/>
+    <div v-if="filtersPanelActive" class="filtersPanel">
+      <div class="selectedFilter" v-for="filter in scoreFiltersWithColors" :key="filter.filter.metric.id">
+        <value-slider v-if="filter.filter.metric.type === 'value'" v-model="filter.filter.filterValues" :label="filter.filter.metric.name" :color="filter.color" :active="true" :range="true" @discardMetric="removeFilter(filter.filter)"/>
+        <flag-check v-else v-model="filter.filter.filterValues.minValue" :label="filter.filter.metric.name" :active="true" @discardMetric="removeFilter(filter.filter)"/>
       </div>
     </div>  
   </div>
 </template>
 
-<script>
-import { useArtistsList } from '@/store/ArtistsList';
-import { useMetrics } from '@/store/Metrics';
-import { usePageStatus } from '@/store/PageStatus';
+<script lang="ts">
+import { useArtistsList } from '@/store/artistsList';
+import { useMetrics } from '@/store/metrics';
+import { usePageStatus } from '@/store/pageStatus';
 import { debounce } from '@/utils';
 import { mapActions, mapState } from 'pinia';
 import ValueSlider from './metrics/ValueSlider.vue';
@@ -43,18 +43,28 @@ import FlagCheck from './metrics/FlagCheck.vue';
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import MetricsSelector from './MetricsSelector.vue';
 import KeyboardEvents from './helpers/KeyboardEvents.vue';
+import { ScoreFilter } from '@/types/score';
+import { Metric } from '@/types/metrics';
+import { defineComponent } from 'vue';
 
 
-export default {
+type ScoreFilterWithColor = {
+  filter: ScoreFilter,
+  color: string
+}
+
+
+
+export default defineComponent({
   name: 'SearchSection',
   data () {
     return {
-      text: "",
-      loading: false,
-      metricsPanelActive: false,
-      suggestionsPanelActive: true,
-      selectedMetrics: {},
-      suggestedMetrics: {},
+      text: "" as string,
+      loading: false as boolean,
+      filtersPanelActive: false as boolean,
+      suggestedMetricsPanelActive: true as boolean,
+      selectedFilters: {} as {[key: string]: ScoreFilter},
+      suggestedMetrics: {} as {[key: string]: Metric},
     }
   },
   components: {
@@ -72,42 +82,42 @@ export default {
   },
   methods: {
     ...mapActions(usePageStatus, ['activateList', 'showNewArtist']),
-    ...mapActions(useArtistsList, ['fetchArtists', 'addPartialArtist']),
+    ...mapActions(useArtistsList, ['fetchArtists']),
     ...mapActions(useMetrics, ['fetchMetrics']),
     async search () {
       if (this.loading)
         return
 
-      this.toggleMetricsPanel(false)
+      this.toggleFiltersPanel(false)
       this.loading = true
 
-      await this.fetchArtists(this.text, Object.values(this.selectedMetrics)).catch((error) => {console.log(error)})
+      await this.fetchArtists(this.text, Object.values(this.selectedFilters)).catch((error) => {console.log(error)})
 
       this.activateList()
       this.loading = false
       this.deactivateSuggestedMetricsPanel()
     },
     async searchOnEnter() {
-      if (!this.headerMinimized || this.suggestionsPanelActive)
+      if (!this.headerMinimized || this.suggestedMetricsPanelActive || this.filtersPanelActive)
         await this.search()
     },
-    toggleMetricsPanel(value) {
-      // When the selected metrics is empty the panel can only be switched off.
-      if ((this.metricsPanelActive && !value) || Object.keys(this.selectedMetrics).length > 0) {
-        if (value !== undefined)
-          this.metricsPanelActive = value
+    toggleFiltersPanel(value: boolean | null = null) {
+      // When the selected filters are empty the panel can only be switched off.
+      if ((this.filtersPanelActive && !value) || Object.keys(this.selectedFilters).length > 0) {
+        if (value !== null)
+          this.filtersPanelActive = value
         else
-          this.metricsPanelActive = !this.metricsPanelActive
+          this.filtersPanelActive = !this.filtersPanelActive
       }
     },
-    getSuggestedMetrics() {
+    getSuggestedFilters() {
       this.activateSuggestedMetricsPanel()
       debounce(
         () => {
           this.suggestedMetrics = {}
           this.metrics.forEach(
             (metric) => {
-              if (metric.name.includes(this.text) & !(metric.name in this.selectedMetrics) & metric.name != "score")
+              if (metric.name.includes(this.text) && !(metric.name in this.selectedFilters))
                 this.suggestedMetrics[metric.name] = metric
             }
           )
@@ -115,24 +125,24 @@ export default {
         300
       )()
     },
-    addMetric(metric) {
-      this.selectedMetrics[metric.name] = metric
+    addFilter(metric: Metric) {
+      this.selectedFilters[metric.name] = {metric, filterValues: {minValue: 1, maxValue: 5}}
       this.suggestedMetrics = {}
       this.text = ""
-      this.toggleMetricsPanel(true)
+      this.toggleFiltersPanel(true)
     },
-    removeMetric(metric) {
-      delete this.selectedMetrics[metric.name]
-      if (Object.keys(this.selectedMetrics).length <= 0)
-        this.toggleMetricsPanel(false)
+    removeFilter(scoreFilter: ScoreFilter) {
+      delete this.selectedFilters[scoreFilter.metric.name]
+      if (Object.keys(this.selectedFilters).length <= 0)
+        this.toggleFiltersPanel(false)
     },
     activateSuggestedMetricsPanel () {
-      this.suggestionsPanelActive = true
+      this.suggestedMetricsPanelActive = true
     },
     deactivateSuggestedMetricsPanel () {
       debounce(
         () => {
-          this.suggestionsPanelActive = false
+          this.suggestedMetricsPanelActive = false
         },
         100
       )()
@@ -141,14 +151,17 @@ export default {
   computed: {
     ...mapState(useMetrics, ['metrics']),
     ...mapState(usePageStatus, ['headerMinimized']),
-    showSuggestionsPanel() {
-      return this.suggestionsPanelActive & this.text !== ""
+    showSuggestedMetricsPanel(): boolean {
+      return this.suggestedMetricsPanelActive && this.text !== ""
     },
-    searchOutlineColor() {
-      return this.suggestionsPanelActive ? "var(--darkyellow)" : "var(--darkred)"
+    searchOutlineColor(): string {
+      return this.suggestedMetricsPanelActive ? "var(--darkyellow)" : "var(--darkred)"
+    },
+    scoreFiltersWithColors(): ScoreFilterWithColor[] {
+      return this.addColorsToMap(Object.values(this.selectedFilters).map((filter: ScoreFilter) => {return {filter: filter}}))
     }
   }
-}
+});
 
 </script>
 
@@ -224,13 +237,13 @@ export default {
     stroke: var(--lightgreen);
   }
 
-  div.selectedMetric {
+  div.selectedFilter {
     margin-left: 20px;
     margin-top: 0px;
     margin-bottom: 0px;
   }
   
-  div.metricsPanel {
+  div.filtersPanel {
     display: flex;  
     align-items: center;
     justify-content: left;
