@@ -1,5 +1,5 @@
 export class ArtistAlreadyExistsError extends Error {
-  constructor(message) {
+  constructor(message: string) {
     super(message);
     this.name = "ArtistAlreadyExistsError";
   }

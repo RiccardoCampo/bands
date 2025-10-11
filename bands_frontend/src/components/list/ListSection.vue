@@ -1,22 +1,23 @@
 <template>
-  <div v-if="this.hasResults" class="listContainer" @scroll="onScroll">
+  <div v-if="hasResults" class="listContainer" @scroll="onScroll">
     <div class="list">
       <list-element v-if="newArtistActive" :new="true" color="green"></list-element>
-      <list-element v-for="artist in displayArtists" :key="artist" :artist="artist" :color="artist.color"></list-element>
+      <list-element v-for="artist in addColors(artists)" :key="artist" :artist="artist" :color="artist.color"></list-element>
     </div>
   </div>
   <p v-else class="noResults"> no search results :( </p>
 </template>
 
-<script>
+<script lang="ts">
 import { mapActions, mapState } from 'pinia';
 import ListElement from './ListElement.vue';
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
-import { usePageStatus } from '@/store/PageStatus';
-import { useArtistsList } from '@/store/ArtistsList';
+import { usePageStatus } from '@/store/pageStatus';
+import { useArtistsList } from '@/store/artistsList';
+import { defineComponent } from 'vue';
 
 
-export default {
+export default defineComponent({
   name: 'ListSection',
   components: {
     'list-element': ListElement,
@@ -25,27 +26,26 @@ export default {
   computed: {
     ...mapState(usePageStatus, ['pageSize', 'newArtistActive']),
     ...mapState(useArtistsList, ['artists', 'page']),
-    ...mapActions(useArtistsList, ['fetchArtistsPage']),
-    hasResults() {
+    hasResults(): boolean {
       return this.artists.length > 0 || this.newArtistActive
     },
-    displayArtists () {
-      return this.addColors(this.artists)
-    },
-    listHeight () {
+    listHeight (): string {
       return this.pageSize.height - 260 + 'px';
     }
   },
   methods: {
-    async onScroll({ target: { scrollTop, clientHeight, scrollHeight }}) {
+    ...mapActions(useArtistsList, ['fetchArtistsPage']),
+    async onScroll(event: Event) {
+      const target = event.target as HTMLElement;
+      const { scrollTop, clientHeight, scrollHeight } = target;
       // When page is 1 it will fetch the next page when half the scroll size is reached, when page is 2 at 3/4, page 3 at 5/6, etc.
-      const toLoadRatio = 1 - 1 / this.page * 2
+      const toLoadRatio = 1 - 1 / (this.page ?? 1) * 2
       if (scrollTop + clientHeight >= scrollHeight * toLoadRatio) {
-        await this.fetchArtistsPage.catch((error) => {console.log(error)})
+        await this.fetchArtistsPage().catch((error) => {console.log(error)})
       }
     }
   }
-}
+});
 
 </script>
 

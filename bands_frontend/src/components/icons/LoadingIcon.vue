@@ -10,11 +10,12 @@
         <line id="line8" x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
     </svg-icon>
 </template>
-<script>
+<script lang="ts">
 
 import SvgIcon from './SvgIcon.vue';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   props: {
       width: {
           type: [Number, String],
@@ -32,7 +33,7 @@ export default {
   components: {
     'svg-icon': SvgIcon,
   },
-}
+});
 
 </script>
 
