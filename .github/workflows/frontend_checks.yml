@@ -41,7 +41,11 @@ jobs:
         key: npm-${{ hashFiles('**/package-lock.json') }}
 
     - name: Install Dependencies
-      run: npm install
+      run: |
+        cd bands_frontend
+        npm install
 
     - name: Run checks
-      run: npm run lint
+      run: |
+        cd bands_frontend
+        npm run lint
