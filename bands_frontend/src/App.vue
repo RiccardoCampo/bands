@@ -9,7 +9,7 @@ import { mapActions, mapState } from 'pinia';
 import HeaderSection from './components/HeaderSection.vue';
 import ListSection from './components/list/ListSection.vue';
 import SearchSection from './components/SearchSection.vue';
-import { usePageStatus } from './store/PageStatus';
+import { usePageStatus } from './store/pageStatus';
 
 export default {
   name: 'BandsApp',

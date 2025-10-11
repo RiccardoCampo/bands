@@ -13,9 +13,10 @@
     </div>
 </template> 
   
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
     name: 'FlagCheck',
     emits: ["discardMetric", "update:modelValue"],
     props: {
@@ -49,16 +50,16 @@ export default {
         this.emit()
     },
     computed: {
-        hoverColor () {
+        hoverColor (): string {
             if (!this.active)
                 return "var(--white)"
 
             return this.value ? "var(--lightgreen)" : "var(--lightred)"
         },
-        outlineHeight () {
+        outlineHeight (): string {
             return this.height + "px"
         },
-        outlineWidth () {
+        outlineWidth (): string {
             return this.width + "px"
         },
     },
@@ -76,7 +77,7 @@ export default {
             this.$emit("discardMetric", this.label)
         },
     }
-}
+});
 
 </script>
 

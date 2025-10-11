@@ -1,7 +1,7 @@
 <template>
     <div class="metricsSelectorContainer">
       <div class="selectorPanel" >
-        <div class="metric" v-for="metric in metrics" :key="metric">
+        <div class="metric" v-for="metric in metrics" :key="metric.id">
           <span class="metric">
             {{ metric.name }}
           </span>
@@ -12,30 +12,36 @@
         <div v-if="allowNewMetric" class="metric" style="justify-content: space-between; margin-bottom: 10px;">
           <input class="input" v-model="newMetric.name"/>
           <button class="metricType" @click="toggleNewMetricType" title="Switch Metric Type">
-            <span>{{ this.newMetric.type }}</span>
+            <span>{{ newMetric.type }}</span>
           </button>
           <button class="metric" @click="addNewMetric" :disabled="newMetric.name === 'New Metric'" title="Add New Metric">
             <loading-icon v-if="loading" height="28" width="28"/>
             <check-icon v-else height=28 width=28 />
           </button>
         </div>
-        <div class="metric" v-else-if="Object.keys(this.metrics).length === 0">
+        <div class="metric" v-else-if="metrics.length === 0">
             <span class="emptySearch">No metrics found</span>
         </div>
       </div>
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
-import { useMetrics } from '@/store/Metrics';
+import { useMetrics } from '@/store/metrics';
+import { Metric, MetricType, NewMetric } from '@/types/metrics';
 import { mapActions } from 'pinia';
+import { PropType } from 'vue';
+import { defineComponent } from 'vue';
 
 
-export default {
+export default defineComponent({
     name: 'MetricsSelector',
     props: {
-        metrics: Object,
+        metrics: {
+          type: Array as PropType<Metric[]>,
+          required: true
+        },
         width: String,
         allowNewMetric: {
             type: Boolean,
@@ -45,8 +51,8 @@ export default {
     mixins: [WithColorMixin],
     data () {
         return {
-          localMetric: this.metrics,
-          newMetric: {},
+          localMetrics: this.metrics as Metric[],
+          newMetric: {} as NewMetric,
           loading: false
         }
     },
@@ -55,30 +61,30 @@ export default {
     },
     methods: {
         ...mapActions(useMetrics, ["addMetric"]),
-        selectMetric (metric) {
+        selectMetric (metric: Metric) {
           this.$emit("metricSelected", metric)
         },
         toggleNewMetricType () {
-          this.newMetric.type = this.newMetric.type === "value" ? "flag" : "value"
+          this.newMetric.type = this.newMetric.type === MetricType.value ? MetricType.flag : MetricType.value
         },
         async addNewMetric() {
           if (this.allowNewMetric) {
             this.loading = true
             const createdMetric = await this.addMetric(this.newMetric).finally(() => { this.loading = false })
 
-            this.localMetric.push(createdMetric)
+            this.localMetrics.push(createdMetric)
             this.resetNewMetric()
           }
         },
         resetNewMetric () {
           this.newMetric = {
             name: "New Metric",
-            type: "value",
+            type: MetricType.value,
             category: "score",
           }
         }
     }
-}
+});
 </script>
 
 <style scoped>

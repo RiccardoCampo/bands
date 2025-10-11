@@ -3,11 +3,12 @@
         <polyline points="24 10 13 21 8 16"></polyline>
     </svg-icon>
 </template>
-<script>
+<script lang="ts">
 
 import SvgIcon from './SvgIcon.vue';
 
-export default {
+import { defineComponent } from 'vue';
+export default defineComponent({
   props: {
       width: {
           type: [Number, String],
@@ -25,6 +26,6 @@ export default {
   components: {
     'svg-icon': SvgIcon,
   },
-}
+});
 
 </script>

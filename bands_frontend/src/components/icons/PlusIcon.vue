@@ -3,11 +3,12 @@
         <line x1="16" y1="9" x2="16" y2="23"></line><line x1="9" y1="16" x2="23" y2="16"></line>
     </svg-icon>
 </template>
-<script>
+<script lang="ts">
 
 import SvgIcon from './SvgIcon.vue';
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   props: {
       width: {
           type: [Number, String],
@@ -25,6 +26,6 @@ export default {
   components: {
     'svg-icon': SvgIcon,
   },
-}
+});
 
 </script>

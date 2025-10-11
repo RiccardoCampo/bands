@@ -9,8 +9,9 @@
     </svg>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+export default defineComponent({
     props: {
         width: {
             type: [Number, String],
@@ -38,9 +39,9 @@ export default {
         }
     },
     computed: {
-        viewBox() {
+        viewBox(): string {
             return `0 0 ${this.viewBoxWidth} ${this.viewBoxHeight}`
         }
     }
-}
+});
 </script>

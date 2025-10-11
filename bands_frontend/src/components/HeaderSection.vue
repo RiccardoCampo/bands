@@ -5,25 +5,29 @@
 </template>
 
 
-<script>
+<script lang="ts">
 import HeaderBand from './HeaderBand.vue';
 import {ColorOrder, HeaderBandSize} from '../config';
 import { mapState } from 'pinia';
-import { usePageStatus } from '@/store/PageStatus';
+import { usePageStatus } from '@/store/pageStatus';
+import { defineComponent } from 'vue';
+
+type LetterWithColor = {
+  letter: string
+  color: string
+}
+
 
 /**
  * Header section, render as many bands are needed to fill in the screen width (add or remove bands when the screen is resized).
  * Bands colors are picked from the color ordered list, centered on the five lettered bands.
  */
-export default {
+export default defineComponent({
   name: 'HeaderSection',
   components: {
     'header-band': HeaderBand,
   },
   methods: {
-    resizeHandler() {
-      this.screenWidth = document.documentElement.clientWidth
-    },
     /**
      * Get the band color, given it's index and the number of added bands.
      * Make sure that the lettered bands start from the first color, additional bands will follow the order.
@@ -31,7 +35,7 @@ export default {
      * @param index band index
      * @param addedBands number of non-letter bands
      */
-    getColor(index, addedBands) {
+    getColor(index: number, addedBands: number) {
       const colorsLength = ColorOrder.length;
 
       let colorIndex = (index + colorsLength - (addedBands / 2) % colorsLength ) % colorsLength;
@@ -44,7 +48,7 @@ export default {
     /**
      * Get the list of bands. Each band is defined by its letter (empty when no letter) and color.
      */
-    bands() {
+    bands(): LetterWithColor[] {
       let bands = ["b", "a", "n", "d", "s"]
       let widthToFill = this.pageSize.width - this.letteredBandsSize
       let addedBands = 0
@@ -56,23 +60,23 @@ export default {
 
       return bands.map((band, index) => ({letter: band, color: this.getColor(index, addedBands)}))
     },
-    letteredBandsSize() {
+    letteredBandsSize(): number {
       return HeaderBandSize.WIDTH * 5
     },
-    sideMargin() {
+    sideMargin(): string {
       return this.shouldShrink ? "-10px" : (-HeaderBandSize.WIDTH - 10) + "px"
     },
     /**
      * Shrink the bands if the screen gets too tight.
      */
-    shouldShrink() {
+    shouldShrink(): boolean {
       return this.pageSize.width < this.letteredBandsSize
     },
-    bandsPosition () {
+    bandsPosition (): string {
       return (this.headerMinimized ? -240 : -10) + "px"
     },
   }
-}
+});
 </script>
 
 <style scoped>

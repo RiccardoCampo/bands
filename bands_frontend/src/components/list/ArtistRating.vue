@@ -7,9 +7,10 @@
     </div>
 </template>
 
-<script>    
+<script lang="ts">    
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'ArtistRating',
   props: {
       modelValue: Number,
@@ -18,12 +19,12 @@ export default {
   },
   data () {
     return {
-        rating: this.modelValue,
-        displayRating: this.modelValue,
+        rating: this.modelValue as number,
+        displayRating: this.modelValue as number,
     }
   },
   methods: {
-    setRating(value) {
+    setRating(value: number) {
       if (this.active) {
         this.displayRating = value
         this.rating = value
@@ -31,7 +32,7 @@ export default {
         this.$emit('update:modelValue', this.rating)
       }
     },
-    setDisplayRating(value) {
+    setDisplayRating(value: number) {
       if (this.active)
         this.displayRating = value
     },
@@ -46,7 +47,7 @@ export default {
       this.displayRating = this.rating
     }
   }
-}
+});
 
 </script>
 
