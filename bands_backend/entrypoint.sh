@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Wait for the DB to spin up (1 minute)"
+sleep 1m
+
 echo "Apply database migrations"
 export DATABASE_USERNAME=root
 export DATABASE_PASSWORD=$MYSQL_ROOT_PASSWORD
