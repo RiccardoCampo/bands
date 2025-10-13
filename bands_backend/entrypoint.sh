@@ -11,4 +11,9 @@ echo "Starting server"
 export DATABASE_USERNAME=$DATABASE_APP_USERNAME
 export DATABASE_PASSWORD=$DATABASE_APP_USER_PASSWORD
 
-.venv/bin/gunicorn --bind 0.0.0.0:8000 bands_backend.wsgi:application
+if [[ $USE_SSL == 1 ]]; then
+  echo "Using SSL"
+	.venv/bin/gunicorn --certfile=certificate.pem --keyfile=privatekey.pem --bind 0.0.0.0:8000 bands_backend.wsgi:application
+else
+	.venv/bin/gunicorn --bind 0.0.0.0:8000 bands_backend.wsgi:application
+fi
