@@ -1,0 +1,15 @@
+[Unit]
+Description=Bands
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+WorkingDirectory=/home/ubuntu/bands
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose down
+User=ubuntu
+Group=docker
+
+[Install]
+WantedBy=multi-user.target

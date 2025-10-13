@@ -75,3 +75,14 @@ values (1, 1, 3),
 (1, 5, 1),
 (1, 4, 3)
 ```
+
+
+## Pushing Docker images from Windows
+1. Replace `CRLF` with `LF` in all the `entrypoint.sh` files, otherwise they won't be recognized.
+2. run `deploy.bat`
+
+
+## Build with Docker
+
+1. Fill in the .env, start from .env.example
+2. Run `docker-compose up`
