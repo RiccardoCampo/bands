@@ -77,9 +77,12 @@ values (1, 1, 3),
 ```
 
 
-## Deploy
-### CORS
-Set `ALLOWED_HOSTS` and `DJANGO_CORS_ALLOWED_ORIGINS_REGEX` in the .env to the host or origins where the frontend is hosted.
+## Pushing Docker images from Windows
+1. Replace `CRLF` with `LF` in all the `entrypoint.sh` files, otherwise they won't be recognized.
+2. run `deploy.bat`
 
-### Pushing Docker images from Windows
-Replace `CRLF` with `LF` in all the `entrypoint.sh` files, otherwise they won't be recognized.
+
+## Build with Docker
+
+1. Fill in the .env, start from .env.example
+2. Run `docker-compose up`
