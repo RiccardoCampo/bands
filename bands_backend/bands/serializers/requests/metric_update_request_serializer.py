@@ -4,8 +4,4 @@ from bands.serializers.requests.metric_create_request_serializer import MetricCr
 
 
 class MetricUpdateRequestSerializer(MetricCreateRequestSerializer):
-    """
-    Serializer for the Metric update request payload.
-    """
-
     name = serializers.CharField(max_length=255, required=False)

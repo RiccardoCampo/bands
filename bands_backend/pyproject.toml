@@ -8,7 +8,7 @@ license = "GPL-3.0"
 [tool.poetry.dependencies]
 python = "^3.11"
 django = "^5.1"
-mysqlclient = "^2.2.4"
+mysqlclient = "^2.2.7"
 python-dotenv = "^1.0.1"
 django-rest-framework = "^0.1.0"
 gunicorn = "^23.0.0"
@@ -16,10 +16,8 @@ django-cors-headers = "^4.6.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.3"
-black = "^24.8.0"
 isort = "^5.13.2"
 mypy = "^1.11.2"
-flake8 = "^7.1.1"
 bandit = "^1.7.9"
 django-stubs = "^5.0.4"
 djangorestframework-stubs = "^3.15.0"
@@ -36,14 +34,10 @@ testpaths = [
     "tests/unit",
 ]
 
-[tool.black]
-line-length = "119"
-target-version = ["py311"]
-
 [tool.ruff]
 cache-dir = ".cache/.ruff"
 lint.select = ["C", "E", "F", "W", "D"]
-lint.ignore = ["D100", "D104", "D200", "D202", "D203", "D212"]
+lint.ignore = ["D100", "D104", "D200", "D202", "D203", "D212", "D102", "D101", "D106", "D103"]
 line-length = 119
 exclude = [
     ".linters",

@@ -6,10 +6,6 @@ from bands.views.artist_view import ArtistViewSet
 
 
 class TestArtistViewSet:
-    """
-    ArtistViewSet unit tests.
-    """
-
     BASE_ARTIST_QUERY: str = (
         "SELECT DISTINCT `artist`.`deleted_at`, `artist`.`id`, `artist`.`name`, `artist`.`spotify_url`, "
         "`artist`.`image_url`, `artist`.`created_at`, `artist`.`updated_at`, `artist`.`rating` FROM `artist`"
@@ -62,10 +58,6 @@ class TestArtistViewSet:
         ],
     )
     def test_filter_artists(self, query_params: dict[str, str], expected_sql: str) -> None:
-        """
-        Assert that the correct query is built, starting from the request query parameters.
-        """
-
         artist_view_set = ArtistViewSet()
         artist_view_set.request = MagicMock(query_params=query_params)
 

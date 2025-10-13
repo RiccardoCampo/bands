@@ -7,16 +7,8 @@ from tests.integration.bands.views.test_case import TestCase
 
 
 class TestArtistViewSet(TestCase):
-    """
-    ArtistViewSet unit tests.
-    """
-
     @classmethod
     def setUpTestData(cls) -> None:
-        """
-        Fill the database.
-        """
-
         for artist in ARTISTS:
             Artist.objects.create(**artist)
 
@@ -27,10 +19,6 @@ class TestArtistViewSet(TestCase):
             Score.objects.create(**score)
 
     def test_list_valid(self) -> None:
-        """
-        Check that the list endpoint respond without errors, returning the expected number of artists.
-        """
-
         response = self.client.get("/bands/artist/?page=1&name=artist-t&rating=[3,]")
 
         self.assertEqual(response.status_code, 200)
@@ -41,20 +29,12 @@ class TestArtistViewSet(TestCase):
         self.assert_artist_equal(results[1], ARTISTS[2])
 
     def test_list_invalid(self) -> None:
-        """
-        Check that the list endpoint respond without errors, returning the expected number of artists.
-        """
-
         response = self.client.get("/bands/artist/?score=[2,")
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content), {"score": "invalid score value [2, for metric score"})
 
     def test_retrieve_valid(self) -> None:
-        """
-        Assert that the test artist is retrieve correctly.
-        """
-
         test_artist_id = 1
 
         response = self.client.get(f"/bands/artist/{test_artist_id}/")
@@ -64,20 +44,12 @@ class TestArtistViewSet(TestCase):
         self.assert_artist_equal(Artist.objects.get(id=test_artist_id), ARTISTS[0])
 
     def test_retrieve_not_found(self) -> None:
-        """
-        Return 404 if the id is missing.
-        """
-
         response = self.client.get("/bands/artist/10/")
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(json.loads(response.content), {"not_found_error": "Artist matching query does not exist."})
 
     def test_create_valid(self) -> None:
-        """
-        Assert that the test artist is created correctly.
-        """
-
         test_artist = {
             "name": "test-artist-four",
             "spotify_url": "https://test-artist-4.com",
@@ -95,10 +67,6 @@ class TestArtistViewSet(TestCase):
         self.assert_artist_equal(Artist.objects.order_by("id").last() or {}, test_artist)
 
     def test_create_invalid(self) -> None:
-        """
-        Return a bad response if the input payload is invalid.
-        """
-
         response = self.client.post(
             "/bands/artist/",
             data={
@@ -111,10 +79,6 @@ class TestArtistViewSet(TestCase):
         self.assertEqual(json.loads(response.content), {"name": ["This field is required."]})
 
     def test_create_already_existing(self) -> None:
-        """
-        Return a bad response if the artist already exist.
-        """
-
         response = self.client.post("/bands/artist/", data=ARTISTS[0])
 
         self.assertEqual(response.status_code, 400)
@@ -124,10 +88,6 @@ class TestArtistViewSet(TestCase):
         )
 
     def test_update_valid(self) -> None:
-        """
-        Assert that the test artist is updated correctly.
-        """
-
         test_artist_update = {
             "name": "test-artist-modified",
             "spotify_url": "https://test-artist-1234.com",
@@ -148,20 +108,12 @@ class TestArtistViewSet(TestCase):
         self.assert_artist_equal(Artist.objects.get(id=test_artist_id), test_artist_update)
 
     def test_update_invalid(self) -> None:
-        """
-        Return a bad response if the input payload is invalid.
-        """
-
         response = self.client.put("/bands/artist/1/", data={"name": ""}, content_type="application/json")
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content), {"name": ["This field may not be blank."]})
 
     def test_update_already_existing(self) -> None:
-        """
-        Return a bad response if the artist already exist.
-        """
-
         response = self.client.put(
             "/bands/artist/1/", data={"name": ARTISTS[1]["name"]}, content_type="application/json"
         )
@@ -173,20 +125,12 @@ class TestArtistViewSet(TestCase):
         )
 
     def test_update_not_found(self) -> None:
-        """
-        Return 404 if the id is missing.
-        """
-
         response = self.client.put("/bands/artist/10/", data={"name": "test"}, content_type="application/json")
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(json.loads(response.content), {"not_found_error": "Artist matching query does not exist."})
 
     def test_delete_valid(self) -> None:
-        """
-        Assert that the artist is deleted correctly.
-        """
-
         response = self.client.delete("/bands/artist/1/")
 
         self.assertEqual(response.status_code, 200)
@@ -195,10 +139,6 @@ class TestArtistViewSet(TestCase):
         self.assertIsNotNone(Artist.objects.get(name=ARTISTS[0]["name"]).deleted_at)
 
     def test_delete_not_found(self) -> None:
-        """
-        Return 404 if the id is missing.
-        """
-
         response = self.client.delete("/bands/artist/10/")
 
         self.assertEqual(response.status_code, 404)
@@ -211,8 +151,4 @@ class TestArtistViewSet(TestCase):
         expected_artist: dict[str, Any] | Artist,
         ignore: tuple = ("id", "created_at", "deleted_at", "scores"),
     ) -> None:
-        """
-        Compare two artist dict representation.
-        """
-
         super().assert_model_equal(actual_artist, expected_artist, ignore)

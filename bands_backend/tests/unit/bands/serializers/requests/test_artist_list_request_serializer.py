@@ -5,10 +5,6 @@ from bands.serializers.requests.artist_list_request_serializer import ArtistList
 
 
 class TestArtistListRequestSerializer:
-    """
-    Test ArtistListRequestSerializer.
-    """
-
     @pytest.mark.parametrize(
         "value_query_param,expected_bounds",
         [
@@ -20,10 +16,6 @@ class TestArtistListRequestSerializer:
         ],
     )
     def test_get_score_bounds(self, value_query_param: str, expected_bounds: tuple[int, int]) -> None:
-        """
-        Assert that the score value bounds are extracted correctly from the query parameter.
-        """
-
         assert ArtistListRequestSerializer._get_score_bounds(value_query_param) == expected_bounds
 
     @pytest.mark.parametrize(
@@ -73,30 +65,18 @@ class TestArtistListRequestSerializer:
     def test_validate_score_value(
         self, data: dict[str, int | str], valid: bool, errors: dict[str, ErrorDetail]
     ) -> None:
-        """
-        Assert query parameters validity.
-        """
-
         serializer = ArtistListRequestSerializer(data=data)
 
         assert serializer.is_valid(raise_exception=False) == valid
         assert serializer._errors == errors
 
     def test_get_scores(self) -> None:
-        """
-        Assert that the scores are serialized correctly.
-        """
-
         serializer = ArtistListRequestSerializer(data={"test-metric-1": "1", "test-metric-2": "[1,3]"})
         serializer.is_valid()
 
         assert serializer.data == {"rating": None, "scores": {"test-metric-1": 1, "test-metric-2": (1, 3)}}
 
     def test_get_rating(self) -> None:
-        """
-        Assert that the rating is serialized correctly.
-        """
-
         serializer = ArtistListRequestSerializer(data={"rating": "[1,3]"})
         serializer.is_valid()
 

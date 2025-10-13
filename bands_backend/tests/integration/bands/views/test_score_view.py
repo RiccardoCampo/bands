@@ -6,16 +6,8 @@ from tests.integration.bands.views.test_case import TestCase
 
 
 class TestScoreViewSet(TestCase):
-    """
-    MetricViewSet unit tests.
-    """
-
     @classmethod
     def setUpTestData(cls) -> None:
-        """
-        Fill the database.
-        """
-
         for artist in ARTISTS:
             Artist.objects.create(**artist)
 
@@ -26,10 +18,6 @@ class TestScoreViewSet(TestCase):
             Score.objects.create(**score)
 
     def test_create_valid(self) -> None:
-        """
-        Assert that the test score is created correctly.
-        """
-
         test_score = {
             "artist_id": 1,
             "metric_id": 2,
@@ -48,10 +36,6 @@ class TestScoreViewSet(TestCase):
         self.assert_model_equal(Score.objects.order_by("id").last() or {}, test_score, ("id",))
 
     def test_create_invalid(self) -> None:
-        """
-        Return a bad response if the input payload is invalid.
-        """
-
         response = self.client.post(
             "/bands/score/",
             data={
@@ -68,10 +52,6 @@ class TestScoreViewSet(TestCase):
         )
 
     def test_create_already_existing(self) -> None:
-        """
-        Return a bad response if the score already exist.
-        """
-
         response = self.client.post("/bands/score/", data=SCORES[0])
 
         self.assertEqual(response.status_code, 400)
@@ -81,10 +61,6 @@ class TestScoreViewSet(TestCase):
         )
 
     def test_update_valid(self) -> None:
-        """
-        Assert that the test score is updated correctly.
-        """
-
         test_score_update = {
             "value": 3,
             "this-field": "is-ignored",
@@ -102,20 +78,12 @@ class TestScoreViewSet(TestCase):
         self.assertEqual(Score.objects.get(id=test_score_id).value, test_score_update["value"])
 
     def test_update_invalid(self) -> None:
-        """
-        Return a bad response if the input payload is invalid.
-        """
-
         response = self.client.put("/bands/score/1/", data={"value": ""}, content_type="application/json")
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(json.loads(response.content), {"value": ["A valid integer is required."]})
 
     def test_update_not_found(self) -> None:
-        """
-        Return 404 if the id is missing.
-        """
-
         response = self.client.put(
             f"/bands/score/{len(SCORES) + 1}/", data={"value": 5}, content_type="application/json"
         )
@@ -124,10 +92,6 @@ class TestScoreViewSet(TestCase):
         self.assertEqual(json.loads(response.content), {"not_found_error": "Score matching query does not exist."})
 
     def test_delete_valid(self) -> None:
-        """
-        Assert that the score is deleted correctly.
-        """
-
         test_id = Metric.objects.all()[0].id
 
         response = self.client.delete(f"/bands/score/{test_id}/")
@@ -137,10 +101,6 @@ class TestScoreViewSet(TestCase):
         self.assertIsNone(Score.objects.filter(id=test_id).first())
 
     def test_delete_not_found(self) -> None:
-        """
-        Return 404 if the id is missing.
-        """
-
         response = self.client.delete(f"/bands/score/{len(SCORES) + 1}/")
 
         self.assertEqual(response.status_code, 404)
@@ -148,10 +108,6 @@ class TestScoreViewSet(TestCase):
         self.assertEqual(Score.objects.count(), len(SCORES))
 
     def test_bulk_upsert_valid(self) -> None:
-        """
-        Assert that the test scores are created or updated correctly.
-        """
-
         test_score_1_id = 1
         test_score_1_new_value = 3
         test_score_2_id = 2
@@ -175,10 +131,6 @@ class TestScoreViewSet(TestCase):
         self.assertEqual(Score.objects.get(id=test_score_2_id).value, test_score_2_new_value)
 
     def test_bulk_upsert_invalid(self) -> None:
-        """
-        Return a bad response if the input payload is invalid.
-        """
-
         for payload in [
             {
                 "updates": [
@@ -209,10 +161,6 @@ class TestScoreViewSet(TestCase):
             self.assertEqual(response.status_code, 400)
 
     def test_bulk_upsert_not_found(self) -> None:
-        """
-        Return 404 if one of the ids is missing. Successful updates are rolled back.
-        """
-
         response = self.client.put(
             f"/bands/score/{len(SCORES) + 1}/", data={"value": 5}, content_type="application/json"
         )

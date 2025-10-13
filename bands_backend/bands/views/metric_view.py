@@ -9,10 +9,6 @@ from bands.views.model_view import ModelViewSet
 
 
 class MetricViewSet(ModelViewSet):
-    """
-    Metric API.
-    """
-
     serializer_class = MetricSerializer
     queryset = Metric.objects.filter(deleted_at=None)
     model = Metric
@@ -20,10 +16,4 @@ class MetricViewSet(ModelViewSet):
     update_request_serializer = MetricUpdateRequestSerializer
 
     def list(self, _: Request) -> Response:
-        """
-        List.
-
-        Get the paginated list of artist, filter it by name or scores.
-        """
-
         return Response(self.get_serializer(self.get_queryset(), many=True).data)
