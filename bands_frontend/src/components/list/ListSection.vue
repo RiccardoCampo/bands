@@ -23,6 +23,11 @@ export default defineComponent({
     'list-element': ListElement,
   },
   mixins: [ColorsMixin],
+  data () {
+    return {
+      fetchingPage: false as boolean
+    }
+  },
   computed: {
     ...mapState(usePageStatus, ['pageSize', 'newArtistActive']),
     ...mapState(useArtistsList, ['artists', 'page']),
@@ -35,14 +40,18 @@ export default defineComponent({
   },
   methods: {
     ...mapActions(useArtistsList, ['fetchArtistsPage']),
-    async onScroll(event: Event) {
+    async onScroll(event: Event) {      
+      if (this.fetchingPage || this.page === null)
+        return
+      this.fetchingPage = true
       const target = event.target as HTMLElement;
       const { scrollTop, clientHeight, scrollHeight } = target;
       // When page is 1 it will fetch the next page when half the scroll size is reached, when page is 2 at 3/4, page 3 at 5/6, etc.
-      const toLoadRatio = 1 - 1 / (this.page ?? 1) * 2
+      const toLoadRatio = 1 - 1 / ((this.page ?? 1) * 2)
       if (scrollTop + clientHeight >= scrollHeight * toLoadRatio) {
         await this.fetchArtistsPage().catch((error) => {console.log(error)})
       }
+      this.fetchingPage = false
     }
   }
 });
