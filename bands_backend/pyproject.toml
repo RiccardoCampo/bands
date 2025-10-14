@@ -13,6 +13,8 @@ python-dotenv = "^1.0.1"
 django-rest-framework = "^0.1.0"
 gunicorn = "^23.0.0"
 django-cors-headers = "^4.6.0"
+syrupy = "^5.0.0"
+pytest-django = "^4.11.1"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.6.3"
@@ -30,12 +32,12 @@ build-backend = "poetry.core.masonry.api"
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra -q"
-testpaths = [
-    "tests/unit",
-]
+testpaths = ["tests"]
+DJANGO_SETTINGS_MODULE = "tests.settings"
 
 [tool.ruff]
 cache-dir = ".cache/.ruff"
+preview = true
 lint.select = ["C", "E", "F", "W", "D"]
 lint.ignore = ["D100", "D104", "D200", "D202", "D203", "D212", "D102", "D101", "D106", "D103"]
 line-length = 119
@@ -48,7 +50,7 @@ exclude = [
     "pyproject.toml",
     "Makefile",
 ]
-target-version = "py311"
+target-version = "py313"
 
 [tool.isort]
 py_version = 311

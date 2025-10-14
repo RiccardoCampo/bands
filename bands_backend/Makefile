@@ -9,10 +9,7 @@ style-fix:
 	isort .
 
 test:
-	echo "Unit tests..."
 	pytest
-	echo "Integration tests..."
-	python .\manage.py test tests.integration
 
 run:
 	python manage.py runserver
