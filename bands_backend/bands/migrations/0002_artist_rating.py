@@ -7,10 +7,6 @@ import bands.models_extensions
 
 
 class Migration(migrations.Migration):
-    """
-    Add artist.rating.
-    """
-
     dependencies = [
         ("bands", "0001_initial"),
     ]

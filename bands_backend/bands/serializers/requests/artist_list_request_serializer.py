@@ -8,22 +8,12 @@ from bands.models import Artist, Score
 
 
 class ArtistListRequestSerializer(serializers.Serializer):
-    """
-    Serializer for the Artist list request parameters.
-    """
-
     name = serializers.CharField(max_length=255, required=False)
     page = serializers.IntegerField(min_value=1, required=False)
     rating = serializers.SerializerMethodField()
     scores = serializers.SerializerMethodField()
 
     def is_valid(self, *, raise_exception: bool = True) -> bool:
-        """
-        Check if the parameters are valid.
-
-        Check each metric name and score, besides the name and page checks.
-        """
-
         self._errors = {}
 
         super().is_valid()
@@ -44,10 +34,6 @@ class ArtistListRequestSerializer(serializers.Serializer):
         return not bool(self._errors)
 
     def get_scores(self, _: Any) -> dict[str, int | tuple[int, int]]:
-        """
-        Get the scores request parameters.
-        """
-
         scores_params: dict[str, int | tuple[int, int]] = {}
 
         for key, value in self.initial_data.items():
@@ -60,10 +46,6 @@ class ArtistListRequestSerializer(serializers.Serializer):
         return scores_params
 
     def get_rating(self, _: Any) -> None | int | tuple[int, int]:
-        """
-        Get the scores request parameters.
-        """
-
         raw_rating = self.initial_data.get("rating")
 
         if raw_rating:
@@ -72,28 +54,14 @@ class ArtistListRequestSerializer(serializers.Serializer):
 
     @staticmethod
     def _validate_score_value(score_value: Any) -> bool:
-        """
-        Check that the score value is either a single number of a range (with bounds optional).
-        """
-
         return bool(isinstance(score_value, str) and re.match(r"(\d+)|(\[\d*,\d*])", score_value))
 
     @staticmethod
     def _validate_metric_name(metric_name: Any) -> bool:
-        """
-        Check that the metric name is a string shorter than 255.
-        """
-
         return isinstance(metric_name, str) and len(metric_name) <= 255
 
     @staticmethod
     def _get_score_bounds(value_query_param: str) -> tuple[int, int]:
-        """
-        Extract the range values from the request.
-
-        Default the left value to 0 and the right value to the maximum, clamp both values.
-        """
-
         left_value, right_value = str(value_query_param)[1:-1].split(",")
 
         return (

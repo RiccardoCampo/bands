@@ -1,0 +1,54 @@
+# serializer version: 1
+# name: test_create_valid
+  dict({
+    'category': 'genre',
+    'id': 6,
+    'name': 'test-metric',
+    'type': 'value',
+  })
+# ---
+# name: test_delete_valid
+  'OK'
+# ---
+# name: test_list_valid
+  list([
+    dict({
+      'category': 'genre',
+      'id': 1,
+      'name': 'test-genre-1',
+      'type': 'value',
+    }),
+    dict({
+      'category': 'genre',
+      'id': 2,
+      'name': 'test-genre-2',
+      'type': 'value',
+    }),
+    dict({
+      'category': 'genre',
+      'id': 3,
+      'name': 'test-subgenre',
+      'type': 'value',
+    }),
+    dict({
+      'category': 'score',
+      'id': 4,
+      'name': 'test-value-metric',
+      'type': 'value',
+    }),
+    dict({
+      'category': 'score',
+      'id': 5,
+      'name': 'test-flag-metric',
+      'type': 'flag',
+    }),
+  ])
+# ---
+# name: test_update_valid
+  dict({
+    'category': 'genre',
+    'id': 1,
+    'name': 'test-metric',
+    'type': 'flag',
+  })
+# ---

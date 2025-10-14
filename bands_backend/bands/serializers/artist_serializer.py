@@ -5,18 +5,8 @@ from bands.serializers.score_in_artist_serializer import ScoreInArtistSerializer
 
 
 class ArtistSerializer(serializers.ModelSerializer):
-    """
-    Artists model serializer.
-
-    Includes the list of scores.
-    """
-
     scores = ScoreInArtistSerializer(many=True, source="score_set")
 
     class Meta:
-        """
-        Settings.
-        """
-
         model = Artist
         fields = ["id", "name", "spotify_url", "image_url", "rating", "created_at", "scores"]

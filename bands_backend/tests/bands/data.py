@@ -74,4 +74,10 @@ SCORES: list[dict[str, str | int]] = [
         "metric_id": "5",
         "value": 1,
     },
+    {
+        "id": 4,
+        "artist_id": "2",
+        "metric_id": "1",
+        "value": 3,
+    },
 ]

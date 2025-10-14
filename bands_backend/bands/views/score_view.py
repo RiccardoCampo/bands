@@ -13,10 +13,6 @@ from bands.views.model_view import ModelViewSet
 
 
 class ScoreViewSet(ModelViewSet):
-    """
-    Score API.
-    """
-
     serializer_class = ScoreSerializer
     queryset = Score.objects
     model = Score
@@ -26,12 +22,6 @@ class ScoreViewSet(ModelViewSet):
     @transaction.atomic
     @action(detail=False, methods=["PUT"], name="Bulk update", url_path="bulk-upsert")
     def bulk_update(self, request: Request) -> Response:
-        """
-        Bulk upsert.
-
-        Create or update each score specified in the request payload.
-        """
-
         request_payload: serializers.Serializer = ScoreBulkUpsertRequestSerializer(data=request.data)
         request_payload.is_valid(raise_exception=True)
 
