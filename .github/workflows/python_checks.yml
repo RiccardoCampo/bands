@@ -1,4 +1,4 @@
-name: Style checks
+name: Backend
 
 run-name: ${{ github.event.pull_request.title || github.ref_name }}
 on:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   python-style-checks:
-    name: Python style checks
+    name: Style checks
     runs-on: ubuntu-latest
 
     steps:
@@ -63,7 +63,7 @@ jobs:
         make style
 
   python-tests:
-    name: Python tests
+    name: Tests
     runs-on: ubuntu-latest
 
     steps:

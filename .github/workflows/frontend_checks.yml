@@ -1,4 +1,4 @@
-name: Style checks
+name: Frontend
 
 run-name: ${{ github.event.pull_request.title || github.ref_name }}
 on:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   typescript-style-checks:
-    name: Typescript style checks
+    name: Style checks
     runs-on: ubuntu-latest
 
     steps:
