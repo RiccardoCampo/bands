@@ -7,26 +7,21 @@ ENV PYTHONFAULTHANDLER=1 \
 RUN mkdir app
 WORKDIR /app
 
-# Install dependencies required to build mysqlclient package
+# Install dependencies required to build and use mysqlclient package
 RUN apt-get update && \
     apt-get install -y default-libmysqlclient-dev
 
 # Stage 1: Base build stage
 FROM base AS builder
 
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
 # Install dependencies required to build mysqlclient package
 RUN apt-get install -y pkg-config python3-dev build-essential
 
-ENV PIP_DEFAULT_TIMEOUT=100 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1 \
-    POETRY_VERSION=2.0.1
-
-RUN pip install "poetry==$POETRY_VERSION"
-
 COPY pyproject.toml ./
-RUN poetry config virtualenvs.in-project true && \
-    poetry install --only=main --no-root
+RUN uv sync --no-dev --no-install-project
 
 # Stage 2: Production stage
 FROM base AS final

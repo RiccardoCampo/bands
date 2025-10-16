@@ -5,10 +5,6 @@ from bands.models_extensions import PositiveAutoField, PositiveTinyIntegerField,
 
 
 class Artist(SoftDeleteModel):
-    """
-    Artist model.
-    """
-
     MIN_RATING_VALUE = 1
     MAX_RATING_VALUE = 5
 
@@ -23,16 +19,8 @@ class Artist(SoftDeleteModel):
     )
 
     class Meta:
-        """
-        Settings.
-        """
-
         db_table = "artist"
 
     @staticmethod
     def clamp_rating(value: int) -> int:
-        """
-        Clamp the input value between min and the max rating value.
-        """
-
         return min(max(Artist.MIN_RATING_VALUE, value), Artist.MAX_RATING_VALUE)

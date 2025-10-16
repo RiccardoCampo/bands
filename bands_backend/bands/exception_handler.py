@@ -5,10 +5,6 @@ from rest_framework.views import exception_handler
 
 
 def custom_exception_handler(exc: Exception, context: dict) -> Response:
-    """
-    Render exceptions.
-    """
-
     response = exception_handler(exc, context)
 
     if isinstance(exc, IntegrityError):

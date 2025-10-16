@@ -1,4 +1,4 @@
-name: Style checks
+name: Backend
 
 run-name: ${{ github.event.pull_request.title || github.ref_name }}
 on:
@@ -19,7 +19,7 @@ concurrency:
 
 jobs:
   python-style-checks:
-    name: Python style checks
+    name: Style checks
     runs-on: ubuntu-latest
 
     steps:
@@ -29,35 +29,53 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.13'
 
-    - name: Install Poetry
-      run: pip install poetry
-
-    - name: Setup Virtualenv
-      id: virtualenv-setup
-      run: |
-        export POETRY_VIRTUALENVS_CREATE=true
-        cd bands_backend
-        poetry run python --version
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
 
     - name: Cache dependencies
       id: cache-dependencies
       uses: actions/cache@v4
       with:
         path: |
-          ~/bands_backend/.cache
-          ~/bands_backend/.venv
-        key: poetry-${{ hashFiles('**/poetry.lock') }}
-
-    - name: Install dependencies
-      run: |
-        cd bands_backend
-        python --version && poetry --version
-        poetry install --no-ansi --no-interaction --sync --no-root
+          bands_backend/.cache
+          bands_backend/.venv
+        key: uv-${{ hashFiles('**/uv.lock') }}
 
     - name: Run checks
       run: |
         cd bands_backend
-        source $(poetry env info --path)/bin/activate
-        make style
+        python --version && uv --version
+        uv run make style
+
+  python-tests:
+    name: Tests
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@main
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
+
+    - name: Cache dependencies
+      id: cache-dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          bands_backend/.cache
+          bands_backend/.venv
+        key: uv-${{ hashFiles('**/uv.lock') }}
+
+    - name: Run checks
+      run: |
+        cd bands_backend
+        python --version && uv --version
+        uv run make test

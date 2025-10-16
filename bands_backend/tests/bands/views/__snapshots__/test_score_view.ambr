@@ -1,0 +1,21 @@
+# serializer version: 1
+# name: test_bulk_upsert_valid
+  'OK'
+# ---
+# name: test_create_valid
+  dict({
+    'artist': 1,
+    'metric': 2,
+    'value': 3,
+  })
+# ---
+# name: test_delete_valid
+  'OK'
+# ---
+# name: test_update_valid
+  dict({
+    'artist': 1,
+    'metric': 1,
+    'value': 3,
+  })
+# ---

@@ -5,27 +5,13 @@ from bands.models import Score
 
 
 class ScoreBulkUpsertRequestSerializer(serializers.Serializer):
-    """
-    Serializer for the Score bulk upsert request payload.
-    """
-
     class ScoreUpsertSerializer(serializers.Serializer):
-        """
-        Serializer for a single score bulk upsert.
-        """
-
         id = serializers.IntegerField(required=False)
         metric_id = serializers.IntegerField(required=False)
         artist_id = serializers.IntegerField(required=False)
         value = serializers.IntegerField(min_value=0, max_value=Score.MAX_SCORE_VALUE, required=True)
 
         def is_valid(self, *, raise_exception: bool = True) -> bool:
-            """
-            Check if the parameters are valid.
-
-            Check each metric name and score, besides the name and page checks.
-            """
-
             self._errors = {}
 
             super().is_valid()

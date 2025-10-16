@@ -7,23 +7,11 @@ from bands.models_extensions import PositiveAutoField, PositiveTinyIntegerField,
 
 
 class Metric(SoftDeleteModel):
-    """
-    Metric model.
-    """
-
     class MetricType(models.IntegerChoices):
-        """
-        Metric type enum.
-        """
-
         FLAG = 0, gettext_lazy("flag")
         VALUE = 1, gettext_lazy("value")
 
     class MetricCategory(models.IntegerChoices):
-        """
-        Metric type enum.
-        """
-
         SCORE = 0, gettext_lazy("score")
         MAIN_SCORE = 1, gettext_lazy("main_score")
         GENRE = 2, gettext_lazy("genre")
@@ -35,16 +23,8 @@ class Metric(SoftDeleteModel):
     category = PositiveTinyIntegerField(choices=MetricCategory, default=0)
 
     class Meta:
-        """
-        Settings.
-        """
-
         db_table = "metric"
 
     @classmethod
     def enum_fields(cls) -> dict[str, Type[models.IntegerChoices]]:
-        """
-        Get the enum field and their classes.
-        """
-
         return {"category": cls.MetricCategory, "type": cls.MetricType}

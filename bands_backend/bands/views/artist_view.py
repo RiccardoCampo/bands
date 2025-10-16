@@ -13,10 +13,6 @@ from bands.views.model_view import ModelViewSet
 
 
 class ArtistViewSet(ModelViewSet):
-    """
-    Artist API.
-    """
-
     serializer_class = ArtistSerializer
     queryset = Artist.objects.filter(deleted_at=None)
     model = Artist
@@ -24,12 +20,6 @@ class ArtistViewSet(ModelViewSet):
     update_request_serializer = ArtistUpdateRequestSerializer
 
     def list(self, request: Request) -> Response:
-        """
-        List.
-
-        Get the paginated list of artist, filter it by name or scores.
-        """
-
         query_params = ArtistListRequestSerializer(data=self.request.query_params)
         query_params.is_valid()
 
@@ -43,21 +33,11 @@ class ArtistViewSet(ModelViewSet):
         return self.paginator.get_paginated_response(serializer.data)  # type: ignore[union-attr]
 
     def retrieve(self, _: Request, pk: int) -> Response:
-        """
-        Retrieve.
-
-        Display an existing model.
-        """
-
         model = self.get_queryset().get(id=pk)
 
         return Response(self.get_serializer(model).data)
 
     def _filter_artists(self, query_params: dict[str, Any]) -> QuerySet:
-        """
-        Get the query set, apply query string filters.
-        """
-
         artists = self.get_queryset().order_by("-rating", "name")
 
         if name := query_params.get("name"):
