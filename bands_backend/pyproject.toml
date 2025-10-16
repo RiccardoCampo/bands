@@ -1,33 +1,35 @@
-[tool.poetry]
+[project]
 name = "bands_backend"
 version = "0.1.0"
 description = ""
-authors = ["Riccardo Campo <riccardocampo@tutanota.com>"]
+authors = [{ name = "Riccardo Campo", email = "riccardocampo@tutanota.com" }]
+requires-python = ">=3.13"
 license = "GPL-3.0"
+dependencies = [
+    "django~=5.1",
+    "mysqlclient>=2.2.7,<3",
+    "python-dotenv>=1.0.1,<2",
+    "django-rest-framework>=0.1.0,<0.2",
+    "gunicorn>=23.0.0,<24",
+    "django-cors-headers>=4.6.0,<5",
+    "syrupy>=5.0.0,<6",
+    "pytest-django>=4.11.1,<5",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-django = "^5.1"
-mysqlclient = "^2.2.7"
-python-dotenv = "^1.0.1"
-django-rest-framework = "^0.1.0"
-gunicorn = "^23.0.0"
-django-cors-headers = "^4.6.0"
-syrupy = "^5.0.0"
-pytest-django = "^4.11.1"
-
-[tool.poetry.group.dev.dependencies]
-ruff = "^0.6.3"
-isort = "^5.13.2"
-mypy = "^1.11.2"
-bandit = "^1.7.9"
-django-stubs = "^5.0.4"
-djangorestframework-stubs = "^3.15.0"
-pytest = "^8.3.3"
+[dependency-groups]
+dev = [
+    "ruff>=0.6.3,<0.7",
+    "isort>=5.13.2,<6",
+    "mypy>=1.11.2,<2",
+    "bandit>=1.7.9,<2",
+    "django-stubs>=5.0.4,<6",
+    "djangorestframework-stubs>=3.15.0,<4",
+    "pytest>=8.3.3,<9",
+]
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -46,14 +48,14 @@ exclude = [
     ".env",
     ".env.example",
     ".gitignore",
-    "poetry.lock",
+    "uv.lock",
     "pyproject.toml",
     "Makefile",
 ]
 target-version = "py313"
 
 [tool.isort]
-py_version = 311
+py_version = 312
 skip_glob = "_init__.py"
 line_length = 119
 multi_line_output = 3
@@ -61,7 +63,7 @@ combine_as_imports = true
 include_trailing_comma = true
 
 [tool.mypy]
-python_version = 3.11
+python_version = 3.13
 incremental = true
 cache_dir = ".cache/mypy"
 color_output = true
