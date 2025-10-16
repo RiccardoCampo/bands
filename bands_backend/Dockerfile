@@ -1,4 +1,4 @@
-FROM python:3.13-slim-bookworm AS base
+FROM python:3.13-slim AS base
 
 ENV PYTHONFAULTHANDLER=1 \
     PYTHONHASHSEED=random \
@@ -13,6 +13,9 @@ RUN apt-get update && \
 
 # Stage 1: Base build stage
 FROM base AS builder
+
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 # Install dependencies required to build mysqlclient package
 RUN apt-get install -y pkg-config python3-dev build-essential
