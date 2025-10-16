@@ -31,15 +31,8 @@ jobs:
       with:
         python-version: '3.13'
 
-    - name: Install Poetry
-      run: pip install poetry
-
-    - name: Setup Virtualenv
-      id: virtualenv-setup
-      run: |
-        export POETRY_VIRTUALENVS_CREATE=true
-        cd bands_backend
-        poetry run python --version
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
 
     - name: Cache dependencies
       id: cache-dependencies
@@ -48,19 +41,13 @@ jobs:
         path: |
           bands_backend/.cache
           bands_backend/.venv
-        key: poetry-${{ hashFiles('**/poetry.lock') }}
-
-    - name: Install dependencies
-      run: |
-        cd bands_backend
-        python --version && poetry --version
-        poetry install --no-ansi --no-interaction --sync --no-root
+        key: uv-${{ hashFiles('**/uv.lock') }}
 
     - name: Run checks
       run: |
         cd bands_backend
-        source $(poetry env info --path)/bin/activate
-        make style
+        python --version && uv --version
+        uv run make style
 
   python-tests:
     name: Tests
@@ -75,15 +62,8 @@ jobs:
       with:
         python-version: '3.13'
 
-    - name: Install Poetry
-      run: pip install poetry
-
-    - name: Setup Virtualenv
-      id: virtualenv-setup
-      run: |
-        export POETRY_VIRTUALENVS_CREATE=true
-        cd bands_backend
-        poetry run python --version
+    - name: Install uv
+      uses: astral-sh/setup-uv@v6
 
     - name: Cache dependencies
       id: cache-dependencies
@@ -92,16 +72,10 @@ jobs:
         path: |
           bands_backend/.cache
           bands_backend/.venv
-        key: poetry-${{ hashFiles('**/poetry.lock') }}
+        key: uv-${{ hashFiles('**/uv.lock') }}
 
-    - name: Install dependencies
+    - name: Run checks
       run: |
         cd bands_backend
-        python --version && poetry --version
-        poetry install --no-ansi --no-interaction --sync --no-root
-
-    - name: Run tests
-      run: |
-        cd bands_backend
-        source $(poetry env info --path)/bin/activate
-        make test
+        python --version && uv --version
+        uv run make test
