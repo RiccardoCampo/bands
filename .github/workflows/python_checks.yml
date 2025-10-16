@@ -50,7 +50,7 @@ jobs:
         uv run make style
 
   python-tests:
-    name: Style checks
+    name: Tests
     runs-on: ubuntu-latest
 
     steps:
