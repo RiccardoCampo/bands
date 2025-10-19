@@ -30,6 +30,19 @@ export type ArtistsPage = {
   next: number | null
 }
 
+export type ArtistCreateRequest = {
+  name: string
+  spotify_url: string | null
+  image_url: string | null
+  rating: number
+}
+
+export type ArtistUpdateRequest = {
+  name: string
+  spotify_url: string | null
+  image_url: string | null
+  rating: number
+}
 
 
 export default {
@@ -54,7 +67,12 @@ export default {
   },
   async create (artist: Artist): Promise<ArtistResponse> {
     try {
-      return (await axios.post(BASE_URL, artist)).data
+      return (await axios.post(BASE_URL, {
+        name: artist.name,
+        rating: artist.rating,
+        spotify_url: artist.spotifyUrl,
+        image_url: artist.imageUrl
+      } as ArtistCreateRequest)).data
     } catch (error: any) {
       if (error.response?.data?.integrity_error !== undefined)
         throw new ArtistAlreadyExistsError("An artist with this name already exist")
@@ -62,6 +80,11 @@ export default {
     }
   },
   async update (artist: Artist): Promise<ArtistResponse> {
-    return (await axios.put(`${BASE_URL}${artist.id}/`, artist)).data
+    return (await axios.put(`${BASE_URL}${artist.id}/`, {
+        name: artist.name,
+        rating: artist.rating,
+        spotify_url: artist.spotifyUrl,
+        image_url: artist.imageUrl
+      } as ArtistUpdateRequest)).data
   }
 };
