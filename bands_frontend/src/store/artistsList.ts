@@ -58,6 +58,7 @@ export const useArtistsList = defineStore('artists-list', {
         const createdArtist = await artistsAPIRepository.create(artist);
         
         const artistId: number = createdArtist.id
+        artist.id = artistId
 
         await scoresAPIRepository.upsertBulk(artist)
 
