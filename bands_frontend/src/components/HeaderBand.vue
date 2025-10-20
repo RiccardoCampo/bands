@@ -29,7 +29,7 @@ export default defineComponent({
     mixins: [WithColorMixin],
     data () {
         return {
-            sliderPosition: 240,
+            sliderPosition: Math.floor(Math.random() * (HeaderSliderMaxHeight - HeaderSliderMinHeight + 1)) + HeaderSliderMinHeight,
         }
     },
     computed: {
