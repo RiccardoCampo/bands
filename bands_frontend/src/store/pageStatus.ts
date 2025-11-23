@@ -6,6 +6,7 @@ export const usePageStatus = defineStore('page-status', {
         _colorOffset: undefined as number | undefined,
         listActive: false as boolean,
         newArtistActive: false as boolean,
+        searchStarted: false as boolean,
         pageSize: {
             width: 0,
             height: 0,
@@ -23,6 +24,10 @@ export const usePageStatus = defineStore('page-status', {
         }
     },
     actions: {
+        startSearch() {
+            this.searchStarted = true
+            this.activateList()
+        },
         activateList () {
             this.listActive = true
         },

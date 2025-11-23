@@ -81,7 +81,7 @@ export default defineComponent({
     )
   },
   methods: {
-    ...mapActions(usePageStatus, ['activateList', 'showNewArtist']),
+    ...mapActions(usePageStatus, ['startSearch', 'showNewArtist']),
     ...mapActions(useArtistsList, ['fetchArtists']),
     ...mapActions(useMetrics, ['fetchMetrics']),
     async search () {
@@ -97,7 +97,7 @@ export default defineComponent({
 
       await this.fetchArtists(this.text, Object.values(this.selectedFilters).map((filter) => {return filter.filter})).catch((error) => {console.log(error)})
 
-      this.activateList()
+      this.startSearch()
       this.loading = false
       this.deactivateSuggestedMetricsPanel()
     },
