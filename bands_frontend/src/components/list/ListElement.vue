@@ -22,15 +22,15 @@
           <input class="input link" v-model="localArtist.spotifyUrl">
         </div>
         <div class="scores">
-          <div v-for="score in scores" :key="score.metric.name" class="score">
-            <value-slider v-if="isValue(score)" v-model="score.score.value" :color="score.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></value-slider>
-            <flag-check v-else v-model="score.score.value" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></flag-check>
+          <div v-for="score in scores" :key="score.metric.name + score.values.maxValue" class="score">
+            <value-slider v-if="isValue(score)" v-model="score.values" :color="score.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></value-slider>
+            <flag-check v-else v-model="score.values.minValue" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></flag-check>
           </div>
         </div>
         <button v-if="editing" class="button edit" @click="toggleMetricsPanel" title="Add Score">
           <plus-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
         </button>
-        <metric-selector v-if="editing && metricsPanelActive" width="300px" :color="color" :metrics="newMetrics" :allowNewMetric="true" @metricSelected="addScore" />
+        <metric-selector v-if="editing && metricsPanelActive" width="400px" :color="color" :metrics="selectionMetrics" :allowNewMetric="true" @metricSelected="addOrEditScore" @metricUnselected="removePanelScore" @clickOutside="toggleMetricsPanel"/>
         <div class="actions">
           <button v-if="editing" class="button confirm" @click="edit" title="Confirm Changes">
             <loading-icon v-if="loading" style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
@@ -56,26 +56,23 @@ import FlagCheck from '../metrics/FlagCheck.vue';
 import { mapActions, mapState } from 'pinia';
 import { useArtistsList } from '@/store/artistsList';
 import { usePageStatus } from '@/store/pageStatus';
-import MetricsSelector from '../MetricsSelector.vue';
+import MetricsSelector, { ScoreFilterWithColor } from '../MetricsSelector.vue';
 import { useMetrics } from '@/store/metrics';
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
 import { ArtistAlreadyExistsError } from '@/exceptions';
 import { PropType } from 'vue';
-import { NewScore, Score } from '@/types/score';
+import { FilterValues, Score } from '@/types/score';
 import { MetricType, Metric } from '@/types/metrics';
 import { Artist } from '@/types/artist';
 import { defineComponent } from 'vue';
+import { debounce } from '@/utils';
 
 
 type ArtistScore = {
-  score: Score | NewScore
-  metric: ArtistScoreMetric
+  scoreId?: number
+  values: FilterValues,
+  metric: Metric
   color: string
-}
-
-type ArtistScoreMetric = {
-  name: string
-  type: MetricType
 }
 
 
@@ -98,7 +95,7 @@ export default defineComponent({
       name: "",
       localArtist: {} as Artist,
       rating: 1,
-      scores: [] as ArtistScore[],
+      scores: {} as {[key: string]: ArtistScore},
       backupArtist: {} as Artist,
       metricsPanelActive: false,
       scoresToRemove: [] as number [],
@@ -107,9 +104,39 @@ export default defineComponent({
   },
   computed: {
     ...mapState(useMetrics, ['metrics']),
-    newMetrics (): Metric[] {
-      const currentMetrics = this.scores.map(score => score.metric.name)
-      return this.metrics.filter((metric: Metric) => {return !currentMetrics.includes(metric.name)})
+    selectionMetrics(): ScoreFilterWithColor[] {
+      const currentMetricsIds = Object.keys(this.scores)
+      const scoresLength = this.scores.length
+      const newMetrics = this.metrics.filter(
+        (metric: Metric) => {return !currentMetricsIds.includes(metric.id.toString())}
+      ).map(
+        (metric, index) => {
+          return {
+            filter: {
+              metric,
+              filterValues: {
+                minValue: 0,
+                maxValue: 5,
+              },
+            },
+            color: this.getColor(index) + scoresLength,
+            selected: false,
+            range: false,
+          };
+        }
+      )
+      const scores = Object.values(this.scores).map((score, index) => {
+        return {
+          filter: {
+            metric: score.metric,
+            filterValues: score.values,
+          },
+          color: this.getColor(index),
+          selected: true,
+          range: false,
+        }
+      })
+      return [...scores, ...newMetrics]
     }
   },
   methods: {
@@ -136,7 +163,20 @@ export default defineComponent({
     async edit () {
       if (this.loading)
         return
-      this.localArtist.scores = this.scores.map(score => score.score)
+      this.localArtist.scores = Object.values(this.scores).map(
+        score => {
+          const value = score.metric.type === MetricType.flag ? score.values.minValue : score.values.maxValue
+          return score.scoreId === undefined ? {
+            metricId: score.metric.id,
+            value,
+          } : {
+            id: score.scoreId,
+            metric: score.metric.name,
+            type: score.metric.type,
+            value,
+          }
+        }
+      )
       this.localArtist.rating = this.rating
       this.loading = true
       try {
@@ -161,40 +201,54 @@ export default defineComponent({
       }
     },
     setScores () {
-      this.scores = this.addColors(
-        this.localArtist.scores.map(
-          (score: Score | NewScore) => {
-            if ("id" in score)
-              return {score: score, metric: {type: score.type, name: score.metric}}
+      this.scores = {}
+      this.localArtist.scores.forEach((score, index) => {
+        if ("id" in score) {
+          const metric: Metric = this.metrics.filter(metric => metric.name === score.metric)[0]
+          this.scores[metric.id] = {
+            scoreId: score.id,
+            metric,
+            values: metric.type === MetricType.flag ? {minValue: score.value, maxValue: 0} : {minValue: 0, maxValue: score.value},
+            color: this.getColor(index)
           }
-        )
-      )
+        }
+      })
       this.rating = this.localArtist.rating
       this.scoresToRemove = []
     },
     toggleMetricsPanel() {
       this.metricsPanelActive = !this.metricsPanelActive
     },  
-    addScore(metric: Metric) {
-      this.scores.push({
-        score: {
-          metricId: metric.id,
-          value: 1,
-        },
-        metric: metric,
-        color: this.getColor(this.colorOffset + this.scores.length - 1)
-      })
-      this.toggleMetricsPanel()
+    addOrEditScore(score: ScoreFilterWithColor) {
+      const metricId = score.filter.metric.id
+      if (metricId in this.scores) {
+        this.scores[metricId].values = score.filter.filterValues
+      } else {
+        debounce(() => {
+          this.scores[metricId] = {
+            values: score.filter.filterValues,
+            metric: score.filter.metric,
+            color: this.getColor(Object.keys(this.scores).length - 1)
+          }
+        }, 300)()
+      }        
     },
     removeScore(score: ArtistScore) {  
-      if ("id" in score.score)
-        this.scoresToRemove.push(score.score.id)
+      if (score.scoreId !== undefined)
+        this.scoresToRemove.push(score.scoreId)
 
-      this.scores = this.scores.filter((checkScore) => { return checkScore.metric !== score.metric })
+      delete this.scores[score.metric.id]
+    },
+    removePanelScore(score: ScoreFilterWithColor) {
+      const existingScore = this.scores[score.filter.metric.id]
+      if (existingScore !== undefined && existingScore.scoreId !== undefined)
+        this.scoresToRemove.push(existingScore.scoreId)
+
+      delete this.scores[score.filter.metric.id]
     },
     isValue(score: ArtistScore) {
       return score.metric.type === MetricType.value
-    }
+    },
   },
   mounted () {
     const newArtist = {name: "New Artist", scores: [] as Score[], rating: 1}

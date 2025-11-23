@@ -1,15 +1,36 @@
-<template>
-    <div class="metricsSelectorContainer">
-      <div class="selectorPanel" >
-        <div class="metric" v-for="metric in metrics" :key="metric.id">
+<template >
+    <div class="metricsSelectorContainer" >
+      <div class="selectorPanel" v-click-outside="clickOutside">
+        <div class="metricContainer"   v-for="metricWithValue in metrics" :key="metricWithValue.filter.metric.id">
           <span class="metric">
-            {{ metric.name }}
+            {{ metricWithValue.filter.metric.name }}
           </span>
-          <button class="metric" @click="selectMetric(metric)" title="Select Metric">
-            <plus-icon height=28 width=28 />
+          <div class="metric">
+            <value-slider 
+              v-if="metricWithValue.filter.metric.type === 'value'"
+              v-model="metricWithValue.filter.filterValues"
+              v-on:update:modelValue="selectMetric(metricWithValue)"
+              :color="metricWithValue.selected ? metricWithValue.color : 'grey'"
+              active
+              :range="metricWithValue.range"
+              hideDiscardButton
+              hideLabel 
+            />
+            <flag-check
+              v-else
+              v-model="metricWithValue.filter.filterValues.minValue"
+              v-on:update:modelValue="selectMetric(metricWithValue)"
+              active
+              hideDiscardButton
+              hideLabel
+            />
+          </div>
+          <button class="metric" @click="editMetric(metricWithValue)" title="Select Metric">
+            <cross-icon v-if="metricWithValue.selected" height=28 width=28 />
+            <plus-icon v-else height=28 width=28 />
           </button>
         </div>
-        <div v-if="allowNewMetric" class="metric" style="justify-content: space-between; margin-bottom: 10px;">
+        <div v-if="allowNewMetric" class="metricContainer" style="margin-bottom: 10px;">
           <input class="input" v-model="newMetric.name"/>
           <button class="metricType" @click="toggleNewMetricType" title="Switch Metric Type">
             <span>{{ newMetric.type }}</span>
@@ -19,7 +40,7 @@
             <check-icon v-else height=28 width=28 />
           </button>
         </div>
-        <div class="metric" v-else-if="metrics.length === 0">
+        <div class="metricContainer" v-else-if="metrics.length === 0">
             <span class="emptySearch">No metrics found</span>
         </div>
       </div>
@@ -27,20 +48,34 @@
 </template>
 
 <script lang="ts">
+import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
+import ValueSlider from './metrics/ValueSlider.vue';
+import FlagCheck from './metrics/FlagCheck.vue';
 import { useMetrics } from '@/store/metrics';
-import { Metric, MetricType, NewMetric } from '@/types/metrics';
+import { MetricType, NewMetric } from '@/types/metrics';
+import { ScoreFilter } from '@/types/score';
 import { mapActions } from 'pinia';
 import { PropType } from 'vue';
 import { defineComponent } from 'vue';
+
+
+
+
+export type ScoreFilterWithColor = {
+  filter: ScoreFilter,
+  color: string,
+  selected: boolean,
+  range: boolean
+}
 
 
 export default defineComponent({
     name: 'MetricsSelector',
     props: {
         metrics: {
-          type: Array as PropType<Metric[]>,
-          required: true
+            type: Array as PropType<ScoreFilterWithColor[]>,
+            default: () => { return []}
         },
         width: String,
         allowNewMetric: {
@@ -48,12 +83,15 @@ export default defineComponent({
             default: false
         }
     },
-    mixins: [WithColorMixin],
+    components: {
+      "value-slider": ValueSlider,
+      "flag-check": FlagCheck,
+    },
+    mixins: [ColorsMixin, WithColorMixin],
     data () {
         return {
-          localMetrics: this.metrics as Metric[],
           newMetric: {} as NewMetric,
-          loading: false
+          loading: false,
         }
     },
     mounted () {
@@ -61,8 +99,18 @@ export default defineComponent({
     },
     methods: {
         ...mapActions(useMetrics, ["addMetric"]),
-        selectMetric (metric: Metric) {
-          this.$emit("metricSelected", metric)
+        editMetric (metricWithValue: ScoreFilterWithColor) {
+          if (!metricWithValue.selected) {
+            this.selectMetric(metricWithValue)
+          }
+          else {
+            metricWithValue.selected = false
+            this.$emit("metricUnselected", metricWithValue)
+          }
+        },
+        selectMetric (metricWithValue: ScoreFilterWithColor) {
+          metricWithValue.selected = true
+          this.$emit("metricSelected", metricWithValue)
         },
         toggleNewMetricType () {
           this.newMetric.type = this.newMetric.type === MetricType.value ? MetricType.flag : MetricType.value
@@ -70,9 +118,8 @@ export default defineComponent({
         async addNewMetric() {
           if (this.allowNewMetric) {
             this.loading = true
-            const createdMetric = await this.addMetric(this.newMetric).finally(() => { this.loading = false })
+            await this.addMetric(this.newMetric).finally(() => { this.loading = false })
 
-            this.localMetrics.push(createdMetric)
             this.resetNewMetric()
           }
         },
@@ -82,6 +129,9 @@ export default defineComponent({
             type: MetricType.value,
             category: "score",
           }
+        },
+        clickOutside() {
+          this.$emit("clickOutside")
         }
     }
 });
@@ -103,16 +153,21 @@ div.selectorPanel {
   overflow-y: scroll;
 }
 
-div.metric {
+div.metricContainer {
   display: flex;
   width: v-bind("width");
   margin-left: 10px;
+  justify-content: space-between;
+}
+
+div.metric {
+  align-self: center;
 }
 
 span.metric {
   text-align: left;
   font-size: 1.3pc;
-  flex-grow: 1;
+  width: 100px;
 }
 
 button.metric {
@@ -129,7 +184,7 @@ button.metric:active {
   background-color: var(--cream);
 }
 button.metric:disabled {
-  color: var(--lightgrey);
+  color: var(--darkgrey);
   background-color: var(--cream);
 }
 

@@ -6,9 +6,9 @@
         </div>
     </div>    
     <div class="labels">
-        <p class="label">{{ label }}</p>
-        <button v-if="active" class="discard" @click="discard" title="Discard Metric">
-          <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"/>
+        <p v-if="!hideLabel" class="label">{{ label }}</p>
+        <button v-if="active && !hideDiscardButton" class="discard" @click="discard" title="Discard Metric">
+          <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--darkgrey)"/>
         </button>
     </div>
 </template> 
@@ -38,6 +38,14 @@ export default defineComponent({
         active: {
             type: Boolean,
             default: false
+        },
+        hideDiscardButton: {
+            type: Boolean,
+            default: false
+        },
+        hideLabel: {
+            type: Boolean,
+            default: false
         }
     },
     data () {
@@ -47,7 +55,6 @@ export default defineComponent({
     },
     mounted () {
         this.value = Boolean(this.modelValue)
-        this.emit()
     },
     computed: {
         hoverColor (): string {
@@ -104,7 +111,8 @@ div.labels {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: -27px 0 7px 0;
+    margin: 0 0 7px 0;
+    max-height: 20px;
 }
 p.label {
     font-size: 1.4pc;
