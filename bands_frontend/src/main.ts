@@ -14,8 +14,32 @@ import ChevronUp from './components/icons/ChevronUp.vue';
 import ChevronDown from './components/icons/ChevronDown.vue';
 import PlusIcon from './components/icons/PlusIcon.vue';
 import EditIcon from './components/icons/EditIcon.vue';
+import { debounce } from './utils';
 
 const app = createApp(App)
+
+app.directive('click-outside', {
+    beforeMount: function (element, binding) {
+        element.clickOutsideEvent = function (event: any) {
+            const rect = element.getBoundingClientRect()
+            const isInside = event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom
+            if (element !== event.target && !isInside) {
+                binding.value(event);
+            }
+        };
+        // Do not add the listener right away, this allow opening the element with a click outside the element itself.
+        debounce(
+            () => {
+                document.body.addEventListener('mousedown', element.clickOutsideEvent)
+            },
+            300
+        )()
+        
+    },
+    unmounted: function (element) {
+        document.body.removeEventListener('mousedown', element.clickOutsideEvent)
+    }
+});
 
 const pinia = createPinia()
 app.use(pinia)
