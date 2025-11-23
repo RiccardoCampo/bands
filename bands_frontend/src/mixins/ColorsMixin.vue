@@ -9,15 +9,14 @@ export default defineComponent({
     name: 'ColorsMixin',
     methods: {
         getColor (index: number) {
-            return ColorOrder[Math.floor(index) % ColorOrder.length];
+            return ColorOrder[(Math.floor(index) + this.colorOffset) % ColorOrder.length];
         },
         addColors (array: any[]) {            
-            return array.map((element, index) => ({...element, color: this.getColor(index + this.colorOffset)}))
+            return array.map((element, index) => ({...element, color: this.getColor(index)}))
         },
-        // TODO add correct typing for map.
         addColorsToMap (map: any) {
             Object.keys(map).forEach(
-                (key, index) => {map[key]["color"] = this.getColor(index + this.colorOffset)}
+                (key, index) => {map[key]["color"] = this.getColor(index)}
             )
             
             return map

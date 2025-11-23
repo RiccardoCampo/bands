@@ -11,9 +11,9 @@
             </div>
         </div>
         <div class="labels">
-            <span class="label">{{ label }}</span>
-            <button v-if="active" class="discard" @click="discard" title="Discard Metric">
-                <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--grey)"/>
+            <p v-if="!hideLabel" class="label">{{ label }}</p>
+            <button v-if="active && !hideDiscardButton" class="discard" @click="discard" title="Discard Metric">
+                <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--darkgrey)"/>
             </button>
         </div>
     </div>
@@ -34,7 +34,7 @@ export default defineComponent({
             type: String
         },
         modelValue: {
-            type: [Object, Number] as PropType<FilterValues | number>,
+            type: [Object, Number] as PropType<FilterValues>,
             default: () => {return {minValue: 0, maxValue: 1}}
         },
         width: {
@@ -50,6 +50,14 @@ export default defineComponent({
             default: false
         },
         range: {
+            type: Boolean,
+            default: false
+        },
+        hideDiscardButton: {
+            type: Boolean,
+            default: false
+        },
+        hideLabel: {
             type: Boolean,
             default: false
         }
@@ -71,7 +79,6 @@ export default defineComponent({
             this.minValue = Math.max(this.modelValue.minValue - 1, 0)
             this.maxValue = Math.max(this.modelValue.maxValue, 1)
         }
-        this.emit()
     },
     computed: {
         stepWidth (): number {
@@ -158,7 +165,7 @@ export default defineComponent({
             this.emit()
         },
         emit () {
-            this.$emit('update:modelValue', this.range ? {minValue: this.minValue + 1, maxValue: this.maxValue} : this.maxValue)
+          this.$emit('update:modelValue', {minValue: this.minValue + 1, maxValue: this.maxValue})
         },
         discard ()  {
             this.$emit("discardMetric", this.label)
@@ -214,7 +221,7 @@ div.thumb:hover {
 
 span.scoreTooltip {
     user-select: none;
-    color: var(--grey);
+    color: var(--darkgrey);
     position: relative;
     bottom: -15px;
     left: -2px;
@@ -224,8 +231,9 @@ div.labels {
     justify-content: center;
     align-items: center;
     margin: 2px 0 7px 0;
+    max-height: 30px;
 }
-span.label {
+p.label {
     font-size: 1.4pc;
 }
 
