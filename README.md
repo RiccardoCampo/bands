@@ -2,7 +2,7 @@
 
 ## Dev Setup - Windows
 ### Backend
-1. Install poetry
+1. Install uv
    1. Install Scoop
    ```commandline
    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
@@ -13,16 +13,14 @@
    scoop install pipx
    pipx ensurepath
    ```
-   5. Install poetry
+   5. Install uv
    ```commandline
-    pipx install poetry
+    pipx install uv
    ``` 
 2. Configure the venv
    1.
       ```commandline
-      poetry config virtualenvs.in-project true
-      poetry env use 3.13.1
-      poetry install
+      uv sync
       ```
    2. at this point you might have trouble installing mysqlclient, the easiest way to solve this is to download a pre-compiled version from here: https://pypi.org/project/mysqlclient/#files
 
