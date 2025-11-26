@@ -29,19 +29,19 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapState(usePageStatus, ['pageSize', 'newArtistActive']),
+    ...mapState(usePageStatus, ['pageSize', 'newArtistActive', 'searchStarted']),
     ...mapState(useArtistsList, ['artists', 'page']),
     hasResults(): boolean {
       return this.artists.length > 0 || this.newArtistActive
     },
     listHeight (): string {
-      return this.pageSize.height - 260 + 'px';
+      return this.pageSize.height - 170 + 'px';
     }
   },
   methods: {
     ...mapActions(useArtistsList, ['fetchArtistsPage']),
     async onScroll(event: Event) {      
-      if (this.fetchingPage || this.page === null)
+      if (this.fetchingPage || !this.searchStarted || this.page === null)
         return
       this.fetchingPage = true
       const target = event.target as HTMLElement;
