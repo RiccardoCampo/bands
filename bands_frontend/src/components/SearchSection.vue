@@ -2,7 +2,7 @@
   <div class="searchContainer">
     <div class="search">
       <div class="searchInputOutline">
-        <input class="search" v-model="text" :oninput="getSuggestedFilters" placeholder="type an artist or a metric..." @focus="activateSuggestedMetricsPanel" @blur="deactivateSuggestedMetricsPanel">
+        <input class="search" v-model="text" :oninput="getSuggestedFilters" placeholder="type an artist or a metric..." @focus="activateSuggestedMetricsPanel">
       </div>
 
       <keyboard-events @keyupEnter="searchOnEnter"></keyboard-events>
@@ -12,7 +12,7 @@
       </button>
       
       <button class="searchBar" @click="toggleFiltersPanel()" title="Show Score Filters">
-        <chevron-up v-if="filtersPanelActive" height=32 iconColor="inherit"></chevron-up>
+        <chevron-up v-if="showFiltersPanel" height=32 iconColor="inherit"></chevron-up>
         <chevron-down v-else height=32 iconColor="inherit"></chevron-down>
       </button>
 
@@ -20,13 +20,13 @@
         <plus-icon height=32 width=28 iconColor="inherit"/>
       </button>
     </div>
-    
-    <metrics-selector v-if="showSuggestedMetricsPanel" width="496px" color="yellow" style="left: -56px" :metrics="Object.values(suggestedMetrics)" @metricSelected="addFilter"/>
 
-    <div v-if="filtersPanelActive" class="filtersPanel">
-      <div class="selectedFilter" v-for="filter in scoreFiltersWithColors" :key="filter.filter.metric.id">
-        <value-slider v-if="filter.filter.metric.type === 'value'" v-model="filter.filter.filterValues" :label="filter.filter.metric.name" :color="filter.color" :active="true" :range="true" @discardMetric="removeFilter(filter.filter)"/>
-        <flag-check v-else v-model="filter.filter.filterValues.minValue" :label="filter.filter.metric.name" :active="true" @discardMetric="removeFilter(filter.filter)"/>
+    <metrics-selector v-if="showSuggestedMetricsPanel" width="496px" color="yellow" style="left: -56px" :metrics="selectionMetrics" @metricSelected="addFilter" @metricUnselected="removeFilter" @clickOutside="deactivateSuggestedMetricsPanel"/>
+
+    <div v-if="showFiltersPanel" class="filtersPanel">
+      <div class="selectedFilter" v-for="filter in selectedFilters" :key="filter.filter.metric.id">
+        <value-slider v-if="filter.filter.metric.type === 'value'" v-model="filter.filter.filterValues" :label="filter.filter.metric.name" :color="filter.color" :active="true" :range="true" @discardMetric="removeFilter(filter)"/>
+        <flag-check v-else v-model="filter.filter.filterValues.minValue" :label="filter.filter.metric.name" :active="true" @discardMetric="removeFilter(filter)"/>
       </div>
     </div>  
   </div>
@@ -43,16 +43,9 @@ import FlagCheck from './metrics/FlagCheck.vue';
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import MetricsSelector from './MetricsSelector.vue';
 import KeyboardEvents from './helpers/KeyboardEvents.vue';
-import { ScoreFilter } from '@/types/score';
 import { Metric } from '@/types/metrics';
 import { defineComponent } from 'vue';
-
-
-type ScoreFilterWithColor = {
-  filter: ScoreFilter,
-  color: string
-}
-
+import { ScoreFilterWithColor } from './MetricsSelector.vue';
 
 
 export default defineComponent({
@@ -62,9 +55,9 @@ export default defineComponent({
       text: "" as string,
       loading: false as boolean,
       filtersPanelActive: false as boolean,
-      suggestedMetricsPanelActive: true as boolean,
-      selectedFilters: {} as {[key: string]: ScoreFilter},
-      suggestedMetrics: {} as {[key: string]: Metric},
+      suggestedMetricsPanelActive: false as boolean,
+      selectedFilters: {} as {[key: string]: ScoreFilterWithColor},
+      suggestedMetrics: [] as Array<Metric>,
     }
   },
   components: {
@@ -78,22 +71,33 @@ export default defineComponent({
   ],
   async mounted () {
     this.loading = true
-    await this.fetchMetrics().catch((error) => {console.log(error)}).finally(() => { this.loading = false })
+    await this.fetchMetrics().catch((error) => {console.log(error)}).finally(
+      () => {
+        this.loading = false
+        // Suggested filters won't be displayed if the metrics are loading.
+        if (this.text !== "")
+          this.getSuggestedFilters()
+      }
+    )
   },
   methods: {
-    ...mapActions(usePageStatus, ['activateList', 'showNewArtist']),
+    ...mapActions(usePageStatus, ['startSearch', 'showNewArtist']),
     ...mapActions(useArtistsList, ['fetchArtists']),
     ...mapActions(useMetrics, ['fetchMetrics']),
     async search () {
       if (this.loading)
         return
 
-      this.toggleFiltersPanel(false)
+      this.toggleFiltersPanel(true)
       this.loading = true
 
-      await this.fetchArtists(this.text, Object.values(this.selectedFilters)).catch((error) => {console.log(error)})
+      // Either search by metric or by text.
+      if (Object.keys(this.selectedFilters).length > 0)
+        this.text = ""
 
-      this.activateList()
+      await this.fetchArtists(this.text, Object.values(this.selectedFilters).map((filter) => {return filter.filter})).catch((error) => {console.log(error)})
+
+      this.startSearch()
       this.loading = false
       this.deactivateSuggestedMetricsPanel()
     },
@@ -111,33 +115,26 @@ export default defineComponent({
       }
     },
     getSuggestedFilters() {
-      this.activateSuggestedMetricsPanel()
       debounce(
         () => {
-          this.suggestedMetrics = {}
-          this.metrics.forEach(
-            (metric) => {
-              if (metric.name.includes(this.text) && !(metric.name in this.selectedFilters))
-                this.suggestedMetrics[metric.name] = metric
-            }
-          )
+          this.suggestedMetrics = this.metrics.filter((metric) => { return metric.name.includes(this.text) })
         },
         300
       )()
+      this.activateSuggestedMetricsPanel()
     },
-    addFilter(metric: Metric) {
-      this.selectedFilters[metric.name] = {metric, filterValues: {minValue: 1, maxValue: 5}}
-      this.suggestedMetrics = {}
-      this.text = ""
-      this.toggleFiltersPanel(true)
+    addFilter(metricWithValue: ScoreFilterWithColor) {
+      this.selectedFilters[metricWithValue.filter.metric.id] = metricWithValue
     },
-    removeFilter(scoreFilter: ScoreFilter) {
-      delete this.selectedFilters[scoreFilter.metric.name]
-      if (Object.keys(this.selectedFilters).length <= 0)
-        this.toggleFiltersPanel(false)
+    removeFilter(metricWithValue: ScoreFilterWithColor) {
+      delete this.selectedFilters[metricWithValue.filter.metric.id]
+      if (Object.keys(this.selectedFilters).length === 0)
+        this.filtersPanelActive = false
     },
     activateSuggestedMetricsPanel () {
-      this.suggestedMetricsPanelActive = true
+      if (!this.loading) {
+        this.suggestedMetricsPanelActive = true
+      }
     },
     deactivateSuggestedMetricsPanel () {
       debounce(
@@ -154,11 +151,37 @@ export default defineComponent({
     showSuggestedMetricsPanel(): boolean {
       return this.suggestedMetricsPanelActive && this.text !== ""
     },
+    showFiltersPanel(): boolean {
+      return !this.showSuggestedMetricsPanel && this.filtersPanelActive
+    },
     searchOutlineColor(): string {
       return this.suggestedMetricsPanelActive ? "var(--darkyellow)" : "var(--darkred)"
     },
-    scoreFiltersWithColors(): ScoreFilterWithColor[] {
-      return this.addColorsToMap(Object.values(this.selectedFilters).map((filter: ScoreFilter) => {return {filter: filter}}))
+    selectionMetrics(): ScoreFilterWithColor[] {
+      return [
+        ...Object.values(this.selectedFilters).map(
+          (filter, index) => {
+            filter.color = this.getColor(index); return filter
+          }
+        ),
+        ...this.suggestedMetrics.filter(
+          (metric) => {
+            return !(metric.id in this.selectedFilters)
+          }
+        ).map(
+          (metric: Metric, index: number) => {
+            return {
+              filter: {
+                metric: metric,
+                filterValues: {minValue: 0, maxValue: 5}
+              },
+              color: this.getColor(index + Object.keys(this.selectedFilters).length),
+              selected: false,
+              range: true,
+            }
+          }
+        )
+      ]
     }
   }
 });
@@ -188,7 +211,7 @@ export default defineComponent({
     height: 28px;
     outline: none;
     border-style: none;
-    color: var(--grey);
+    color: var(--darkgrey);
     z-index: 1; 
     transition: all 0.2s;
     margin-top: 3px;

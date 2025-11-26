@@ -13,7 +13,7 @@ class ScoreInArtistSerializer(serializers.ModelSerializer):
     class Meta:
         model = Score
         fields = ["id", "metric", "type", "category", "value"]
-        ordering = ["metric"]
+        ordering = ["category", "metric"]
 
     @staticmethod
     def get_type(model: Score) -> str:
@@ -21,4 +21,4 @@ class ScoreInArtistSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_category(model: Score) -> str:
-        return model.metric.get_category_display()
+        return model.metric.category

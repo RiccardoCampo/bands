@@ -8,7 +8,7 @@ from bands.models import Metric
 class MetricCreateRequestSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255, required=True)
     type = serializers.ChoiceField(choices=Metric.MetricType.labels, required=False)
-    category = serializers.ChoiceField(choices=Metric.MetricCategory.labels, required=False)
+    category = serializers.CharField(max_length=255, required=True)
 
     def to_representation(self, instance: Any) -> dict[str, Any]:
         data = super().to_representation(instance)

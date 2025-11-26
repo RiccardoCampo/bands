@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
-import {HeaderSliderMaxHeight, HeaderSliderMinHeight, HeaderSliderMinimizedHeight, HeaderBandSize} from '../config';
+import {HeaderSliderMaxHeight, HeaderSliderMinHeight, HeaderBandMinSize, HeaderBandMaxSize} from '../config';
 import { defineComponent } from 'vue';
 
 /**
@@ -29,28 +29,34 @@ export default defineComponent({
     mixins: [WithColorMixin],
     data () {
         return {
-            sliderPosition: 240,
+            sliderPosition: Math.floor(Math.random() * (HeaderSliderMaxHeight - HeaderSliderMinHeight + 1)) + HeaderSliderMinHeight,
         }
     },
     computed: {
         /**
          * The slider is only visible for lettered bands.
          */
-        displaySlider (): boolean {
+        displaySlider(): boolean {
             return Boolean(this.letter)
         },
-        flex (): string {
-            return `0 ${HeaderBandSize.WIDTH}px`
+        flex(): string {
+            return (this.minimized && this.letter ? `0 ${HeaderBandMinSize.WIDTH}px` : `0 ${HeaderBandMaxSize.WIDTH}px`)
         },
-        height (): string {
-            return HeaderBandSize.HEIGHT + "px"
+        height(): string {
+            return (this.minimized ? HeaderBandMinSize.HEIGHT : HeaderBandMaxSize.HEIGHT) + "px"
         },
-        highlightedHeight (): string {
-            return (this.minimized ? HeaderSliderMinimizedHeight : this.sliderPosition) + "px"
+        highlightedHeight(): string {
+            return (this.minimized ? HeaderBandMinSize.HEIGHT : this.sliderPosition) + "px"
         },
-        sliderHeight (): string {
+        sliderHeight(): string {
             return (this.minimized ? 0 : 10) + "px"
         },
+        fontSize(): string {
+            return (this.minimized ? 10 : 16) + "pc"
+        },
+        letterTopMargin(): string {
+            return (this.minimized ? -150 : -240) + "px"
+        }
     },
     methods: {
         /**
@@ -93,8 +99,8 @@ div.band {
     background-color: v-bind("lightColor");
     flex-grow: 0;
     flex-shrink: 1;
-    min-width: 110px;
     height: v-bind("height");
+    transition: display 2s;
 }
 div.highlighted {
     height: v-bind("highlightedHeight");
@@ -109,10 +115,11 @@ div.slider {
 div.letter {
     font-family: title;
     position: relative;
-    top: -240px;
+    top: v-bind("letterTopMargin");
     height: 0px;
     user-select: none;
-    font-size: 16pc;
+    font-size: v-bind("fontSize");
     color: var(--white);
+    transition: all 2s;
 }
 </style>
