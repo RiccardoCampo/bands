@@ -46,7 +46,7 @@
 # ---
 # name: test_update_valid
   dict({
-    'category': 'genre',
+    'category': 'genre2',
     'id': 1,
     'name': 'test-metric',
     'type': 'flag',
