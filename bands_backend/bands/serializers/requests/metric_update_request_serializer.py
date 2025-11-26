@@ -5,3 +5,4 @@ from bands.serializers.requests.metric_create_request_serializer import MetricCr
 
 class MetricUpdateRequestSerializer(MetricCreateRequestSerializer):
     name = serializers.CharField(max_length=255, required=False)
+    category = serializers.CharField(max_length=255, required=False)

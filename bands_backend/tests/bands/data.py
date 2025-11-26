@@ -27,31 +27,31 @@ METRICS: list[dict[str, str | int]] = [
         "id": 1,
         "name": "test-genre-1",
         "type": 1,
-        "category": 2,
+        "category": "genre",
     },
     {
         "id": 2,
         "name": "test-genre-2",
         "type": 1,
-        "category": 2,
+        "category": "genre",
     },
     {
         "id": 3,
         "name": "test-subgenre",
         "type": 1,
-        "category": 2,
+        "category": "genre",
     },
     {
         "id": 4,
         "name": "test-value-metric",
         "type": 1,
-        "category": 0,
+        "category": "score",
     },
     {
         "id": 5,
         "name": "test-flag-metric",
         "type": 0,
-        "category": 0,
+        "category": "score",
     },
 ]
 

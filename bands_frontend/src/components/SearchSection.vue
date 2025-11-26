@@ -128,6 +128,8 @@ export default defineComponent({
     },
     removeFilter(metricWithValue: ScoreFilterWithColor) {
       delete this.selectedFilters[metricWithValue.filter.metric.id]
+      if (Object.keys(this.selectedFilters).length === 0)
+        this.filtersPanelActive = false
     },
     activateSuggestedMetricsPanel () {
       if (!this.loading) {

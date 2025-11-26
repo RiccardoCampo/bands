@@ -35,15 +35,14 @@ def test_create_invalid(client: Client) -> None:
         "/bands/metric/",
         data={
             "type": "invalid-type",
-            "category": "invalid-category",
         },
     )
 
     assert response.status_code == 400
     assert json.loads(response.content) == {
         "name": ["This field is required."],
+        "category": ["This field is required."],
         "type": ['"invalid-type" is not a valid choice.'],
-        "category": ['"invalid-category" is not a valid choice.'],
     }
 
 
@@ -63,7 +62,7 @@ def test_update_valid(client: Client, snapshot: Any) -> None:
     test_metric_update = {
         "name": "test-metric",
         "type": "flag",
-        "category": "genre",
+        "category": "genre2",
         "this-field": "is-ignored",
     }
     test_metric_id = Metric.objects.all()[0].id
@@ -77,6 +76,7 @@ def test_update_valid(client: Client, snapshot: Any) -> None:
 
     db_metric = Metric.objects.get(id=test_metric_id)
     assert db_metric.name == test_metric_update["name"]
+    assert db_metric.category == test_metric_update["category"]
 
 
 def test_update_invalid(client: Client) -> None:
