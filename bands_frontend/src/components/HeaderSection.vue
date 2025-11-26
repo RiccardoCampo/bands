@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import HeaderBand from './HeaderBand.vue';
-import {ColorOrder, HeaderBandSize} from '../config';
+import {ColorOrder, HeaderBandMaxSize} from '../config';
 import { mapState } from 'pinia';
 import { usePageStatus } from '@/store/pageStatus';
 import { defineComponent } from 'vue';
@@ -50,21 +50,21 @@ export default defineComponent({
      */
     bands(): LetterWithColor[] {
       let bands = ["b", "a", "n", "d", "s"]
-      let widthToFill = this.pageSize.width - this.letteredBandsSize
+      let widthToFill = this.pageSize.width - this.letteredBandsSize + 400
       let addedBands = 0
       while (widthToFill > 0) {
         bands = [""].concat(bands, [""])
-        widthToFill -= HeaderBandSize.WIDTH * 2
+        widthToFill -= HeaderBandMaxSize.WIDTH * 2
         addedBands += 2
       }
 
       return bands.map((band, index) => ({letter: band, color: this.getColor(index, addedBands)}))
     },
     letteredBandsSize(): number {
-      return HeaderBandSize.WIDTH * 5
+      return HeaderBandMaxSize.WIDTH * 5
     },
     sideMargin(): string {
-      return this.shouldShrink ? "-10px" : (-HeaderBandSize.WIDTH - 10) + "px"
+      return this.shouldShrink ? "-10px" : (-HeaderBandMaxSize.WIDTH - 10) + "px"
     },
     /**
      * Shrink the bands if the screen gets too tight.

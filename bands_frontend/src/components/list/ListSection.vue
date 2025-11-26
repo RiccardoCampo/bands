@@ -35,7 +35,7 @@ export default defineComponent({
       return this.artists.length > 0 || this.newArtistActive
     },
     listHeight (): string {
-      return this.pageSize.height - 260 + 'px';
+      return this.pageSize.height - 170 + 'px';
     }
   },
   methods: {
