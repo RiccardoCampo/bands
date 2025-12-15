@@ -22,7 +22,7 @@
           <input class="input link" v-model="localArtist.spotifyUrl">
         </div>
         <div class="scores">
-          <div v-for="score in scores" :key="score.metric.name + score.values.maxValue" class="score">
+          <div v-for="score in scores" :key="score.metric.name + score.rerender" class="score">
             <value-slider v-if="isValue(score)" v-model="score.values" :color="score.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></value-slider>
             <flag-check v-else v-model="score.values.minValue" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></flag-check>
           </div>
@@ -73,6 +73,7 @@ type ArtistScore = {
   values: FilterValues,
   metric: Metric
   color: string
+  rerender: boolean
 }
 
 
@@ -209,7 +210,8 @@ export default defineComponent({
             scoreId: score.id,
             metric,
             values: metric.type === MetricType.flag ? {minValue: score.value, maxValue: 0} : {minValue: 0, maxValue: score.value},
-            color: this.getColor(index)
+            color: this.getColor(index),
+            rerender: false
           }
         }
       })
@@ -223,12 +225,18 @@ export default defineComponent({
       const metricId = score.filter.metric.id
       if (metricId in this.scores) {
         this.scores[metricId].values = score.filter.filterValues
+        this.scores[metricId].rerender = true
+        
+        debounce(() => {
+          this.scores[metricId].rerender = false
+        }, 300)()
       } else {
         debounce(() => {
           this.scores[metricId] = {
             values: score.filter.filterValues,
             metric: score.filter.metric,
-            color: this.getColor(Object.keys(this.scores).length - 1)
+            color: this.getColor(Object.keys(this.scores).length - 1),
+            rerender: false
           }
         }, 300)()
       }        
