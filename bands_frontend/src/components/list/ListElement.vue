@@ -211,8 +211,12 @@ export default defineComponent({
             metric,
             values: metric.type === MetricType.flag ? {minValue: score.value, maxValue: 0} : {minValue: 0, maxValue: score.value},
             color: this.getColor(index),
-            rerender: false
+            rerender: true
           }
+
+          debounce(() => {
+            this.scores[metric.id].rerender = false
+          }, 300)()
         }
       })
       this.rating = this.localArtist.rating
