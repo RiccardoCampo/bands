@@ -8,7 +8,7 @@
             {{ localArtist.name }}
           </p>
           <input v-else class="input name" v-model="localArtist.name">
-          <a v-if="!editing" :href="localArtist.spotifyUrl ?? ''" target="_blank" class="link">
+          <a v-if="!editing" :href="localArtist.linkUrl ?? ''" target="_blank" class="link">
             <external-link height="32" width="32"></external-link>
           </a>
           <artist-rating v-model="rating" :color="darkColor" :active="editing"></artist-rating>
@@ -18,8 +18,8 @@
           <input class="input link" v-model="localArtist.imageUrl">
         </div>
         <div v-if="editing" class="link">
-          <span class="link">Spotify URL</span>
-          <input class="input link" v-model="localArtist.spotifyUrl">
+          <span class="link">Link URL</span>
+          <input class="input link" v-model="localArtist.linkUrl">
         </div>
         <div class="scores">
           <div v-for="score in scores" :key="score.metric.name + score.rerender" class="score">
