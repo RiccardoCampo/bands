@@ -1,6 +1,6 @@
 <template>
     <div class="mainContainer">
-        <div class="sliderContainer" ref="container" :onmouseup="moveSlider" :onmouseleave="stopSliding" :onmousemove="slide">
+        <div class="sliderContainer" ref="container" :onmouseup="moveSlider" :onmouseleave="stopSliding" :onmousemove="slide" :onmousedown="startSliding">
             <div class="backFill"></div>
             <div v-if="active && range" class="thumb" :onmousedown="startSlidingLeft">
                 <span class="scoreTooltip" v-if="isSliding">{{ minValue + 1 }}</span>
@@ -110,6 +110,18 @@ export default defineComponent({
         }
     },
     methods: {
+        startSliding (event: any) {
+            const position = event.pageX
+            if (this.range) {
+                // If the cursor stands from the first half of the selected bar or left of the left thumb.
+                if (position - (this.maxValue - this.minValue) / 2 * this.stepWidth < this.sliderPosition + this.minValue * this.stepWidth)
+                    this.slidingLeft = this.active
+                else 
+                    this.slidingRight = this.active
+            } else {
+                this.slidingRight = this.active
+            }
+        },
         startSlidingRight () {
             this.slidingRight = this.active
         },
@@ -144,15 +156,6 @@ export default defineComponent({
                 } else if (this.slidingRight) {
                     this.updateMaxValueFromPosition(position)
                     this.slidingRight = false
-                } else if (this.range) {
-                    // If the cursor stands from the first half of the selected bar or left of the left thumb.
-                    if (position - (this.maxValue - this.minValue) / 2 * this.stepWidth < this.sliderPosition + this.minValue * this.stepWidth)
-                        this.updateMinValueFromPosition(position)
-                    else 
-                        this.updateMaxValueFromPosition(position)
-                } else {
-                    if (position < this.sliderPosition + 5 * this.stepWidth)
-                        this.updateMaxValueFromPosition(position)
                 }
             }
         },
