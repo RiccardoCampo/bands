@@ -3,6 +3,6 @@ from rest_framework import serializers
 
 class ArtistUpdateRequestSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=255, required=False)
-    spotify_url = serializers.URLField(required=False, allow_blank=True)
+    link_url = serializers.URLField(required=False, allow_blank=True)
     image_url = serializers.URLField(required=False, allow_blank=True)
     rating = serializers.IntegerField(required=False)

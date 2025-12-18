@@ -7,7 +7,7 @@
     'rating': 4,
     'scores': list([
     ]),
-    'spotify_url': 'https://test-artist-4.com',
+    'link_url': 'https://test-artist-4.com',
   })
 # ---
 # name: test_delete_valid
@@ -40,7 +40,7 @@
             'value': 3,
           }),
         ]),
-        'spotify_url': 'https://test-artist-2.com',
+        'link_url': 'https://test-artist-2.com',
       }),
       dict({
         'id': 3,
@@ -49,7 +49,7 @@
         'rating': 3,
         'scores': list([
         ]),
-        'spotify_url': 'https://test-artist-3.com',
+        'link_url': 'https://test-artist-3.com',
       }),
     ]),
   })
@@ -76,7 +76,7 @@
         'value': 1,
       }),
     ]),
-    'spotify_url': 'https://test-artist-1.com',
+    'link_url': 'https://test-artist-1.com',
   })
 # ---
 # name: test_update_valid
@@ -101,6 +101,6 @@
         'value': 1,
       }),
     ]),
-    'spotify_url': 'https://test-artist-1234.com',
+    'link_url': 'https://test-artist-1234.com',
   })
 # ---
