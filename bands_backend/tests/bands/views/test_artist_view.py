@@ -166,3 +166,15 @@ def test_delete_not_found(client: Client) -> None:
 
     assert response.status_code == 404
     assert json.loads(response.content) == {"not_found_error": "Artist matching query does not exist."}
+
+def test_get_similar_artists_empty(client: Client) -> None:
+    response = client.get("/bands/artist/10000/similar/")
+
+    assert response.status_code == 200
+    assert json.loads(response.content) == []
+
+def test_get_similar_artists(client: Client, snapshot: Any) -> None:
+    response = client.get("/bands/artist/1/similar/")
+
+    assert response.status_code == 200
+    assert json.loads(response.content) == snapshot

@@ -1,6 +1,7 @@
 from typing import Any
 
 from django.db.models import QuerySet
+from rest_framework.decorators import action
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -36,6 +37,34 @@ class ArtistViewSet(ModelViewSet):
         model = self.get_queryset().get(id=pk)
 
         return Response(self.get_serializer(model).data)
+
+    @action(detail=True, methods=["GET"], name="Get similar artists", url_path="similar")
+    def get_similar_artists(self, _: Request, pk: int) -> Response:
+        artists = Artist.objects.raw("""
+            SELECT a.*
+            FROM (
+                SELECT artist_id, sum(score) as score
+                FROM (
+                    SELECT potential.artist_id,
+                           if(target.type = 0, 8, power(2, 4 - abs(target.value - potential.value))) AS score
+                    FROM 
+                        (
+                            SELECT metric_id, value, m.`type`, s.artist_id 
+                            FROM score s JOIN metric m ON s.metric_id = m.id
+                            WHERE artist_id = %s
+                        ) target
+                        LEFT JOIN score potential
+                        ON target.metric_id = potential.metric_id
+                    WHERE potential.artist_id != target.artist_id
+                ) artist_scores
+                GROUP BY 1
+            ) result JOIN artist a ON a.id = result.artist_id
+            WHERE score > 10
+            ORDER BY score DESC
+            LIMIT 10
+        """, [pk])
+
+        return Response([self.get_serializer(model).data for model in artists])
 
     def _filter_artists(self, query_params: dict[str, Any]) -> QuerySet:
         artists = self.get_queryset().order_by("-rating", "name")
