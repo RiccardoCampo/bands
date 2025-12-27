@@ -76,6 +76,16 @@ export const useArtistsList = defineStore('artists-list', {
 
         const retrievedArtist = await artistsAPIRepository.retrieve(updatedArtist.id)
         this.artistsMap.set(updatedArtist.id, artistReponseToModel(retrievedArtist))
-      }
+      },
+      async fetchSimilarArtists(artistId: number) {
+        const similarArtists = await artistsAPIRepository.getSimilar(artistId)
+        this.artistsMap = new Map<number, Artist>()
+        similarArtists.forEach((artist) => { this.artistsMap.set(artist.id, artistReponseToModel(artist)) })
+
+        this.page = null
+
+        this.query = ""
+        this.scoreFilters = []
+      },
     }
 })
