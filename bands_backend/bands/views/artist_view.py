@@ -47,9 +47,9 @@ class ArtistViewSet(ModelViewSet):
                 FROM (
                     SELECT potential.artist_id,
                            if(target.type = 0, 8, power(2, 4 - abs(target.value - potential.value))) AS score
-                    FROM 
+                    FROM
                         (
-                            SELECT metric_id, value, m.`type`, s.artist_id 
+                            SELECT metric_id, value, m.`type`, s.artist_id
                             FROM score s JOIN metric m ON s.metric_id = m.id
                             WHERE artist_id = %s
                         ) target
