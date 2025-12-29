@@ -179,4 +179,4 @@ def test_get_similar_artists(client: Client, snapshot: Any) -> None:
     response = client.get("/bands/artist/1/similar/")
 
     assert response.status_code == 200
-    assert json.loads(response.content) == snapshot
+    assert json.loads(response.content) == snapshot(exclude=paths("0.created_at"))
