@@ -86,5 +86,10 @@ export default {
         spotify_url: artist.spotifyUrl,
         image_url: artist.imageUrl
       } as ArtistUpdateRequest)).data
+  },
+  async getSimilar (artistId: number): Promise<ArtistResponse[]> {
+    return (
+      await axios.get(`${BASE_URL}${artistId}/similar/`)
+    ).data
   }
 };

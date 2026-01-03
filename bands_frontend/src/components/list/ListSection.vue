@@ -2,7 +2,7 @@
   <div v-if="hasResults" class="listContainer" @scroll="onScroll">
     <div class="list">
       <list-element v-if="newArtistActive" :new="true" color="green"></list-element>
-      <list-element v-for="artist in addColors(artists)" :key="artist" :artist="artist" :color="artist.color"></list-element>
+      <list-element v-for="artist in addColors(artists)" :key="artist" :artist="artist" :color="artist.color" @artistsLikeThis="artistsLikeThis(artist.id)"></list-element>
     </div>
   </div>
   <p v-else class="noResults"> no search results :( </p>
@@ -39,8 +39,8 @@ export default defineComponent({
     }
   },
   methods: {
-    ...mapActions(useArtistsList, ['fetchArtistsPage']),
-    async onScroll(event: Event) {      
+    ...mapActions(useArtistsList, ['fetchArtistsPage', 'fetchSimilarArtists']),
+    async onScroll(event: Event) {
       if (this.fetchingPage || !this.searchStarted || this.page === null)
         return
       this.fetchingPage = true
@@ -51,6 +51,13 @@ export default defineComponent({
       if (scrollTop + clientHeight >= scrollHeight * toLoadRatio) {
         await this.fetchArtistsPage().catch((error) => {console.log(error)})
       }
+      this.fetchingPage = false
+    },
+    async artistsLikeThis(artistId: number) {
+      if (this.fetchingPage || !this.searchStarted)
+        return
+      this.fetchingPage = true
+      await this.fetchSimilarArtists(artistId).catch((error) => {console.log(error)})
       this.fetchingPage = false
     }
   }

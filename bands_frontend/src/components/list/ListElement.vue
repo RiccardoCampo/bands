@@ -43,6 +43,9 @@
           <button v-if="!editing" class="button edit" @click="toggleEdit" title="Edit Artist">
             <edit-icon :height="26" :width="26"/>
           </button>
+          <button v-if="!editing" class="button edit" @click="artistsLikeThis" title="Artists like this">
+            <sliders-icon :height="26" :width="26"/>
+          </button>
         </div>
       </div>
     </div>
@@ -261,6 +264,10 @@ export default defineComponent({
     isValue(score: ArtistScore) {
       return score.metric.type === MetricType.value
     },
+    artistsLikeThis () {
+      if (this.localArtist.id)
+        this.$emit("artistsLikeThis")
+    }
   },
   mounted () {
     const newArtist = {name: "New Artist", scores: [] as Score[], rating: 1}
