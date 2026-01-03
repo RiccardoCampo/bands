@@ -46,7 +46,9 @@ class ArtistViewSet(ModelViewSet):
                 SELECT artist_id, sum(score) as score
                 FROM (
                     SELECT potential.artist_id,
-                           if(target.type = 0, 8, power(2, 4 - abs(target.value - potential.value))) AS score
+                          CASE WHEN target.type = 0
+                               THEN 8
+                               ELSE POWER(2, 4 - ABS(target.value - potential.value)) END AS score
                     FROM
                         (
                             SELECT metric_id, value, m.`type`, s.artist_id
