@@ -20,14 +20,7 @@
                 hideDiscardButton
                 hideLabel 
               />
-              <flag-label
-                v-else
-                v-model="metricWithValue.filter.filterValues.minValue"
-                v-on:update:modelValue="selectMetric(metricWithValue)"
-                active
-                hideDiscardButton
-                hideLabel
-              />
+              <flag-label v-else active hideDiscardButton hideLabel/>
             </div>
             <button class="metric" @click="editMetric(metricWithValue)" title="Select Metric">
               <cross-icon v-if="metricWithValue.selected" height=28 width=28 />

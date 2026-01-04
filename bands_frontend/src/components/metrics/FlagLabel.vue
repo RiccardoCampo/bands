@@ -1,8 +1,7 @@
 <template>
-    <div class="box" :onclick="toggle">
+    <div class="box">
         <div class="outline">
-            <check-icon v-if="value" :height="height" :width="width" iconColor="var(--darkgreen)"/>
-            <cross-icon v-else :height="height" :width="width" iconColor="var(--darkred)"/>
+            <check-icon :height="height" :width="width" iconColor="var(--darkgreen)"/>
         </div>
     </div>    
     <div class="labels">
@@ -18,14 +17,10 @@ import { defineComponent } from 'vue';
 
 export default defineComponent({
     name: 'FlagLabel',
-    emits: ["discardMetric", "update:modelValue"],
+    emits: ["discardMetric"],
     props: {
         label: {
             type: String
-        },
-        modelValue: {
-            type: Number,
-            default: 1
         },
         width: {
             type: Number,
@@ -48,20 +43,12 @@ export default defineComponent({
             default: false
         }
     },
-    data () {
-        return {
-            value: false
-        }
-    },
-    mounted () {
-        this.value = Boolean(this.modelValue)
-    },
     computed: {
         hoverColor (): string {
             if (!this.active)
                 return "var(--white)"
 
-            return this.value ? "var(--lightgreen)" : "var(--lightred)"
+            return "var(--lightgreen)"
         },
         outlineHeight (): string {
             return this.height + "px"
@@ -71,15 +58,6 @@ export default defineComponent({
         },
     },
     methods: {
-        toggle () {
-            if (this.active) {
-                this.value = !this.value
-                this.emit()
-            }
-        },
-        emit () {
-            this.$emit('update:modelValue', this.value ? 1: 0)
-        },
         discard ()  {
             this.$emit("discardMetric", this.label)
         },
