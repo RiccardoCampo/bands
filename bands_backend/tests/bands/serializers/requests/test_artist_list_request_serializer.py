@@ -7,11 +7,11 @@ from bands.serializers.requests.artist_list_request_serializer import ArtistList
 @pytest.mark.parametrize(
     "value_query_param,expected_bounds",
     [
-        pytest.param("[,]", (0, 5), id="empty"),
+        pytest.param("[,]", (1, 5), id="empty"),
         pytest.param("[1,]", (1, 5), id="left only"),
-        pytest.param("[,4]", (0, 4), id="right only"),
+        pytest.param("[,4]", (1, 4), id="right only"),
         pytest.param("[2,3]", (2, 3), id="both"),
-        pytest.param("[-1,6]", (0, 5), id="both clamped"),
+        pytest.param("[-1,6]", (1, 5), id="both clamped"),
     ],
 )
 def test_get_score_bounds(value_query_param: str, expected_bounds: tuple[int, int]) -> None:

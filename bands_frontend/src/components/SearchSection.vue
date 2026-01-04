@@ -25,8 +25,21 @@
 
     <div v-if="showFiltersPanel" class="filtersPanel">
       <div class="selectedFilter" v-for="filter in selectedFilters" :key="filter.filter.metric.id">
-        <value-slider v-if="filter.filter.metric.type === 'value'" v-model="filter.filter.filterValues" :label="filter.filter.metric.name" :color="filter.color" :active="true" :range="true" @discardMetric="removeFilter(filter)"/>
-        <flag-check v-else v-model="filter.filter.filterValues.minValue" :label="filter.filter.metric.name" :active="true" @discardMetric="removeFilter(filter)"/>
+        <value-slider
+          v-if="filter.filter.metric.type === 'value'"
+          v-model="filter.filter.filterValues"
+          :label="filter.filter.metric.name"
+          :color="filter.color"
+          :active="true"
+          :range="true"
+          @discardMetric="removeFilter(filter)"
+        />
+        <flag-label
+          v-else :label="filter.filter.metric.name"
+          :color="filter.color"
+          :active="true"
+          @discardMetric="removeFilter(filter)"
+        />
       </div>
     </div>  
   </div>
@@ -39,7 +52,7 @@ import { usePageStatus } from '@/store/pageStatus';
 import { debounce } from '@/utils';
 import { mapActions, mapState } from 'pinia';
 import ValueSlider from './metrics/ValueSlider.vue';
-import FlagCheck from './metrics/FlagCheck.vue';
+import FlagLabel from './metrics/FlagLabel.vue';
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import MetricsSelector from './MetricsSelector.vue';
 import KeyboardEvents from './helpers/KeyboardEvents.vue';
@@ -63,7 +76,7 @@ export default defineComponent({
   components: {
     "metrics-selector": MetricsSelector,
     "value-slider": ValueSlider,
-    "flag-check": FlagCheck,
+    "flag-label": FlagLabel,
     "keyboard-events": KeyboardEvents,
   },
   mixins: [

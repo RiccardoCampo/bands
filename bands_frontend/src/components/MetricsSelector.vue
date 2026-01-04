@@ -6,7 +6,7 @@
             {{ category }}
           </span>
           <div class="metricContainer" v-for="metricWithValue in metricsWithValues" :key="metricWithValue.filter.metric.id">
-            <span class="metric">
+            <span class="metric" v-if="metricWithValue.filter.metric.type === 'value'">
               {{ metricWithValue.filter.metric.name }}
             </span>
             <div class="metric">
@@ -20,13 +20,13 @@
                 hideDiscardButton
                 hideLabel 
               />
-              <flag-check
+              <flag-label
                 v-else
-                v-model="metricWithValue.filter.filterValues.minValue"
-                v-on:update:modelValue="selectMetric(metricWithValue)"
+                :label="metricWithValue.filter.metric.name"
+                :color="metricWithValue.selected ? metricWithValue.color : 'grey'"
+                :fontColor="metricWithValue.selected ? 'black' : 'white'"
                 active
                 hideDiscardButton
-                hideLabel
               />
             </div>
             <button class="metric" @click="editMetric(metricWithValue)" title="Select Metric">
@@ -57,7 +57,7 @@
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
 import ValueSlider from './metrics/ValueSlider.vue';
-import FlagCheck from './metrics/FlagCheck.vue';
+import FlagLabel from './metrics/FlagLabel.vue';
 import { useMetrics } from '@/store/metrics';
 import { MetricType, NewMetric } from '@/types/metrics';
 import { ScoreFilter } from '@/types/score';
@@ -89,7 +89,7 @@ export default defineComponent({
     },
     components: {
       "value-slider": ValueSlider,
-      "flag-check": FlagCheck,
+      "flag-label": FlagLabel,
     },
     mixins: [ColorsMixin, WithColorMixin],
     data () {
