@@ -57,7 +57,7 @@ export default {
         if (scoreFilter.metric.type == MetricType.value)
           queryString += `&${scoreFilter.metric.name}=[${scoreFilter.filterValues.minValue},${scoreFilter.filterValues.maxValue}]`
         else
-          queryString += `&${scoreFilter.metric.name}=${scoreFilter.filterValues.minValue}`
+          queryString += `&${scoreFilter.metric.name}=1`
       });
 
     return (await axios.get(`${BASE_URL}?${queryString}`)).data
