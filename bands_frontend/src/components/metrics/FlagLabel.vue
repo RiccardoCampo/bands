@@ -35,7 +35,7 @@ export default defineComponent({
     },
     mixins: [WithColorMixin],
     computed: {
-        labelFontColor() {
+        labelFontColor(): string {
             return `var(--${this.fontColor})`;
         }
     },
