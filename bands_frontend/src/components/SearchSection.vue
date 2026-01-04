@@ -25,8 +25,21 @@
 
     <div v-if="showFiltersPanel" class="filtersPanel">
       <div class="selectedFilter" v-for="filter in selectedFilters" :key="filter.filter.metric.id">
-        <value-slider v-if="filter.filter.metric.type === 'value'" v-model="filter.filter.filterValues" :label="filter.filter.metric.name" :color="filter.color" :active="true" :range="true" @discardMetric="removeFilter(filter)"/>
-        <flag-label v-else :label="filter.filter.metric.name" :active="true" @discardMetric="removeFilter(filter)"/>
+        <value-slider
+          v-if="filter.filter.metric.type === 'value'"
+          v-model="filter.filter.filterValues"
+          :label="filter.filter.metric.name"
+          :color="filter.color"
+          :active="true"
+          :range="true"
+          @discardMetric="removeFilter(filter)"
+        />
+        <flag-label
+          v-else :label="filter.filter.metric.name"
+          :color="filter.color"
+          :active="true"
+          @discardMetric="removeFilter(filter)"
+        />
       </div>
     </div>  
   </div>

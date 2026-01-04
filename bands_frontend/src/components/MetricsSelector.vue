@@ -6,7 +6,7 @@
             {{ category }}
           </span>
           <div class="metricContainer" v-for="metricWithValue in metricsWithValues" :key="metricWithValue.filter.metric.id">
-            <span class="metric">
+            <span class="metric" v-if="metricWithValue.filter.metric.type === 'value'">
               {{ metricWithValue.filter.metric.name }}
             </span>
             <div class="metric">
@@ -20,7 +20,14 @@
                 hideDiscardButton
                 hideLabel 
               />
-              <flag-label v-else active hideDiscardButton hideLabel/>
+              <flag-label
+                v-else
+                :label="metricWithValue.filter.metric.name"
+                :color="metricWithValue.selected ? metricWithValue.color : 'grey'"
+                :fontColor="metricWithValue.selected ? 'black' : 'white'"
+                active
+                hideDiscardButton
+              />
             </div>
             <button class="metric" @click="editMetric(metricWithValue)" title="Select Metric">
               <cross-icon v-if="metricWithValue.selected" height=28 width=28 />

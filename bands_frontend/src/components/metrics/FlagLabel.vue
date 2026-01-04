@@ -1,18 +1,16 @@
-<template>
-    <div class="box">
-        <div class="outline">
-            <check-icon :height="height" :width="width" iconColor="var(--darkgreen)"/>
-        </div>
-    </div>    
+<template> 
     <div class="labels">
-        <p v-if="!hideLabel" class="label">{{ label }}</p>
+        <div class="outline">
+            <span class="label">{{ label }}</span>
+        </div>
         <button v-if="active && !hideDiscardButton" class="discard" @click="discard" title="Discard Metric">
-          <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--darkgrey)"/>
+          <cross-icon style="margin-top: 4px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--darkgrey)"/>
         </button>
     </div>
 </template> 
   
 <script lang="ts">
+import WithColorMixin from '@/mixins/WithColorMixin.vue';
 import { defineComponent } from 'vue';
 
 export default defineComponent({
@@ -22,13 +20,9 @@ export default defineComponent({
         label: {
             type: String
         },
-        width: {
-            type: Number,
-            default: 32
-        },
-        height: {
-            type: Number,
-            default: 32
+        fontColor: {
+            type: String,
+            default: "black"
         },
         active: {
             type: Boolean,
@@ -38,24 +32,12 @@ export default defineComponent({
             type: Boolean,
             default: false
         },
-        hideLabel: {
-            type: Boolean,
-            default: false
-        }
     },
+    mixins: [WithColorMixin],
     computed: {
-        hoverColor (): string {
-            if (!this.active)
-                return "var(--white)"
-
-            return "var(--lightgreen)"
-        },
-        outlineHeight (): string {
-            return this.height + "px"
-        },
-        outlineWidth (): string {
-            return this.width + "px"
-        },
+        labelFontColor() {
+            return `var(--${this.fontColor})`;
+        }
     },
     methods: {
         discard ()  {
@@ -68,39 +50,26 @@ export default defineComponent({
 
 <style scoped>
 
-div.box {
+div.labels {
     display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
 div.outline {
-    height: v-bind("outlineHeight");
-    width: v-bind("outlineWidth");
-    transition: all 0.2s;
-    border-radius: 30%;
+    height: 28px;
+    background-color: v-bind("lightColor");
 }
 
-div.outline:hover {
-    background-color: v-bind("hoverColor");
-}
-
-div.labels {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 0 7px 0;
-    max-height: 20px;
-}
-p.label {
+span.label {
     font-size: 1.4pc;
+    color: v-bind("labelFontColor");
+    margin: 0 10px 0 10px;
 }
 
 button.discard {
     border: none;
     transition: all 0.1s;
     margin-left: auto;
-    height: 20px;
+    height: 28px;
     width: 20px;
     background: none;
 }

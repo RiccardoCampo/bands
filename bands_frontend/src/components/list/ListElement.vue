@@ -24,12 +24,12 @@
         <div class="scores">
           <div v-for="score in scores" :key="score.metric.name + score.rerender" class="score">
             <value-slider v-if="isValue(score)" v-model="score.values" :color="score.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"/>
-            <flag-label v-else :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"/>
+            <flag-label v-else style="margin-top: 10px" :label="score.metric.name" :color="score.color" :active="editing" @discardMetric="removeScore(score)"/>
           </div>
+          <button v-if="editing" class="button edit" style="margin-top: 8px" @click="toggleMetricsPanel" title="Add Score">
+            <plus-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+          </button>
         </div>
-        <button v-if="editing" class="button edit" @click="toggleMetricsPanel" title="Add Score">
-          <plus-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
-        </button>
         <metric-selector v-if="editing && metricsPanelActive" width="400px" :color="color" :metrics="selectionMetrics" :allowNewMetric="true" @metricSelected="addOrEditScore" @metricUnselected="removePanelScore" @clickOutside="toggleMetricsPanel"/>
         <div class="actions">
           <button v-if="editing" class="button confirm" @click="edit" title="Confirm Changes">
