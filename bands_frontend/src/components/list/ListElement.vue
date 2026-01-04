@@ -23,8 +23,8 @@
         </div>
         <div class="scores">
           <div v-for="score in scores" :key="score.metric.name + score.rerender" class="score">
-            <value-slider v-if="isValue(score)" v-model="score.values" :color="score.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></value-slider>
-            <flag-check v-else v-model="score.values.minValue" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></flag-check>
+            <value-slider v-if="isValue(score)" v-model="score.values" :color="score.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"/>
+            <flag-label v-else v-model="score.values.minValue" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"/>
           </div>
         </div>
         <button v-if="editing" class="button edit" @click="toggleMetricsPanel" title="Add Score">
@@ -55,7 +55,7 @@
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import ArtistRating from './ArtistRating.vue';
 import ValueSlider from '../metrics/ValueSlider.vue';
-import FlagCheck from '../metrics/FlagCheck.vue';
+import FlagLabel from '../metrics/FlagLabel.vue';
 import { mapActions, mapState } from 'pinia';
 import { useArtistsList } from '@/store/artistsList';
 import { usePageStatus } from '@/store/pageStatus';
@@ -89,7 +89,7 @@ export default defineComponent({
   components: {
     "artist-rating": ArtistRating,
     "value-slider": ValueSlider,
-    "flag-check": FlagCheck,
+    "flag-label": FlagLabel,
     "metric-selector": MetricsSelector,
   },
   mixins: [ColorsMixin, WithColorMixin],

@@ -20,7 +20,7 @@
                 hideDiscardButton
                 hideLabel 
               />
-              <flag-check
+              <flag-label
                 v-else
                 v-model="metricWithValue.filter.filterValues.minValue"
                 v-on:update:modelValue="selectMetric(metricWithValue)"
@@ -57,7 +57,7 @@
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
 import ValueSlider from './metrics/ValueSlider.vue';
-import FlagCheck from './metrics/FlagCheck.vue';
+import FlagLabel from './metrics/FlagLabel.vue';
 import { useMetrics } from '@/store/metrics';
 import { MetricType, NewMetric } from '@/types/metrics';
 import { ScoreFilter } from '@/types/score';
@@ -89,7 +89,7 @@ export default defineComponent({
     },
     components: {
       "value-slider": ValueSlider,
-      "flag-check": FlagCheck,
+      "flag-label": FlagLabel,
     },
     mixins: [ColorsMixin, WithColorMixin],
     data () {

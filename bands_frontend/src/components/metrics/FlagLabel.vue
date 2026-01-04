@@ -17,7 +17,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-    name: 'FlagCheck',
+    name: 'FlagLabel',
     emits: ["discardMetric", "update:modelValue"],
     props: {
         label: {
