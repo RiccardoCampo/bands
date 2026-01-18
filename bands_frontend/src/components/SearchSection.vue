@@ -21,7 +21,7 @@
       </button>
     </div>
 
-    <metrics-selector v-if="showSuggestedMetricsPanel" width="496px" color="yellow" style="left: -56px" :metrics="selectionMetrics" @metricSelected="addFilter" @metricUnselected="removeFilter" @clickOutside="deactivateSuggestedMetricsPanel"/>
+    <metrics-selector v-if="showSuggestedMetricsPanel" width="calc(var(--searchBarWidth) + 92px)" color="yellow" style="left: -6px" :metrics="selectionMetrics" @metricSelected="addFilter" @metricUnselected="removeFilter" @clickOutside="deactivateSuggestedMetricsPanel"/>
 
     <div v-if="showFiltersPanel" class="filtersPanel">
       <div class="selectedFilter" v-for="filter in selectedFilters" :key="filter.filter.metric.id">
@@ -220,7 +220,7 @@ export default defineComponent({
     font-family: regular;
     font-size: 1.6pc;
     background-color: var(--white);
-    width: 500px;
+    width: calc(var(--searchBarWidth) - 10px);
     height: 28px;
     outline: none;
     border-style: none;
@@ -232,7 +232,7 @@ export default defineComponent({
 
   div.searchInputOutline {
     background-color: v-bind(searchOutlineColor);
-    width: 510px; 
+    width: var(--searchBarWidth); 
     height: 36px;
   } 
 
@@ -285,7 +285,7 @@ export default defineComponent({
     justify-content: left;
     border-style: none solid solid solid;
     border-color: var(--darkred);
-    width: 606px;
+    width: calc(var(--searchBarWidth) + 96px);
     flex-wrap: wrap;
     transition: all 0.1s;
   }
