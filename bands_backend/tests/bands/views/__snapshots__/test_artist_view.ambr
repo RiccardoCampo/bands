@@ -18,6 +18,7 @@
     dict({
       'id': 2,
       'image_url': 'https://test-artist-2-image.com',
+      'link_url': 'https://test-artist-2.com',
       'name': 'test-artist-two',
       'rating': 4,
       'scores': list([
@@ -36,7 +37,6 @@
           'value': 3,
         }),
       ]),
-      'spotify_url': 'https://test-artist-2.com',
     }),
   ])
 # ---
