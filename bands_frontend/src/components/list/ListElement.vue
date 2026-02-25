@@ -9,7 +9,7 @@
         <input v-else class="input name" v-model="localArtist.name">
         <div class="ratingAndLink">
           <artist-rating v-model="rating" :color="darkColor" :active="editing" style="margin-right: 20px"></artist-rating>
-          <a v-if="!editing" :href="localArtist.spotifyUrl ?? ''" target="_blank" class="link">
+          <a v-if="!editing" :href="localArtist.linkUrl ?? ''" target="_blank" class="link">
             <external-link height="32" width="32"></external-link>
           </a>
         </div>
@@ -20,8 +20,8 @@
           <input class="input link" v-model="localArtist.imageUrl">
         </div>
         <div class="link">
-          <span class="link">Spotify URL</span>
-          <input class="input link" v-model="localArtist.spotifyUrl">
+          <span class="link">Link URL</span>
+          <input class="input link" v-model="localArtist.linkUrl">
         </div>
       </div>
       <div class="scores">

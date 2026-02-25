@@ -19,7 +19,7 @@ function artistReponseToModel(response: ArtistResponse): Artist {
     } }),
     rating: response.rating,
     imageUrl: response.image_url,
-    spotifyUrl: response.spotify_url
+    linkUrl: response.link_url
   }
 }
 
