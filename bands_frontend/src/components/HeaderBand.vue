@@ -101,7 +101,7 @@ div.band {
     flex-grow: 0;
     flex-shrink: 1;
     height: v-bind("height");
-    transition: display 2s;
+    min-width: 30px;
 }
 div.highlighted {
     height: v-bind("highlightedHeight");
@@ -121,6 +121,5 @@ div.letter {
     user-select: none;
     font-size: v-bind("fontSizeAttribute");
     color: var(--white);
-    transition: all 2s;
 }
 </style>

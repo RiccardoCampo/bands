@@ -221,18 +221,19 @@ export default defineComponent({
     font-size: 1.6pc;
     background-color: var(--white);
     width: calc(var(--searchBarWidth) - 10px);
+    max-width: 590px;
     height: 28px;
     outline: none;
     border-style: none;
     color: var(--darkgrey);
-    z-index: 1; 
-    transition: all 0.2s;
+    z-index: 1;
     margin-top: 3px;
   }
 
   div.searchInputOutline {
     background-color: v-bind(searchOutlineColor);
     width: var(--searchBarWidth); 
+    max-width: 600px;
     height: 36px;
   } 
 
