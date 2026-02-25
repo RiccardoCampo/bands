@@ -3,15 +3,42 @@
   dict({
     'id': 4,
     'image_url': 'https://test-artist-4-image.com',
+    'link_url': 'https://test-artist-4.com',
     'name': 'test-artist-four',
     'rating': 4,
     'scores': list([
     ]),
-    'spotify_url': 'https://test-artist-4.com',
   })
 # ---
 # name: test_delete_valid
   'OK'
+# ---
+# name: test_get_similar_artists
+  list([
+    dict({
+      'id': 2,
+      'image_url': 'https://test-artist-2-image.com',
+      'link_url': 'https://test-artist-2.com',
+      'name': 'test-artist-two',
+      'rating': 4,
+      'scores': list([
+        dict({
+          'category': 'genre',
+          'id': 2,
+          'metric': 'test-genre-2',
+          'type': 'value',
+          'value': 4,
+        }),
+        dict({
+          'category': 'genre',
+          'id': 4,
+          'metric': 'test-genre-1',
+          'type': 'value',
+          'value': 3,
+        }),
+      ]),
+    }),
+  ])
 # ---
 # name: test_list_valid
   dict({
@@ -22,6 +49,7 @@
       dict({
         'id': 2,
         'image_url': 'https://test-artist-2-image.com',
+        'link_url': 'https://test-artist-2.com',
         'name': 'test-artist-two',
         'rating': 4,
         'scores': list([
@@ -40,16 +68,15 @@
             'value': 3,
           }),
         ]),
-        'spotify_url': 'https://test-artist-2.com',
       }),
       dict({
         'id': 3,
         'image_url': 'https://test-artist-3-image.com',
+        'link_url': 'https://test-artist-3.com',
         'name': 'test-artist-three',
         'rating': 3,
         'scores': list([
         ]),
-        'spotify_url': 'https://test-artist-3.com',
       }),
     ]),
   })
@@ -58,6 +85,7 @@
   dict({
     'id': 1,
     'image_url': 'https://test-artist-1-image.com',
+    'link_url': 'https://test-artist-1.com',
     'name': 'test-artist-one',
     'rating': 5,
     'scores': list([
@@ -76,13 +104,13 @@
         'value': 1,
       }),
     ]),
-    'spotify_url': 'https://test-artist-1.com',
   })
 # ---
 # name: test_update_valid
   dict({
     'id': 1,
     'image_url': 'https://test-artist-1234-image.com',
+    'link_url': 'https://test-artist-1234.com',
     'name': 'test-artist-modified',
     'rating': 1,
     'scores': list([
@@ -101,6 +129,5 @@
         'value': 1,
       }),
     ]),
-    'spotify_url': 'https://test-artist-1234.com',
   })
 # ---

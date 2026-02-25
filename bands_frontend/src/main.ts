@@ -15,6 +15,7 @@ import ChevronDown from './components/icons/ChevronDown.vue';
 import PlusIcon from './components/icons/PlusIcon.vue';
 import EditIcon from './components/icons/EditIcon.vue';
 import { debounce } from './utils';
+import SlidersIcon from './components/icons/SlidersIcon.vue';
 
 const app = createApp(App)
 
@@ -55,5 +56,6 @@ app.component('chevron-up', ChevronUp)
 app.component('chevron-down', ChevronDown)
 app.component('plus-icon', PlusIcon)
 app.component('edit-icon', EditIcon)
+app.component('sliders-icon', SlidersIcon)
 
 app.mount('#app')

@@ -11,7 +11,7 @@ class Score(models.Model):
     id = PositiveAutoField(primary_key=True)
     artist = models.ForeignKey(Artist, on_delete=models.CASCADE, db_column="artist_id")
     metric = models.ForeignKey(Metric, on_delete=models.CASCADE, db_column="metric_id")
-    value = PositiveTinyIntegerField(validators=[MinValueValidator(0)])
+    value = PositiveTinyIntegerField(validators=[MinValueValidator(1)])
 
     class Meta:
         db_table = "score"
@@ -19,4 +19,4 @@ class Score(models.Model):
 
     @staticmethod
     def clamp_score_value(value: int) -> int:
-        return min(max(0, value), Score.MAX_SCORE_VALUE)
+        return min(max(1, value), Score.MAX_SCORE_VALUE)

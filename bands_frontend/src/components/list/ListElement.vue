@@ -2,48 +2,53 @@
     <div class="container">
       <img v-if="localArtist.imageUrl" :src="localArtist.imageUrl" class="artistImage">
       <div v-else class="artistImage" :style="{ 'background-color': darkColor }"></div>
-      <div class="details">
-        <div class="header">
-          <p class="name" v-if="!editing">
-            {{ localArtist.name }}
-          </p>
-          <input v-else class="input name" v-model="localArtist.name">
-          <a v-if="!editing" :href="localArtist.spotifyUrl ?? ''" target="_blank" class="link">
+      <div class="header">
+        <p class="name" v-if="!editing">
+          {{ localArtist.name }}
+        </p>
+        <input v-else class="input name" v-model="localArtist.name">
+        <div class="ratingAndLink">
+          <artist-rating v-model="rating" :color="darkColor" :active="editing" style="margin-right: 20px"></artist-rating>
+          <a v-if="!editing" :href="localArtist.linkUrl ?? ''" target="_blank" class="link">
             <external-link height="32" width="32"></external-link>
           </a>
-          <artist-rating v-model="rating" :color="darkColor" :active="editing"></artist-rating>
         </div>
-        <div v-if="editing" class="link">
+      </div>
+      <div v-if="editing" class="links">
+        <div class="link">
           <span class="link">Image URL</span>
           <input class="input link" v-model="localArtist.imageUrl">
         </div>
-        <div v-if="editing" class="link">
-          <span class="link">Spotify URL</span>
-          <input class="input link" v-model="localArtist.spotifyUrl">
+        <div class="link">
+          <span class="link">Link URL</span>
+          <input class="input link" v-model="localArtist.linkUrl">
         </div>
-        <div class="scores">
-          <div v-for="score in scores" :key="score.metric.name + score.values.maxValue" class="score">
-            <value-slider v-if="isValue(score)" v-model="score.values" :color="score.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></value-slider>
-            <flag-check v-else v-model="score.values.minValue" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"></flag-check>
-          </div>
+      </div>
+      <div class="scores">
+        <div v-for="score in scores" :key="score.metric.name + score.rerender" class="score">
+          <value-slider v-if="isValue(score)" v-model="score.values" :color="score.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"/>
+          <flag-label v-else style="margin-top: 10px" :label="score.metric.name" :color="score.color" :active="editing" @discardMetric="removeScore(score)"/>
         </div>
-        <button v-if="editing" class="button edit" @click="toggleMetricsPanel" title="Add Score">
+        <button v-if="editing" class="button edit" style="margin-top: 8px" @click="toggleMetricsPanel" title="Add Score">
           <plus-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
         </button>
-        <metric-selector v-if="editing && metricsPanelActive" width="400px" :color="color" :metrics="selectionMetrics" :allowNewMetric="true" @metricSelected="addOrEditScore" @metricUnselected="removePanelScore" @clickOutside="toggleMetricsPanel"/>
-        <div class="actions">
-          <button v-if="editing" class="button confirm" @click="edit" title="Confirm Changes">
-            <loading-icon v-if="loading" style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
-            <check-icon v-else style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
-          </button>
-          <button v-if="editing" class="button discard" @click="toggleEdit" title="Discard Changes">
-            <loading-icon v-if="loading" style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
-            <cross-icon v-else style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
-          </button>
-          <button v-if="!editing" class="button edit" @click="toggleEdit" title="Edit Artist">
-            <edit-icon :height="26" :width="26"/>
-          </button>
-        </div>
+      </div>
+      <metric-selector v-if="editing && metricsPanelActive" width="400px" :color="color" :metrics="selectionMetrics" :allowNewMetric="true" @metricSelected="addOrEditScore" @metricUnselected="removePanelScore" @clickOutside="toggleMetricsPanel"/>
+      <div class="actions">
+        <button v-if="editing" class="button confirm" @click="edit" title="Confirm Changes">
+          <loading-icon v-if="loading" style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+          <check-icon v-else style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+        </button>
+        <button v-if="editing" class="button discard" @click="toggleEdit" title="Discard Changes">
+          <loading-icon v-if="loading" style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+          <cross-icon v-else style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+        </button>
+        <button v-if="!editing" class="button edit" @click="toggleEdit" title="Edit Artist">
+          <edit-icon :height="26" :width="26"/>
+        </button>
+        <button v-if="!editing" class="button edit" @click="artistsLikeThis" title="Artists like this">
+          <sliders-icon :height="26" :width="26"/>
+        </button>
       </div>
     </div>
 </template>
@@ -52,7 +57,7 @@
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import ArtistRating from './ArtistRating.vue';
 import ValueSlider from '../metrics/ValueSlider.vue';
-import FlagCheck from '../metrics/FlagCheck.vue';
+import FlagLabel from '../metrics/FlagLabel.vue';
 import { mapActions, mapState } from 'pinia';
 import { useArtistsList } from '@/store/artistsList';
 import { usePageStatus } from '@/store/pageStatus';
@@ -73,6 +78,7 @@ type ArtistScore = {
   values: FilterValues,
   metric: Metric
   color: string
+  rerender: boolean
 }
 
 
@@ -85,7 +91,7 @@ export default defineComponent({
   components: {
     "artist-rating": ArtistRating,
     "value-slider": ValueSlider,
-    "flag-check": FlagCheck,
+    "flag-label": FlagLabel,
     "metric-selector": MetricsSelector,
   },
   mixins: [ColorsMixin, WithColorMixin],
@@ -209,8 +215,13 @@ export default defineComponent({
             scoreId: score.id,
             metric,
             values: metric.type === MetricType.flag ? {minValue: score.value, maxValue: 0} : {minValue: 0, maxValue: score.value},
-            color: this.getColor(index)
+            color: this.getColor(index),
+            rerender: true
           }
+
+          debounce(() => {
+            this.scores[metric.id].rerender = false
+          }, 300)()
         }
       })
       this.rating = this.localArtist.rating
@@ -223,12 +234,18 @@ export default defineComponent({
       const metricId = score.filter.metric.id
       if (metricId in this.scores) {
         this.scores[metricId].values = score.filter.filterValues
+        this.scores[metricId].rerender = true
+        
+        debounce(() => {
+          this.scores[metricId].rerender = false
+        }, 300)()
       } else {
         debounce(() => {
           this.scores[metricId] = {
             values: score.filter.filterValues,
             metric: score.filter.metric,
-            color: this.getColor(Object.keys(this.scores).length - 1)
+            color: this.getColor(Object.keys(this.scores).length - 1),
+            rerender: false
           }
         }, 300)()
       }        
@@ -249,6 +266,10 @@ export default defineComponent({
     isValue(score: ArtistScore) {
       return score.metric.type === MetricType.value
     },
+    artistsLikeThis () {
+      if (this.localArtist.id)
+        this.$emit("artistsLikeThis")
+    }
   },
   mounted () {
     const newArtist = {name: "New Artist", scores: [] as Score[], rating: 1}
@@ -264,44 +285,85 @@ export default defineComponent({
 <style scoped>
 
 div.container {
-  display: flex;
+  display: grid;
   border-style: solid;
   border-width: 3px;
   border-color: v-bind("lightColor");
   margin-bottom: 10px;
+  column-gap: 30px;
+  grid-template-columns: 180px auto;
+}
+@media (max-width: 600px) {
+  div.container {
+    column-gap: 0px;
+    column-gap: 30px;
+    grid-template-columns: 90px auto;
+  }
 }
 
 .artistImage {
+  grid-row-start: 1;
+  grid-row-end: 10;
   margin: 8px 0px 8px 10px;
   width: 180px;
   height: 180px;
   border-radius: 50%;
   margin-left: 10px;
   margin-top: 8px;
+  object-fit: cover;
+}
+@media (max-width: 600px) {
+  .artistImage {
+    width: 90px;
+    height: 90px;
+    grid-row-end: 1;
+  }
 }
 
 div.artistImage {
-  flex-shrink: 0;
   background-color: v-bind("darkColor");
-}
-
-div.details {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 10;
-  margin-left: 20px;
 }
 
 div.header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  grid-column: 2;
+}
+@media (max-width: 600px) {
+  div.header {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: start;
+  }
+}
+div.ratingAndLink {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+}
+
+div.links {
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 600px) {
+  div.links {
+    grid-column: 1 / span 2;
+    justify-self: center;
+  }
 }
 
 div.scores {
   display: flex;
   flex-wrap: wrap;
   margin-top: 20px;
+  margin-left: 20px
+}
+@media (max-width: 600px) {
+  div.scores {
+    grid-column: 1 / span 2;
+  }
 }
 
 div.score {
@@ -316,6 +378,11 @@ p.name {
   margin-top: 0px;
   margin-bottom: 0px;
   max-width: 500px;
+}
+@media (max-width: 600px) {
+  p.name {
+    font-size: 2.5pc;
+  }
 }
 
 input.input  {
@@ -337,6 +404,13 @@ input.name {
   font-size: 4pc;
   font-weight: 500;
   width: 430px;
+  margin-bottom: 10px
+}
+@media (max-width: 600px) {
+  input.name {
+    font-size: 2.5pc;
+    width: 330px;
+  }
 }
 
 div.link {
@@ -371,7 +445,10 @@ a.link:active {
 
 
 div.actions {
-  margin-top: auto;
+  grid-row: 10;
+  grid-column: 2;
+  margin-top: -20px;
+  margin-right: 5px;
   display: flex;
   justify-content: flex-end;
   margin-right: 4px;

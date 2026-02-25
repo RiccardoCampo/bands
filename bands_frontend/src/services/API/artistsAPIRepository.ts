@@ -18,7 +18,7 @@ export type ArtistScoreResponse = {
 export type ArtistResponse = {
   id: number
   name: string
-  spotify_url: string | null
+  link_url: string | null
   image_url: string | null
   rating: number
   created_at: Date
@@ -32,14 +32,14 @@ export type ArtistsPage = {
 
 export type ArtistCreateRequest = {
   name: string
-  spotify_url: string | null
+  link_url: string | null
   image_url: string | null
   rating: number
 }
 
 export type ArtistUpdateRequest = {
   name: string
-  spotify_url: string | null
+  link_url: string | null
   image_url: string | null
   rating: number
 }
@@ -57,7 +57,7 @@ export default {
         if (scoreFilter.metric.type == MetricType.value)
           queryString += `&${scoreFilter.metric.name}=[${scoreFilter.filterValues.minValue},${scoreFilter.filterValues.maxValue}]`
         else
-          queryString += `&${scoreFilter.metric.name}=${scoreFilter.filterValues.minValue}`
+          queryString += `&${scoreFilter.metric.name}=1`
       });
 
     return (await axios.get(`${BASE_URL}?${queryString}`)).data
@@ -70,7 +70,7 @@ export default {
       return (await axios.post(BASE_URL, {
         name: artist.name,
         rating: artist.rating,
-        spotify_url: artist.spotifyUrl,
+        link_url: artist.linkUrl,
         image_url: artist.imageUrl
       } as ArtistCreateRequest)).data
     } catch (error: any) {
@@ -83,8 +83,13 @@ export default {
     return (await axios.put(`${BASE_URL}${artist.id}/`, {
         name: artist.name,
         rating: artist.rating,
-        spotify_url: artist.spotifyUrl,
+        link_url: artist.linkUrl,
         image_url: artist.imageUrl
       } as ArtistUpdateRequest)).data
+  },
+  async getSimilar (artistId: number): Promise<ArtistResponse[]> {
+    return (
+      await axios.get(`${BASE_URL}${artistId}/similar/`)
+    ).data
   }
 };

@@ -18,6 +18,12 @@
     --lightgrey: #4f5358;
     --darkgrey: #2d3136;
     --black: #1d1d21;
+    --searchBarWidth: 30vw;
+}
+@media (max-width: 600px) {
+    :root {
+        --searchBarWidth: 60vw;
+    }
 }
 
 @font-face {

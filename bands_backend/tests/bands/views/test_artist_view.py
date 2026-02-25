@@ -68,7 +68,7 @@ def test_retrieve_not_found(client: Client) -> None:
 def test_create_valid(client: Client, snapshot: Any) -> None:
     test_artist = {
         "name": "test-artist-four",
-        "spotify_url": "https://test-artist-4.com",
+        "link_url": "https://test-artist-4.com",
         "image_url": "https://test-artist-4-image.com",
         "rating": 4,
         "this-field": "is-ignored",
@@ -85,7 +85,7 @@ def test_create_invalid(client: Client) -> None:
     response = client.post(
         "/bands/artist/",
         data={
-            "spotify_url": "https://test-artist-4.com",
+            "link_url": "https://test-artist-4.com",
             "image_url": "https://test-artist-4-image.com",
         },
     )
@@ -104,7 +104,7 @@ def test_create_already_existing(client: Client) -> None:
 def test_update_valid(client: Client, snapshot: Any) -> None:
     test_artist_update = {
         "name": "test-artist-modified",
-        "spotify_url": "https://test-artist-1234.com",
+        "link_url": "https://test-artist-1234.com",
         "image_url": "https://test-artist-1234-image.com",
         "rating": 1,
         "this-field": "is-ignored",
@@ -121,7 +121,7 @@ def test_update_valid(client: Client, snapshot: Any) -> None:
 
     db_artist = Artist.objects.get(id=test_artist_id)
     assert db_artist.name == test_artist_update["name"]
-    assert db_artist.spotify_url == test_artist_update["spotify_url"]
+    assert db_artist.link_url == test_artist_update["link_url"]
     assert db_artist.image_url == test_artist_update["image_url"]
     assert db_artist.rating == test_artist_update["rating"]
 
@@ -166,3 +166,17 @@ def test_delete_not_found(client: Client) -> None:
 
     assert response.status_code == 404
     assert json.loads(response.content) == {"not_found_error": "Artist matching query does not exist."}
+
+
+def test_get_similar_artists_empty(client: Client) -> None:
+    response = client.get("/bands/artist/10000/similar/")
+
+    assert response.status_code == 200
+    assert json.loads(response.content) == []
+
+
+def test_get_similar_artists(client: Client, snapshot: Any) -> None:
+    response = client.get("/bands/artist/1/similar/")
+
+    assert response.status_code == 200
+    assert json.loads(response.content) == snapshot(exclude=paths("0.created_at"))
