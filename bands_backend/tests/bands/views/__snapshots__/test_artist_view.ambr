@@ -13,6 +13,33 @@
 # name: test_delete_valid
   'OK'
 # ---
+# name: test_get_similar_artists
+  list([
+    dict({
+      'id': 2,
+      'image_url': 'https://test-artist-2-image.com',
+      'name': 'test-artist-two',
+      'rating': 4,
+      'scores': list([
+        dict({
+          'category': 'genre',
+          'id': 2,
+          'metric': 'test-genre-2',
+          'type': 'value',
+          'value': 4,
+        }),
+        dict({
+          'category': 'genre',
+          'id': 4,
+          'metric': 'test-genre-1',
+          'type': 'value',
+          'value': 3,
+        }),
+      ]),
+      'spotify_url': 'https://test-artist-2.com',
+    }),
+  ])
+# ---
 # name: test_list_valid
   dict({
     'count': 2,

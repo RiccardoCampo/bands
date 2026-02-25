@@ -21,12 +21,25 @@
       </button>
     </div>
 
-    <metrics-selector v-if="showSuggestedMetricsPanel" width="496px" color="yellow" style="left: -56px" :metrics="selectionMetrics" @metricSelected="addFilter" @metricUnselected="removeFilter" @clickOutside="deactivateSuggestedMetricsPanel"/>
+    <metrics-selector v-if="showSuggestedMetricsPanel" width="calc(var(--searchBarWidth) + 92px)" color="yellow" style="left: -6px" :metrics="selectionMetrics" @metricSelected="addFilter" @metricUnselected="removeFilter" @clickOutside="deactivateSuggestedMetricsPanel"/>
 
     <div v-if="showFiltersPanel" class="filtersPanel">
       <div class="selectedFilter" v-for="filter in selectedFilters" :key="filter.filter.metric.id">
-        <value-slider v-if="filter.filter.metric.type === 'value'" v-model="filter.filter.filterValues" :label="filter.filter.metric.name" :color="filter.color" :active="true" :range="true" @discardMetric="removeFilter(filter)"/>
-        <flag-check v-else v-model="filter.filter.filterValues.minValue" :label="filter.filter.metric.name" :active="true" @discardMetric="removeFilter(filter)"/>
+        <value-slider
+          v-if="filter.filter.metric.type === 'value'"
+          v-model="filter.filter.filterValues"
+          :label="filter.filter.metric.name"
+          :color="filter.color"
+          :active="true"
+          :range="true"
+          @discardMetric="removeFilter(filter)"
+        />
+        <flag-label
+          v-else :label="filter.filter.metric.name"
+          :color="filter.color"
+          :active="true"
+          @discardMetric="removeFilter(filter)"
+        />
       </div>
     </div>  
   </div>
@@ -39,7 +52,7 @@ import { usePageStatus } from '@/store/pageStatus';
 import { debounce } from '@/utils';
 import { mapActions, mapState } from 'pinia';
 import ValueSlider from './metrics/ValueSlider.vue';
-import FlagCheck from './metrics/FlagCheck.vue';
+import FlagLabel from './metrics/FlagLabel.vue';
 import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import MetricsSelector from './MetricsSelector.vue';
 import KeyboardEvents from './helpers/KeyboardEvents.vue';
@@ -63,7 +76,7 @@ export default defineComponent({
   components: {
     "metrics-selector": MetricsSelector,
     "value-slider": ValueSlider,
-    "flag-check": FlagCheck,
+    "flag-label": FlagLabel,
     "keyboard-events": KeyboardEvents,
   },
   mixins: [
@@ -207,19 +220,20 @@ export default defineComponent({
     font-family: regular;
     font-size: 1.6pc;
     background-color: var(--white);
-    width: 500px;
+    width: calc(var(--searchBarWidth) - 10px);
+    max-width: 590px;
     height: 28px;
     outline: none;
     border-style: none;
     color: var(--darkgrey);
-    z-index: 1; 
-    transition: all 0.2s;
+    z-index: 1;
     margin-top: 3px;
   }
 
   div.searchInputOutline {
     background-color: v-bind(searchOutlineColor);
-    width: 510px; 
+    width: var(--searchBarWidth); 
+    max-width: 600px;
     height: 36px;
   } 
 
@@ -272,7 +286,7 @@ export default defineComponent({
     justify-content: left;
     border-style: none solid solid solid;
     border-color: var(--darkred);
-    width: 606px;
+    width: calc(var(--searchBarWidth) + 96px);
     flex-wrap: wrap;
     transition: all 0.1s;
   }
