@@ -7,10 +7,11 @@
 
 <script lang="ts">
 import HeaderBand from './HeaderBand.vue';
-import {ColorOrder, HeaderBandMaxSize} from '../config';
+import {ColorOrder} from '../config';
 import { mapState } from 'pinia';
 import { usePageStatus } from '@/store/pageStatus';
 import { defineComponent } from 'vue';
+import WithBandSizeMixin from '@/mixins/WithBandSizeMixin.vue';
 
 type LetterWithColor = {
   letter: string
@@ -27,6 +28,7 @@ export default defineComponent({
   components: {
     'header-band': HeaderBand,
   },
+  mixins: [WithBandSizeMixin],
   methods: {
     /**
      * Get the band color, given it's index and the number of added bands.
@@ -54,17 +56,17 @@ export default defineComponent({
       let addedBands = 0
       while (widthToFill > 0) {
         bands = [""].concat(bands, [""])
-        widthToFill -= HeaderBandMaxSize.WIDTH * 2
+        widthToFill -= this.headerBandMaxWidth * 2
         addedBands += 2
       }
 
       return bands.map((band, index) => ({letter: band, color: this.getColor(index, addedBands)}))
     },
     letteredBandsSize(): number {
-      return HeaderBandMaxSize.WIDTH * 5
+      return this.headerBandMaxWidth * 5
     },
     sideMargin(): string {
-      return this.shouldShrink ? "-10px" : (-HeaderBandMaxSize.WIDTH - 10) + "px"
+      return this.shouldShrink ? "-10px" : (-this.headerBandMaxWidth - 10) + "px"
     },
     /**
      * Shrink the bands if the screen gets too tight.
@@ -72,8 +74,8 @@ export default defineComponent({
     shouldShrink(): boolean {
       return this.pageSize.width < this.letteredBandsSize
     },
-    bandsPosition (): string {
-      return (this.headerMinimized ? -240 : -10) + "px"
+    bandsPositionAttribute (): string {
+      return (this.headerMinimized ? this.bandsPositionMinimized : this.bandsPosition) + "px"
     },
   }
 });
@@ -84,7 +86,7 @@ div.header  {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: v-bind("bandsPosition");
+  margin-top: v-bind("bandsPositionAttribute");
   margin-left: v-bind("sideMargin");
   margin-right: v-bind("sideMargin");
   pointer-events: none;

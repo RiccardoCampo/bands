@@ -21,8 +21,10 @@ export default {
     'search-section': SearchSection,
     'list-section':  ListSection,
   },
-  mounted() {
+  beforeMount() {
     this.updateSize();
+  },
+  mounted() {
     window.addEventListener("resize", this.updateSize);
     document.title = 'bands';
   },

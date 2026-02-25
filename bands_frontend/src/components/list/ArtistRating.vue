@@ -55,7 +55,6 @@ export default defineComponent({
 
 div.ratingContainer {
   display: flex;
-  width: 200px;
   justify-self: right;
 }
 

@@ -11,8 +11,8 @@
 
 <script lang="ts">
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
-import {HeaderSliderMaxHeight, HeaderSliderMinHeight, HeaderBandMinSize, HeaderBandMaxSize} from '../config';
 import { defineComponent } from 'vue';
+import WithBandSizeMixin from '@/mixins/WithBandSizeMixin.vue';
 
 /**
  * Header band component. If the band has a letter, also render the slider.
@@ -26,10 +26,10 @@ export default defineComponent({
         position: Number,
         minimized: Boolean
     },
-    mixins: [WithColorMixin],
+    mixins: [WithColorMixin, WithBandSizeMixin],
     data () {
         return {
-            sliderPosition: Math.floor(Math.random() * (HeaderSliderMaxHeight - HeaderSliderMinHeight + 1)) + HeaderSliderMinHeight,
+            sliderPosition: 180,
         }
     },
     computed: {
@@ -40,22 +40,22 @@ export default defineComponent({
             return Boolean(this.letter)
         },
         flex(): string {
-            return (this.minimized && this.letter ? `0 ${HeaderBandMinSize.WIDTH}px` : `0 ${HeaderBandMaxSize.WIDTH}px`)
+            return (this.minimized && this.letter ? `0 ${this.headerBandMinWidth}px` : `0 ${this.headerBandMaxWidth}px`)
         },
         height(): string {
-            return (this.minimized ? HeaderBandMinSize.HEIGHT : HeaderBandMaxSize.HEIGHT) + "px"
+            return (this.minimized ? this.headerBandMinHeight : this.headerBandMaxHeight) + "px"
         },
         highlightedHeight(): string {
-            return (this.minimized ? HeaderBandMinSize.HEIGHT : this.sliderPosition) + "px"
+            return (this.minimized ? this.headerBandMinHeight : this.sliderPosition) + "px"
         },
-        sliderHeight(): string {
-            return (this.minimized ? 0 : 10) + "px"
+        sliderHeightAttribute(): string {
+            return (this.minimized ? this.sliderHeightMinimized : this.sliderHeight) + "px"
         },
-        fontSize(): string {
-            return (this.minimized ? 10 : 16) + "pc"
+        fontSizeAttribute(): string {
+            return (this.minimized ? this.fontSizeMinimized : this.fontSize) + "pc"
         },
-        letterTopMargin(): string {
-            return (this.minimized ? -150 : -240) + "px"
+        letterTopMarginAttribute(): string {
+            return (this.minimized ? this.letterTopMarginMinimized : this.letterTopMargin) + "px"
         }
     },
     methods: {
@@ -63,11 +63,11 @@ export default defineComponent({
          * Move the slider, pick a direction and try to move towards it. Clamp the result between minium and maximum height.
          */
         moveSlider() {
-            this.sliderPosition += (Math.floor(Math.random() * 3) - 1) * 50;
-            this.sliderPosition = Math.min(Math.max(this.sliderPosition, HeaderSliderMinHeight), HeaderSliderMaxHeight);
+            this.sliderPosition += (Math.floor(Math.random() * 3) - 1) * this.sliderMovement;
+            this.sliderPosition = Math.min(Math.max(this.sliderPosition, this.headerSliderMinHeight), this.headerSliderMaxHeight);
         },
         /**
-         * Decide when the next slideer movement will happen.
+         * Decide when the next slider movement will happen.
          * 
          * @param min minimum time in milliseconds
          */
@@ -87,6 +87,7 @@ export default defineComponent({
     },
     mounted: function () {
         if (this.displaySlider) {
+            this.sliderPosition = Math.floor(Math.random() * (this.headerSliderMaxHeight - this.headerSliderMinHeight + 1)) + this.headerSliderMinHeight
             this.startMoveTimeout(this.getNextSliderMoveTime(1000));
         }
     },
@@ -100,7 +101,7 @@ div.band {
     flex-grow: 0;
     flex-shrink: 1;
     height: v-bind("height");
-    transition: display 2s;
+    min-width: 30px;
 }
 div.highlighted {
     height: v-bind("highlightedHeight");
@@ -109,17 +110,16 @@ div.highlighted {
 }
 div.slider {
     position: relative;
-    height: v-bind("sliderHeight");
+    height: v-bind("sliderHeightAttribute");
     background-color: var(--white);
 }
 div.letter {
     font-family: title;
     position: relative;
-    top: v-bind("letterTopMargin");
+    top: v-bind("letterTopMarginAttribute");
     height: 0px;
     user-select: none;
-    font-size: v-bind("fontSize");
+    font-size: v-bind("fontSizeAttribute");
     color: var(--white);
-    transition: all 2s;
 }
 </style>
