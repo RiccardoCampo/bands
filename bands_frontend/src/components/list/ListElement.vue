@@ -8,19 +8,21 @@
         </p>
         <input v-else class="input name" v-model="localArtist.name">
         <div class="ratingAndLink">
-          <artist-rating v-model="rating" :color="darkColor" :active="editing"></artist-rating>
+          <artist-rating v-model="rating" :color="darkColor" :active="editing" style="margin-right: 20px"></artist-rating>
           <a v-if="!editing" :href="localArtist.spotifyUrl ?? ''" target="_blank" class="link">
             <external-link height="32" width="32"></external-link>
           </a>
         </div>
       </div>
-      <div v-if="editing" class="link">
-        <span class="link">Image URL</span>
-        <input class="input link" v-model="localArtist.imageUrl">
-      </div>
-      <div v-if="editing" class="link">
-        <span class="link">Spotify URL</span>
-        <input class="input link" v-model="localArtist.spotifyUrl">
+      <div v-if="editing" class="links">
+        <div class="link">
+          <span class="link">Image URL</span>
+          <input class="input link" v-model="localArtist.imageUrl">
+        </div>
+        <div class="link">
+          <span class="link">Spotify URL</span>
+          <input class="input link" v-model="localArtist.spotifyUrl">
+        </div>
       </div>
       <div class="scores">
         <div v-for="score in scores" :key="score.metric.name + score.rerender" class="score">
@@ -301,7 +303,7 @@ div.container {
 
 .artistImage {
   grid-row-start: 1;
-  grid-row-end: 3;
+  grid-row-end: 10;
   margin: 8px 0px 8px 10px;
   width: 180px;
   height: 180px;
@@ -315,9 +317,6 @@ div.container {
     width: 90px;
     height: 90px;
     grid-row-end: 1;
-  }
-  p.name {
-    font-size: 1pc;
   }
 }
 
@@ -334,6 +333,7 @@ div.header {
 @media (max-width: 600px) {
   div.header {
     flex-direction: column;
+    justify-content: flex-start;
     align-items: start;
   }
 }
@@ -343,6 +343,16 @@ div.ratingAndLink {
   margin-right: 20px;
 }
 
+div.links {
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 600px) {
+  div.links {
+    grid-column: 1 / span 2;
+    justify-self: center;
+  }
+}
 
 div.scores {
   display: flex;
@@ -394,6 +404,13 @@ input.name {
   font-size: 4pc;
   font-weight: 500;
   width: 430px;
+  margin-bottom: 10px
+}
+@media (max-width: 600px) {
+  input.name {
+    font-size: 2.5pc;
+    width: 330px;
+  }
 }
 
 div.link {
@@ -428,7 +445,7 @@ a.link:active {
 
 
 div.actions {
-  grid-row: 3;
+  grid-row: 10;
   grid-column: 2;
   margin-top: -20px;
   margin-right: 5px;
