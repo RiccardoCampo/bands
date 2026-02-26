@@ -34,8 +34,10 @@ export default defineComponent({
     hasResults(): boolean {
       return this.artists.length > 0 || this.newArtistActive
     },
-    listHeight (): string {
-      return this.pageSize.height - 170 + 'px';
+    listHeight (): string { 
+      if (this.pageSize.width >= 600)
+        return this.pageSize.height - 170 + 'px';
+      return this.pageSize.height - 120 +  'px';
     }
   },
   methods: {

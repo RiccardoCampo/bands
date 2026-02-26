@@ -48,7 +48,10 @@ class ArtistViewSet(ModelViewSet):
                     SELECT potential.artist_id,
                           CASE WHEN target.type = 0
                                THEN 8
-                               ELSE POWER(2, 4 - ABS(target.value - potential.value)) END AS score
+                               ELSE POWER(
+                                    2,
+                                    4 - ABS(CAST(target.value as SIGNED) - CAST(potential.value AS SIGNED))
+                               ) END AS score
                     FROM
                         (
                             SELECT metric_id, value, m.`type`, s.artist_id
