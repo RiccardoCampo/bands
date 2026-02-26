@@ -409,7 +409,7 @@ input.name {
 @media (max-width: 600px) {
   input.name {
     font-size: 2.5pc;
-    width: 330px;
+    width: 56vw;
   }
 }
 
@@ -420,6 +420,11 @@ div.link {
 input.link {
   font-size: 1.5pc;
   width: 340px;
+} @media (max-width: 600px) {
+  input.link {
+    font-size: 1pc;
+    width: 50vw;
+  }
 }
 
 span.link {

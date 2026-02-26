@@ -1,9 +1,9 @@
 <template>
   <div style="display: flex; flex-direction: column;">
-  <header-section></header-section>
-  <search-section></search-section>
-  <list-section v-if="listActive"></list-section>
-  <div style="margin-top: 200px;"></div>
+    <header-section></header-section>
+    <search-section></search-section>
+    <list-section v-if="listActive"></list-section>
+    <div style="margin-top: 200px;"></div>
   </div>
 </template>
 
