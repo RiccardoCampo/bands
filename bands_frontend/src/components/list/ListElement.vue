@@ -25,7 +25,7 @@
         </div>
       </div>
       <div class="scores">
-        <div v-for="score in scores" :key="score.metric.name + score.rerender" class="score">
+        <div v-for="score in Object.values(scores).sort((a, b) => a.metric.category.localeCompare(b.metric.category))" :key="score.metric.name + score.rerender" class="score">
           <value-slider v-if="isValue(score)" v-model="score.values" :color="score.metric.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"/>
           <flag-label v-else style="margin-top: 10px" :label="score.metric.name" :color="score.metric.color" :active="editing" @discardMetric="removeScore(score)"/>
         </div>
@@ -65,7 +65,7 @@ import { useMetrics } from '@/store/metrics';
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
 import { ArtistAlreadyExistsError } from '@/exceptions';
 import { PropType } from 'vue';
-import { FilterValues, Score } from '@/types/score';
+import { FilterValues, NewScore, Score } from '@/types/score';
 import { MetricType, Metric } from '@/types/metrics';
 import { Artist } from '@/types/artist';
 import { defineComponent } from 'vue';
@@ -164,18 +164,21 @@ export default defineComponent({
     async edit () {
       if (this.loading)
         return
-      this.localArtist.scores = Object.values(this.scores).map(
+      Object.values(this.scores).forEach(
         score => {
           const value = score.metric.type === MetricType.flag ? score.values.minValue : score.values.maxValue
-          return score.scoreId === undefined ? {
-            metricId: score.metric.id,
-            value,
-          } : {
-            id: score.scoreId,
-            metric: score.metric.name,
-            type: score.metric.type,
-            value,
-          }
+          if (score.scoreId === undefined)
+            this.localArtist.newScores.push({
+              metricId: score.metric.id,
+              value,
+            })
+          else
+            this.localArtist.scores.push({
+              id: score.scoreId,
+              metric: score.metric.name,
+              type: score.metric.type,
+              value,
+            })
         }
       )
       this.localArtist.rating = this.rating
@@ -203,20 +206,20 @@ export default defineComponent({
     },
     setScores () {
       this.scores = {}
+      const metricsMap: {[key: string]: Metric}  = {}
+      this.metrics.map((metric) => { metricsMap[metric.name] = metric; })
       this.localArtist.scores.forEach((score) => {
-        if ("id" in score) {
-          const metric: Metric = this.metrics.filter(metric => metric.name === score.metric)[0]
-          this.scores[metric.id] = {
-            scoreId: score.id,
-            metric,
-            values: metric.type === MetricType.flag ? {minValue: score.value, maxValue: 0} : {minValue: 0, maxValue: score.value},
-            rerender: true
-          }
-
-          debounce(() => {
-            this.scores[metric.id].rerender = false
-          }, 300)()
+        const metric: Metric = metricsMap[score.metric]
+        this.scores[metric.id] = {
+          scoreId: score.id,
+          metric,
+          values: metric.type === MetricType.flag ? {minValue: score.value, maxValue: 0} : {minValue: 0, maxValue: score.value},
+          rerender: true
         }
+
+        debounce(() => {
+          this.scores[metric.id].rerender = false
+        }, 300)()
       })
       this.rating = this.localArtist.rating
       this.scoresToRemove = []
@@ -265,7 +268,7 @@ export default defineComponent({
     }
   },
   mounted () {
-    const newArtist = {name: "New Artist", scores: [] as Score[], rating: 1}
+    const newArtist = {name: "New Artist", scores: [] as Score[], rating: 1, newScores: [] as NewScore[]}
     this.localArtist = this.new ? newArtist : this.artist ?? newArtist
     this.name = this.localArtist.name
     this.editing = this.new

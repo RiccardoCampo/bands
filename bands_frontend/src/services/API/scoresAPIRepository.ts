@@ -21,17 +21,17 @@ export default {
   async upsertBulk (artist: Artist) { 
     const updates = []
     for (const score of artist.scores) {
-      if ("id" in score)
-        updates.push({
-          id: score.id,
-          value: score.value
-        })
-      else
-        updates.push({
-          metric_id: score.metricId,
-          artist_id: artist.id,
-          value: score.value
-        })
+      updates.push({
+        id: score.id,
+        value: score.value
+      })
+    }
+    for (const score of artist.newScores) {
+      updates.push({
+        metric_id: score.metricId,
+        artist_id: artist.id,
+        value: score.value
+      })
     }
     await axios.put(`${BASE_URL}bulk-upsert/`, {updates})
   },
