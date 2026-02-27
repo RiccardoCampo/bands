@@ -29,14 +29,14 @@
           v-if="filter.filter.metric.type === 'value'"
           v-model="filter.filter.filterValues"
           :label="filter.filter.metric.name"
-          :color="filter.color"
+          :color="filter.filter.metric.color"
           :active="true"
           :range="true"
           @discardMetric="removeFilter(filter)"
         />
         <flag-label
           v-else :label="filter.filter.metric.name"
-          :color="filter.color"
+          :color="filter.filter.metric.color"
           :active="true"
           @discardMetric="removeFilter(filter)"
         />
@@ -53,7 +53,6 @@ import { debounce } from '@/utils';
 import { mapActions, mapState } from 'pinia';
 import ValueSlider from './metrics/ValueSlider.vue';
 import FlagLabel from './metrics/FlagLabel.vue';
-import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import MetricsSelector from './MetricsSelector.vue';
 import KeyboardEvents from './helpers/KeyboardEvents.vue';
 import { Metric } from '@/types/metrics';
@@ -79,9 +78,6 @@ export default defineComponent({
     "flag-label": FlagLabel,
     "keyboard-events": KeyboardEvents,
   },
-  mixins: [
-    ColorsMixin,
-  ],
   async mounted () {
     this.loading = true
     await this.fetchMetrics().catch((error) => {console.log(error)}).finally(
@@ -130,7 +126,7 @@ export default defineComponent({
     getSuggestedFilters() {
       debounce(
         () => {
-          this.suggestedMetrics = this.metrics.filter((metric) => { return metric.name.includes(this.text) })
+          this.suggestedMetrics = this.metrics.filter((metric: Metric) => { return metric.name.includes(this.text) })
         },
         300
       )()
@@ -172,23 +168,18 @@ export default defineComponent({
     },
     selectionMetrics(): ScoreFilterWithColor[] {
       return [
-        ...Object.values(this.selectedFilters).map(
-          (filter, index) => {
-            filter.color = this.getColor(index); return filter
-          }
-        ),
+        ...Object.values(this.selectedFilters),
         ...this.suggestedMetrics.filter(
-          (metric) => {
+          (metric: Metric) => {
             return !(metric.id in this.selectedFilters)
           }
         ).map(
-          (metric: Metric, index: number) => {
+          (metric: Metric) => {
             return {
               filter: {
                 metric: metric,
                 filterValues: {minValue: 0, maxValue: 5}
               },
-              color: this.getColor(index + Object.keys(this.selectedFilters).length),
               selected: false,
               range: true,
             }

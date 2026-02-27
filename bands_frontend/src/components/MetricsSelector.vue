@@ -14,7 +14,7 @@
                 v-if="metricWithValue.filter.metric.type === 'value'"
                 v-model="metricWithValue.filter.filterValues"
                 v-on:update:modelValue="selectMetric(metricWithValue)"
-                :color="metricWithValue.selected ? metricWithValue.color : 'grey'"
+                :color="metricWithValue.selected ? metricWithValue.filter.metric.color : 'grey'"
                 active
                 :range="metricWithValue.range"
                 hideDiscardButton
@@ -23,7 +23,7 @@
               <flag-label
                 v-else
                 :label="metricWithValue.filter.metric.name"
-                :color="metricWithValue.selected ? metricWithValue.color : 'grey'"
+                :color="metricWithValue.selected ? metricWithValue.filter.metric.color : 'grey'"
                 :fontColor="metricWithValue.selected ? 'black' : 'white'"
                 active
                 hideDiscardButton
@@ -54,7 +54,6 @@
 </template>
 
 <script lang="ts">
-import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
 import ValueSlider from './metrics/ValueSlider.vue';
 import FlagLabel from './metrics/FlagLabel.vue';
@@ -68,7 +67,6 @@ import { defineComponent } from 'vue';
 
 export type ScoreFilterWithColor = {
   filter: ScoreFilter,
-  color: string,
   selected: boolean,
   range: boolean
 }
@@ -91,7 +89,7 @@ export default defineComponent({
       "value-slider": ValueSlider,
       "flag-label": FlagLabel,
     },
-    mixins: [ColorsMixin, WithColorMixin],
+    mixins: [WithColorMixin],
     data () {
         return {
           newMetric: {} as NewMetric,

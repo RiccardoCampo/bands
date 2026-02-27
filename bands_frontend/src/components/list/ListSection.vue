@@ -11,10 +11,10 @@
 <script lang="ts">
 import { mapActions, mapState } from 'pinia';
 import ListElement from './ListElement.vue';
-import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import { usePageStatus } from '@/store/pageStatus';
 import { useArtistsList } from '@/store/artistsList';
 import { defineComponent } from 'vue';
+import { addColors } from '@/utils';
 
 
 export default defineComponent({
@@ -22,14 +22,13 @@ export default defineComponent({
   components: {
     'list-element': ListElement,
   },
-  mixins: [ColorsMixin],
   data () {
     return {
       fetchingPage: false as boolean
     }
   },
   computed: {
-    ...mapState(usePageStatus, ['pageSize', 'newArtistActive', 'searchStarted']),
+    ...mapState(usePageStatus, ['pageSize', 'newArtistActive', 'searchStarted', 'colorOffset']),
     ...mapState(useArtistsList, ['artists', 'page']),
     hasResults(): boolean {
       return this.artists.length > 0 || this.newArtistActive
@@ -61,7 +60,10 @@ export default defineComponent({
       this.fetchingPage = true
       await this.fetchSimilarArtists(artistId).catch((error) => {console.log(error)})
       this.fetchingPage = false
-    }
+    },
+    addColors (array: any[]) {            
+        return addColors(array, this.colorOffset)
+    },
   }
 });
 

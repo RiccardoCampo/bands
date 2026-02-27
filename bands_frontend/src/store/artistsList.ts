@@ -17,6 +17,7 @@ function artistReponseToModel(response: ArtistResponse): Artist {
       artistId: response.id,
       value: score.value
     } }),
+    newScores: [],
     rating: response.rating,
     imageUrl: response.image_url,
     linkUrl: response.link_url

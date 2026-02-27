@@ -3,6 +3,7 @@ export type Metric = {
     name: string
     type: MetricType
     category: string
+    color: string
 }
 
 export type NewMetric = {
