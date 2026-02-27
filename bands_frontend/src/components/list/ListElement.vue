@@ -26,8 +26,8 @@
       </div>
       <div class="scores">
         <div v-for="score in scores" :key="score.metric.name + score.rerender" class="score">
-          <value-slider v-if="isValue(score)" v-model="score.values" :color="score.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"/>
-          <flag-label v-else style="margin-top: 10px" :label="score.metric.name" :color="score.color" :active="editing" @discardMetric="removeScore(score)"/>
+          <value-slider v-if="isValue(score)" v-model="score.values" :color="score.metric.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"/>
+          <flag-label v-else style="margin-top: 10px" :label="score.metric.name" :color="score.metric.color" :active="editing" @discardMetric="removeScore(score)"/>
         </div>
         <button v-if="editing" class="button edit" style="margin-top: 8px" @click="toggleMetricsPanel" title="Add Score">
           <plus-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
@@ -54,7 +54,6 @@
 </template>
 
 <script lang="ts">
-import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import ArtistRating from './ArtistRating.vue';
 import ValueSlider from '../metrics/ValueSlider.vue';
 import FlagLabel from '../metrics/FlagLabel.vue';
@@ -77,7 +76,6 @@ type ArtistScore = {
   scoreId?: number
   values: FilterValues,
   metric: Metric
-  color: string
   rerender: boolean
 }
 
@@ -94,7 +92,7 @@ export default defineComponent({
     "flag-label": FlagLabel,
     "metric-selector": MetricsSelector,
   },
-  mixins: [ColorsMixin, WithColorMixin],
+  mixins: [WithColorMixin],
   data () {
     return {
       editing: false,
@@ -112,11 +110,10 @@ export default defineComponent({
     ...mapState(useMetrics, ['metrics']),
     selectionMetrics(): ScoreFilterWithColor[] {
       const currentMetricsIds = Object.keys(this.scores)
-      const scoresLength = this.scores.length
       const newMetrics = this.metrics.filter(
         (metric: Metric) => {return !currentMetricsIds.includes(metric.id.toString())}
       ).map(
-        (metric, index) => {
+        (metric) => {
           return {
             filter: {
               metric,
@@ -125,19 +122,17 @@ export default defineComponent({
                 maxValue: 5,
               },
             },
-            color: this.getColor(index) + scoresLength,
             selected: false,
             range: false,
           };
         }
       )
-      const scores = Object.values(this.scores).map((score, index) => {
+      const scores = Object.values(this.scores).map((score) => {
         return {
           filter: {
             metric: score.metric,
             filterValues: score.values,
           },
-          color: this.getColor(index),
           selected: true,
           range: false,
         }
@@ -208,14 +203,13 @@ export default defineComponent({
     },
     setScores () {
       this.scores = {}
-      this.localArtist.scores.forEach((score, index) => {
+      this.localArtist.scores.forEach((score) => {
         if ("id" in score) {
           const metric: Metric = this.metrics.filter(metric => metric.name === score.metric)[0]
           this.scores[metric.id] = {
             scoreId: score.id,
             metric,
             values: metric.type === MetricType.flag ? {minValue: score.value, maxValue: 0} : {minValue: 0, maxValue: score.value},
-            color: this.getColor(index),
             rerender: true
           }
 
@@ -244,7 +238,6 @@ export default defineComponent({
           this.scores[metricId] = {
             values: score.filter.filterValues,
             metric: score.filter.metric,
-            color: this.getColor(Object.keys(this.scores).length - 1),
             rerender: false
           }
         }, 300)()
