@@ -1,4 +1,5 @@
 import { ColorOrder } from '@/config';
+import { debounce } from '@/utils';
 import {defineStore} from 'pinia'
 
 export const usePageStatus = defineStore('page-status', {
@@ -11,7 +12,8 @@ export const usePageStatus = defineStore('page-status', {
             width: 0,
             height: 0,
         },
-        artistsLikeThisName: "" as string
+        artistsLikeThisName: "" as string,
+        error: "" as string
     }),
     getters: {
         headerMinimized (): boolean {
@@ -45,6 +47,12 @@ export const usePageStatus = defineStore('page-status', {
         },
         setArtistLikeThisName(name: string) {
             this.artistsLikeThisName = name
+        },
+        setError(error: string) {
+            this.error = error            
+            setTimeout(() => {
+                this.error = ""
+            }, 5000);
         }
     }
 })

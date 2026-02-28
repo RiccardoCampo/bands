@@ -63,6 +63,7 @@ import { ScoreFilter } from '@/types/score';
 import { mapActions } from 'pinia';
 import { PropType } from 'vue';
 import { defineComponent } from 'vue';
+import { usePageStatus } from '@/store/pageStatus';
 
 
 export type ScoreFilterWithColor = {
@@ -116,6 +117,7 @@ export default defineComponent({
     },
     methods: {
         ...mapActions(useMetrics, ["addMetric"]),
+        ...mapActions(usePageStatus, ["setError"]),
         editMetric (metricWithValue: ScoreFilterWithColor) {
           if (!metricWithValue.selected) {
             this.selectMetric(metricWithValue)
@@ -135,7 +137,7 @@ export default defineComponent({
         async addNewMetric() {
           if (this.allowNewMetric) {
             this.loading = true
-            await this.addMetric(this.newMetric).finally(() => { this.loading = false })
+            await this.addMetric(this.newMetric).catch((error) => { console.log(error); this.setError("Unable to add metric" + error.message); }).finally(() => { this.loading = false })
 
             this.resetNewMetric()
           }
