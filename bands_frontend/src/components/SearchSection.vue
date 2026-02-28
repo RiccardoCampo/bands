@@ -302,6 +302,7 @@ export default defineComponent({
 
   span.artistLikeThisName {
     font-size: 1.5pc;
+    margin-left: 5px;
   }
 
 </style>
