@@ -63,7 +63,6 @@ import { usePageStatus } from '@/store/pageStatus';
 import MetricsSelector, { ScoreFilterWithColor } from '../MetricsSelector.vue';
 import { useMetrics } from '@/store/metrics';
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
-import { ArtistAlreadyExistsError } from '@/exceptions';
 import { PropType } from 'vue';
 import { FilterValues, NewScore, Score } from '@/types/score';
 import { MetricType, Metric } from '@/types/metrics';
@@ -141,7 +140,7 @@ export default defineComponent({
     }
   },
   methods: {
-    ...mapActions(usePageStatus, ["hideNewArtist"]),
+    ...mapActions(usePageStatus, ["hideNewArtist", "setError"]),
     ...mapActions(useArtistsList, ["addArtist", "updateArtist"]),
     toggleEdit () {
       if (this.loading)
@@ -189,9 +188,7 @@ export default defineComponent({
                     .then(() => { this.hideNewArtist() })
                     .catch(
                       (error) => {
-                        if (error instanceof ArtistAlreadyExistsError) {
-                          console.log(error.message)
-                        }
+                        console.log(error); this.setError("Unable to add artist: " + error.message)
                       }
                     )
         }

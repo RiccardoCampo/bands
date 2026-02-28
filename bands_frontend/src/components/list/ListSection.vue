@@ -42,7 +42,7 @@ export default defineComponent({
   },
   methods: {
     ...mapActions(useArtistsList, ['fetchArtistsPage', 'fetchSimilarArtists']),
-    ...mapActions(usePageStatus, ['setArtistLikeThisName']),
+    ...mapActions(usePageStatus, ['setArtistLikeThisName', 'setError']),
     async onScroll(event: Event) {
       if (this.fetchingPage || !this.searchStarted || this.page === null)
         return
@@ -52,7 +52,7 @@ export default defineComponent({
       // When page is 1 it will fetch the next page when half the scroll size is reached, when page is 2 at 3/4, page 3 at 5/6, etc.
       const toLoadRatio = 1 - 1 / ((this.page ?? 1) * 2)
       if (scrollTop + clientHeight >= scrollHeight * toLoadRatio) {
-        await this.fetchArtistsPage().catch((error) => {console.log(error)})
+        await this.fetchArtistsPage().catch((error) => {console.log(error); this.setError("Unable to fetch artists page: " + error.message)})
       }
       this.fetchingPage = false
     },
@@ -60,7 +60,7 @@ export default defineComponent({
       if (this.fetchingPage || !this.searchStarted || artist.id === undefined)
         return
       this.fetchingPage = true
-      await this.fetchSimilarArtists(artist.id).catch((error) => {console.log(error)})
+      await this.fetchSimilarArtists(artist.id).catch((error) => {console.log(error); this.setError("Unable to fetch similar artists: " + error.message)})
       this.setArtistLikeThisName(artist.name)
       this.fetchingPage = false
     },

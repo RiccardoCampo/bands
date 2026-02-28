@@ -89,7 +89,7 @@ export default defineComponent({
   },
   async mounted () {
     this.loading = true
-    await this.fetchMetrics().catch((error) => {console.log(error)}).finally(
+    await this.fetchMetrics().catch((error) => {console.log(error); this.setError("Unable to fetch metrics: " + error.message)}).finally(
       () => {
         this.loading = false
         // Suggested filters won't be displayed if the metrics are loading.
@@ -99,13 +99,14 @@ export default defineComponent({
     )
   },
   methods: {
-    ...mapActions(usePageStatus, ['startSearch', 'showNewArtist']),
+    ...mapActions(usePageStatus, ['startSearch', 'showNewArtist', 'setArtistLikeThisName', 'setError']),
     ...mapActions(useArtistsList, ['fetchArtists']),
     ...mapActions(useMetrics, ['fetchMetrics']),
     async search () {
       if (this.loading)
         return
 
+      this.setArtistLikeThisName("")
       this.toggleFiltersPanel(true)
       this.loading = true
 
@@ -113,7 +114,7 @@ export default defineComponent({
       if (Object.keys(this.selectedFilters).length > 0)
         this.text = ""
 
-      await this.fetchArtists(this.text, Object.values(this.selectedFilters).map((filter) => {return filter.filter})).catch((error) => {console.log(error)})
+      await this.fetchArtists(this.text, Object.values(this.selectedFilters).map((filter) => {return filter.filter})).catch((error) => {console.log(error); this.setError("Unable to fetch artists: " + error.message)})
 
       this.startSearch()
       this.loading = false
