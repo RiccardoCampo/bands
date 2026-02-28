@@ -2,7 +2,7 @@
   <div v-if="hasResults" class="listContainer" @scroll="onScroll">
     <div class="list">
       <list-element v-if="newArtistActive" :new="true" color="green"></list-element>
-      <list-element v-for="artist in addColors(artists)" :key="artist" :artist="artist" :color="artist.color" @artistsLikeThis="artistsLikeThis(artist.id)"></list-element>
+      <list-element v-for="artist in addColors(artists)" :key="artist" :artist="artist" :color="artist.color" @artistsLikeThis="artistsLikeThis(artist)"></list-element>
     </div>
   </div>
   <p v-else class="noResults"> no search results :( </p>
@@ -15,6 +15,7 @@ import { usePageStatus } from '@/store/pageStatus';
 import { useArtistsList } from '@/store/artistsList';
 import { defineComponent } from 'vue';
 import { addColors } from '@/utils';
+import { Artist } from '@/types/artist'
 
 
 export default defineComponent({
@@ -28,7 +29,7 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapState(usePageStatus, ['pageSize', 'newArtistActive', 'searchStarted', 'colorOffset']),
+    ...mapState(usePageStatus, ['pageSize', 'newArtistActive', 'searchStarted', 'colorOffset', 'artistsLikeThisName']),
     ...mapState(useArtistsList, ['artists', 'page']),
     hasResults(): boolean {
       return this.artists.length > 0 || this.newArtistActive
@@ -41,6 +42,7 @@ export default defineComponent({
   },
   methods: {
     ...mapActions(useArtistsList, ['fetchArtistsPage', 'fetchSimilarArtists']),
+    ...mapActions(usePageStatus, ['setArtistLikeThisName']),
     async onScroll(event: Event) {
       if (this.fetchingPage || !this.searchStarted || this.page === null)
         return
@@ -54,14 +56,15 @@ export default defineComponent({
       }
       this.fetchingPage = false
     },
-    async artistsLikeThis(artistId: number) {
-      if (this.fetchingPage || !this.searchStarted)
+    async artistsLikeThis(artist: Artist) {
+      if (this.fetchingPage || !this.searchStarted || artist.id === undefined)
         return
       this.fetchingPage = true
-      await this.fetchSimilarArtists(artistId).catch((error) => {console.log(error)})
+      await this.fetchSimilarArtists(artist.id).catch((error) => {console.log(error)})
+      this.setArtistLikeThisName(artist.name)
       this.fetchingPage = false
     },
-    addColors (array: any[]) {            
+    addColors (array: any[]) {
         return addColors(array, this.colorOffset)
     },
   }
