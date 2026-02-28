@@ -24,6 +24,7 @@
     <metrics-selector v-if="showSuggestedMetricsPanel" width="calc(var(--searchBarWidth) + 92px)" color="yellow" style="left: -6px" :metrics="selectionMetrics" @metricSelected="addFilter" @metricUnselected="removeFilter" @clickOutside="deactivateSuggestedMetricsPanel"/>
 
     <div v-if="showFiltersPanel" class="filtersPanel">
+      <span class="artistLikeThisName" v-if="artistsLikeThisName">Showing artists like: {{ artistsLikeThisName }}</span>
       <div class="selectedFilter" v-for="filter in selectedFilters" :key="filter.filter.metric.id">
         <value-slider
           v-if="filter.filter.metric.type === 'value'"
@@ -41,7 +42,7 @@
           @discardMetric="removeFilter(filter)"
         />
       </div>
-    </div>  
+    </div>
   </div>
 </template>
 
@@ -50,7 +51,7 @@ import { useArtistsList } from '@/store/artistsList';
 import { useMetrics } from '@/store/metrics';
 import { usePageStatus } from '@/store/pageStatus';
 import { debounce } from '@/utils';
-import { mapActions, mapState } from 'pinia';
+import { mapActions, mapState, storeToRefs } from 'pinia';
 import ValueSlider from './metrics/ValueSlider.vue';
 import FlagLabel from './metrics/FlagLabel.vue';
 import MetricsSelector from './MetricsSelector.vue';
@@ -71,6 +72,14 @@ export default defineComponent({
       selectedFilters: {} as {[key: string]: ScoreFilterWithColor},
       suggestedMetrics: [] as Array<Metric>,
     }
+  },
+  setup() {
+    const pageStatus = usePageStatus();
+    const { artistsLikeThisName } = storeToRefs(pageStatus);
+
+    return {
+      artistsLikeThisName,
+    };
   },
   components: {
     "metrics-selector": MetricsSelector,
@@ -116,7 +125,7 @@ export default defineComponent({
     },
     toggleFiltersPanel(value: boolean | null = null) {
       // When the selected filters are empty the panel can only be switched off.
-      if ((this.filtersPanelActive && !value) || Object.keys(this.selectedFilters).length > 0) {
+      if ((this.filtersPanelActive && !value) || Object.keys(this.selectedFilters).length > 0 || this.artistsLikeThisName) {
         if (value !== null)
           this.filtersPanelActive = value
         else
@@ -156,7 +165,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(useMetrics, ['metrics']),
-    ...mapState(usePageStatus, ['headerMinimized']),
+    ...mapState(usePageStatus, ['headerMinimized', 'artistsLikeThisName']),
     showSuggestedMetricsPanel(): boolean {
       return this.suggestedMetricsPanelActive && this.text !== ""
     },
@@ -186,6 +195,15 @@ export default defineComponent({
           }
         )
       ]
+    }
+  },
+  watch: {
+    artistsLikeThisName(newValue, oldValue) {
+      if (newValue) {
+        this.toggleFiltersPanel(true)
+      } else if (!newValue && oldValue) {
+        this.toggleFiltersPanel(false)
+      }
     }
   }
 });
@@ -280,6 +298,11 @@ export default defineComponent({
     width: calc(var(--searchBarWidth) + 96px);
     flex-wrap: wrap;
     transition: all 0.1s;
+  }
+
+  span.artistLikeThisName {
+    font-size: 1.5pc;
+    margin-left: 5px;
   }
 
 </style>
