@@ -3,6 +3,7 @@
     <header-section></header-section>
     <search-section></search-section>
     <list-section v-if="listActive"></list-section>
+    <error-snack-bar></error-snack-bar>
     <div style="margin-top: 200px;"></div>
   </div>
 </template>
@@ -13,6 +14,7 @@ import HeaderSection from './components/HeaderSection.vue';
 import ListSection from './components/list/ListSection.vue';
 import SearchSection from './components/SearchSection.vue';
 import { usePageStatus } from './store/pageStatus';
+import ErrorSnackBar from './components/ErrorSnackBar.vue';
 
 export default {
   name: 'BandsApp',
@@ -20,6 +22,7 @@ export default {
     'header-section': HeaderSection,
     'search-section': SearchSection,
     'list-section':  ListSection,
+    'error-snack-bar': ErrorSnackBar
   },
   beforeMount() {
     this.updateSize();
