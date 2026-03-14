@@ -288,9 +288,8 @@ div.container {
 }
 @media (max-width: 600px) {
   div.container {
-    column-gap: 0px;
-    column-gap: 30px;
-    grid-template-columns: 90px auto;
+    column-gap: 5vw;
+    grid-template-columns: 25vw 68%;
   }
 }
 
@@ -307,8 +306,8 @@ div.container {
 }
 @media (max-width: 600px) {
   .artistImage {
-    width: 90px;
-    height: 90px;
+    width: 25vw;
+    height: 25vw;
     grid-row-end: 1;
   }
 }

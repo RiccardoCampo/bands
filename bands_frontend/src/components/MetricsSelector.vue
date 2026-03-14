@@ -180,6 +180,7 @@ div.categoryAndMetricsContainer {
 div.metricContainer {
   display: flex;
   width: v-bind("width");
+  max-width: 90vw;
   margin-left: 10px;
   justify-content: space-between;
 }
