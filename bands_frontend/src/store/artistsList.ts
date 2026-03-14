@@ -1,5 +1,11 @@
-import artistsAPIRepository, { ArtistResponse, ArtistScoreResponse } from '@/services/API/artistsAPIRepository'
-import scoresAPIRepository from '@/services/API/scoresAPIRepository'
+import { ArtistsAPIRepository } from '@/services/repositories/API/artistsAPIRepository'
+import { ScoresAPIRepository } from '@/services/repositories/API/scoresAPIRepository'
+import { ArtistResponse, ArtistScoreResponse, ArtistsRepository } from '@/services/repositories/artists'
+import { ArtistsDemoRepository } from '@/services/repositories/demo/artistsDemoRepository'
+import { ARTISTS, METRICS, SCORES } from '@/services/repositories/demo/data'
+import { DemoDB } from '@/services/repositories/demo/db'
+import { ScoresDemoRepository } from '@/services/repositories/demo/scoresDemoRepository'
+import { ScoresRepository } from '@/services/repositories/scores'
 import { Artist } from '@/types/artist'
 import { MetricType } from '@/types/metrics'
 import { ScoreFilter } from '@/types/score'
@@ -25,6 +31,18 @@ function artistReponseToModel(response: ArtistResponse): Artist {
 }
 
 
+let artistsRepository: ArtistsRepository
+let scoresRepository: ScoresRepository
+if (process.env.VUE_APP_DEMO === 1) {
+  const db = new DemoDB(ARTISTS, METRICS, SCORES)
+  artistsRepository = new ArtistsDemoRepository(db)
+  scoresRepository = new ScoresDemoRepository(db)
+} else {
+  artistsRepository = new ArtistsAPIRepository()
+  scoresRepository = new ScoresAPIRepository()
+}
+
+
 export const useArtistsList = defineStore('artists-list', {
     state: () => ({
         artistsMap: new Map<number, Artist>(),
@@ -37,7 +55,7 @@ export const useArtistsList = defineStore('artists-list', {
     },
     actions: {
       async fetchArtists(name: string, scoreFilters: ScoreFilter[]) {
-        const artistsPage = await artistsAPIRepository.index(1, name, scoreFilters)
+        const artistsPage = await artistsRepository.index(1, name, scoreFilters)
         this.artistsMap = new Map<number, Artist>()
         artistsPage.results.forEach((artist) => { this.artistsMap.set(artist.id, artistReponseToModel(artist)) })
 
@@ -51,35 +69,35 @@ export const useArtistsList = defineStore('artists-list', {
           return
         }
 
-        const artistPage = await artistsAPIRepository.index(this.page, this.query, this.scoreFilters ?? [])
+        const artistPage = await artistsRepository.index(this.page, this.query, this.scoreFilters ?? [])
         artistPage.results.forEach((artist) => {this.artistsMap.set(artist.id, artistReponseToModel(artist))})
         this.page = artistPage.next === null ? null : (this.page ?? 0) + 1 
       },
       async addArtist(artist: Artist) {
-        const createdArtist = await artistsAPIRepository.create(artist);
+        const createdArtist = await artistsRepository.create(artist);
         
         const artistId: number = createdArtist.id
         artist.id = artistId
 
-        await scoresAPIRepository.upsertBulk(artist)
+        await scoresRepository.upsertBulk(artist)
 
-        const retrievedArtist = await artistsAPIRepository.retrieve(artistId)
+        const retrievedArtist = await artistsRepository.retrieve(artistId)
         this.artistsMap.set(artistId, artistReponseToModel(retrievedArtist))
       },
       async updateArtist(artist: Artist, scoreIdsToDelete: number[]) {
-        const updatedArtist = await artistsAPIRepository.update(artist)
+        const updatedArtist = await artistsRepository.update(artist)
         
-        await scoresAPIRepository.upsertBulk(artist)
+        await scoresRepository.upsertBulk(artist)
 
         for (const scoreId of scoreIdsToDelete) {
-          await scoresAPIRepository.destroy(scoreId)
+          await scoresRepository.destroy(scoreId)
         }
 
-        const retrievedArtist = await artistsAPIRepository.retrieve(updatedArtist.id)
+        const retrievedArtist = await artistsRepository.retrieve(updatedArtist.id)
         this.artistsMap.set(updatedArtist.id, artistReponseToModel(retrievedArtist))
       },
       async fetchSimilarArtists(artistId: number) {
-        const similarArtists = await artistsAPIRepository.getSimilar(artistId)
+        const similarArtists = await artistsRepository.getSimilar(artistId)
         this.artistsMap = new Map<number, Artist>()
         similarArtists.forEach((artist) => { this.artistsMap.set(artist.id, artistReponseToModel(artist)) })
 
