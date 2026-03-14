@@ -201,6 +201,7 @@ export default defineComponent({
   watch: {
     artistsLikeThisName(newValue, oldValue) {
       if (newValue) {
+        this.selectedFilters = {}
         this.toggleFiltersPanel(true)
       } else if (!newValue && oldValue) {
         this.toggleFiltersPanel(false)
@@ -231,7 +232,6 @@ export default defineComponent({
     font-size: 1.6pc;
     background-color: var(--white);
     width: calc(var(--searchBarWidth) - 10px);
-    max-width: 590px;
     height: 28px;
     outline: none;
     border-style: none;
@@ -242,8 +242,7 @@ export default defineComponent({
 
   div.searchInputOutline {
     background-color: v-bind(searchOutlineColor);
-    width: var(--searchBarWidth); 
-    max-width: 600px;
+    width: var(--searchBarWidth);
     height: 36px;
   } 
 

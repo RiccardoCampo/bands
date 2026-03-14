@@ -33,7 +33,7 @@ function artistReponseToModel(response: ArtistResponse): Artist {
 
 let artistsRepository: ArtistsRepository
 let scoresRepository: ScoresRepository
-if (process.env.VUE_APP_DEMO === 1) {
+if (process.env.VUE_APP_DEMO) {
   const db = new DemoDB(ARTISTS, METRICS, SCORES)
   artistsRepository = new ArtistsDemoRepository(db)
   scoresRepository = new ScoresDemoRepository(db)

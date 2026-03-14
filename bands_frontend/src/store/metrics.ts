@@ -20,7 +20,7 @@ function metricResponseToModel(response: MetricResponse, color: string): Metric 
 }
 
 let repository: MetricsRepositrory
-if (process.env.VUE_APP_DEMO === 1) {
+if (process.env.VUE_APP_DEMO) {
   const db = new DemoDB(ARTISTS, METRICS, SCORES)
   repository = new MetricsDemoRepository(db)
 } else {
