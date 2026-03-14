@@ -201,6 +201,7 @@ export default defineComponent({
   watch: {
     artistsLikeThisName(newValue, oldValue) {
       if (newValue) {
+        this.selectedFilters = {}
         this.toggleFiltersPanel(true)
       } else if (!newValue && oldValue) {
         this.toggleFiltersPanel(false)
