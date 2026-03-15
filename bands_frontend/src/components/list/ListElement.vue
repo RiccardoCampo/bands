@@ -30,18 +30,18 @@
           <flag-label v-else style="margin-top: 10px" :label="score.metric.name" :color="score.metric.color" :active="editing" @discardMetric="removeScore(score)"/>
         </div>
         <button v-if="editing" class="button edit" style="margin-top: 8px" @click="toggleMetricsPanel" title="Add Score">
-          <plus-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+          <plus-icon :height="28" :width="28"/>
         </button>
       </div>
       <metric-selector v-if="editing && metricsPanelActive" width="400px" :color="color" :metrics="selectionMetrics" :allowNewMetric="true" @metricSelected="addOrEditScore" @metricUnselected="removePanelScore" @clickOutside="toggleMetricsPanel"/>
       <div class="actions">
         <button v-if="editing" class="button confirm" @click="edit" title="Confirm Changes">
-          <loading-icon v-if="loading" style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
-          <check-icon v-else style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+          <loading-icon v-if="loading" :height="28" :width="28"/>
+          <check-icon v-else :height="28" :width="28"/>
         </button>
         <button v-if="editing" class="button discard" @click="toggleEdit" title="Discard Changes">
-          <loading-icon v-if="loading" style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
-          <cross-icon v-else style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+          <loading-icon v-if="loading" :height="28" :width="28"/>
+          <cross-icon v-else :height="28" :width="28"/>
         </button>
         <button v-if="!editing" class="button edit" @click="toggleEdit" title="Edit Artist">
           <edit-icon :height="26" :width="26"/>
@@ -453,13 +453,9 @@ div.actions {
 }
 
 button.button {
-  border: none;
-  transition: all 0.1s;
   height: 32px;
   width: 32px;  
-  background: none;
   margin-left: 4px;
-  align-items: center;
 }
 
 button.edit {

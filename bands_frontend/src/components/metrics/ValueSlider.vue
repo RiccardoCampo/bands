@@ -13,7 +13,7 @@
         <div class="labels">
             <p v-if="!hideLabel" class="label">{{ label }}</p>
             <button v-if="active && !hideDiscardButton" class="discard" @click="discard" title="Discard Metric">
-                <cross-icon style="margin-top: 0px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--darkgrey)"/>
+                <cross-icon style="margin-top: -1px;" :height="18" :width="18" iconColor="var(--darkgrey)"/>
             </button>
         </div>
     </div>
