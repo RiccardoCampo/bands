@@ -8,10 +8,10 @@
       <keyboard-events @keyupEnter="searchOnEnter"></keyboard-events>
       <button class="searchBar" @click="search" @keyup.enter="search" title="Search">
         <loading-icon v-if="loading" height="32" width="32" iconColor="inherit"/>
-        <search-icon v-else height=32 width=32 iconColor="inherit"/>
+        <search-icon v-else height=30 width=30 iconColor="inherit"/>
       </button>
       
-      <button class="searchBar" @click="toggleFiltersPanel()" title="Show Score Filters">
+      <button class="searchBar chevron" @click="toggleFiltersPanel()" title="Show Score Filters">
         <chevron-up v-if="showFiltersPanel" height=32 iconColor="inherit"></chevron-up>
         <chevron-down v-else height=32 iconColor="inherit"></chevron-down>
       </button>
@@ -253,9 +253,8 @@ export default defineComponent({
   button.searchBar {
     background-color: var(--darkred); 
     stroke: var(--darkyellow);
-    border: none;
     height: 36px;
-    transition: all 0.1s;
+    width: 36px;
   }
 
   button.searchBar:hover {
@@ -283,6 +282,10 @@ export default defineComponent({
     stroke: var(--lightgreen);
   }
 
+  button.chevron {
+    width: 28px;
+  }
+
   div.selectedFilter {
     margin-left: 20px;
     margin-top: 0px;
@@ -294,10 +297,10 @@ export default defineComponent({
     align-items: center;
     justify-content: left;
     border-style: none solid solid solid;
+    border-width: 3.2px;
     border-color: var(--darkred);
-    width: calc(var(--searchBarWidth) + 96px);
+    width: calc(var(--searchBarWidth) + 94px);
     flex-wrap: wrap;
-    transition: all 0.1s;
   }
 
   span.artistLikeThisName {
