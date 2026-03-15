@@ -1,12 +1,14 @@
 <template>
     <div v-if="!bannerDismissed" class="banner">
-        <button class="button" @click="dismiss" title="Dismiss">
-          <cross-icon style="margin-top: 1px;" :height="28" :width="28"/>
-        </button>
-        <button class="button page" @click="changePage">
-          <chevron-up v-if="page == 0" style="rotate: 90deg; margin-top: 1px;" :height="28" :width="28"/>
-          <chevron-down v-if="page == 1" style="rotate: 90deg; margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
-        </button>
+        <div class="buttons">
+            <button class="button page" @click="changePage">
+                <chevron-up v-if="page == 0" style="rotate: 90deg; margin-top: 1px;" :height="28" :width="28"/>
+                <chevron-down v-if="page == 1" style="rotate: 90deg; margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+            </button>
+            <button class="button" @click="dismiss" title="Dismiss">
+                <cross-icon style="margin-top: 1px;" :height="28" :width="28"/>
+            </button>
+        </div>
         <div v-if="page == 0" class="page">
             <h1>Ciao, welcome to Bands demo!</h1>
             <span>Bands is meant for music lovers and helps you catalogue and sort out your music tastes. You can add your favorite artists and assign scores to them. You decide which scores, by defining metrics. This is entirely subjective, no magic is involved and you'll need to enter all the information yourself</span><br>
@@ -68,15 +70,24 @@ export default defineComponent({
 div.banner {
     position: absolute;
     z-index: 100;
-    top: 15vw;
+    top: 35vh;
     left: 30vw;
     width: 40vw;
-    max-height: 30vw;
+    max-height: 60vh;
     background-color: var(--lightblue);
     border: 4px solid var(--darkblue);
     text-align: justify;
     overflow-y: scroll;
+} @media (max-width: 600px) {
+  div.banner {
+    top: 20vh;
+    left: 2vw;
+    width: 94vw;
+    max-height: 75vh;
+    border: 3px solid var(--darkblue);
+  }
 }
+
 div.page {
     margin-left: 10px;
     margin-right: 10px;
@@ -92,6 +103,28 @@ span {
 li {
     font-size: 1.5pc;
 }
+@media (max-width: 600px) {
+    h1 {
+        font-size: 1.5pc;
+    }
+    span {
+        font-size: 1.2pc;
+    }
+    li {
+        font-size: 1.2pc;
+        margin-left: -20px;
+    }
+}
+
+div.buttons {
+    display: flex;
+    justify-content: end;
+    margin-bottom: -28px;
+} @media (max-width: 600px) {
+    div.buttons {
+        margin-bottom: 0px;
+    }
+}
 
 button {
     background-color: var(--lightred); 
@@ -99,7 +132,6 @@ button {
     border: none;
     height: 36px;
     transition: all 0.1s;
-    float: right;
 }
 button:hover {
     background-color: var(--darkred); 
