@@ -13,7 +13,8 @@ export const usePageStatus = defineStore('page-status', {
             height: 0,
         },
         artistsLikeThisName: "" as string,
-        error: "" as string
+        error: "" as string,
+        bannerDismissed: !process.env.VUE_APP_DEMO as boolean,
     }),
     getters: {
         headerMinimized (): boolean {
@@ -53,6 +54,9 @@ export const usePageStatus = defineStore('page-status', {
             setTimeout(() => {
                 this.error = ""
             }, 5000);
-        }
+        },
+        dismissBanner() {
+            this.bannerDismissed = true
+        },
     }
 })

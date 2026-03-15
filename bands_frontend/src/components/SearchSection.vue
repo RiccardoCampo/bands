@@ -103,7 +103,7 @@ export default defineComponent({
     ...mapActions(useArtistsList, ['fetchArtists']),
     ...mapActions(useMetrics, ['fetchMetrics']),
     async search () {
-      if (this.loading)
+      if (this.loading || !this.bannerDismissed)
         return
 
       this.setArtistLikeThisName("")
@@ -166,7 +166,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(useMetrics, ['metrics']),
-    ...mapState(usePageStatus, ['headerMinimized', 'artistsLikeThisName']),
+    ...mapState(usePageStatus, ['headerMinimized', 'artistsLikeThisName', 'bannerDismissed']),
     showSuggestedMetricsPanel(): boolean {
       return this.suggestedMetricsPanelActive && this.text !== ""
     },
