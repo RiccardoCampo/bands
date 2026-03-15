@@ -24,24 +24,25 @@
     <metrics-selector v-if="showSuggestedMetricsPanel" width="calc(var(--searchBarWidth) + 92px)" color="yellow" style="left: -6px" :metrics="selectionMetrics" @metricSelected="addFilter" @metricUnselected="removeFilter" @clickOutside="deactivateSuggestedMetricsPanel"/>
 
     <div v-if="showFiltersPanel" class="filtersPanel">
+      <span class="artistLikeThisName" v-if="artistsLikeThisName">Showing artists like: {{ artistsLikeThisName }}</span>
       <div class="selectedFilter" v-for="filter in selectedFilters" :key="filter.filter.metric.id">
         <value-slider
           v-if="filter.filter.metric.type === 'value'"
           v-model="filter.filter.filterValues"
           :label="filter.filter.metric.name"
-          :color="filter.color"
+          :color="filter.filter.metric.color"
           :active="true"
           :range="true"
           @discardMetric="removeFilter(filter)"
         />
         <flag-label
           v-else :label="filter.filter.metric.name"
-          :color="filter.color"
+          :color="filter.filter.metric.color"
           :active="true"
           @discardMetric="removeFilter(filter)"
         />
       </div>
-    </div>  
+    </div>
   </div>
 </template>
 
@@ -50,10 +51,9 @@ import { useArtistsList } from '@/store/artistsList';
 import { useMetrics } from '@/store/metrics';
 import { usePageStatus } from '@/store/pageStatus';
 import { debounce } from '@/utils';
-import { mapActions, mapState } from 'pinia';
+import { mapActions, mapState, storeToRefs } from 'pinia';
 import ValueSlider from './metrics/ValueSlider.vue';
 import FlagLabel from './metrics/FlagLabel.vue';
-import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import MetricsSelector from './MetricsSelector.vue';
 import KeyboardEvents from './helpers/KeyboardEvents.vue';
 import { Metric } from '@/types/metrics';
@@ -73,18 +73,23 @@ export default defineComponent({
       suggestedMetrics: [] as Array<Metric>,
     }
   },
+  setup() {
+    const pageStatus = usePageStatus();
+    const { artistsLikeThisName } = storeToRefs(pageStatus);
+
+    return {
+      artistsLikeThisName,
+    };
+  },
   components: {
     "metrics-selector": MetricsSelector,
     "value-slider": ValueSlider,
     "flag-label": FlagLabel,
     "keyboard-events": KeyboardEvents,
   },
-  mixins: [
-    ColorsMixin,
-  ],
   async mounted () {
     this.loading = true
-    await this.fetchMetrics().catch((error) => {console.log(error)}).finally(
+    await this.fetchMetrics().catch((error) => {console.log(error); this.setError("Unable to fetch metrics: " + error.message)}).finally(
       () => {
         this.loading = false
         // Suggested filters won't be displayed if the metrics are loading.
@@ -94,13 +99,14 @@ export default defineComponent({
     )
   },
   methods: {
-    ...mapActions(usePageStatus, ['startSearch', 'showNewArtist']),
+    ...mapActions(usePageStatus, ['startSearch', 'showNewArtist', 'setArtistLikeThisName', 'setError']),
     ...mapActions(useArtistsList, ['fetchArtists']),
     ...mapActions(useMetrics, ['fetchMetrics']),
     async search () {
-      if (this.loading)
+      if (this.loading || !this.bannerDismissed)
         return
 
+      this.setArtistLikeThisName("")
       this.toggleFiltersPanel(true)
       this.loading = true
 
@@ -108,7 +114,7 @@ export default defineComponent({
       if (Object.keys(this.selectedFilters).length > 0)
         this.text = ""
 
-      await this.fetchArtists(this.text, Object.values(this.selectedFilters).map((filter) => {return filter.filter})).catch((error) => {console.log(error)})
+      await this.fetchArtists(this.text, Object.values(this.selectedFilters).map((filter) => {return filter.filter})).catch((error) => {console.log(error); this.setError("Unable to fetch artists: " + error.message)})
 
       this.startSearch()
       this.loading = false
@@ -120,7 +126,7 @@ export default defineComponent({
     },
     toggleFiltersPanel(value: boolean | null = null) {
       // When the selected filters are empty the panel can only be switched off.
-      if ((this.filtersPanelActive && !value) || Object.keys(this.selectedFilters).length > 0) {
+      if ((this.filtersPanelActive && !value) || Object.keys(this.selectedFilters).length > 0 || this.artistsLikeThisName) {
         if (value !== null)
           this.filtersPanelActive = value
         else
@@ -130,7 +136,7 @@ export default defineComponent({
     getSuggestedFilters() {
       debounce(
         () => {
-          this.suggestedMetrics = this.metrics.filter((metric) => { return metric.name.includes(this.text) })
+          this.suggestedMetrics = this.metrics.filter((metric: Metric) => { return metric.name.includes(this.text) })
         },
         300
       )()
@@ -160,7 +166,7 @@ export default defineComponent({
   },
   computed: {
     ...mapState(useMetrics, ['metrics']),
-    ...mapState(usePageStatus, ['headerMinimized']),
+    ...mapState(usePageStatus, ['headerMinimized', 'artistsLikeThisName', 'bannerDismissed']),
     showSuggestedMetricsPanel(): boolean {
       return this.suggestedMetricsPanelActive && this.text !== ""
     },
@@ -172,29 +178,34 @@ export default defineComponent({
     },
     selectionMetrics(): ScoreFilterWithColor[] {
       return [
-        ...Object.values(this.selectedFilters).map(
-          (filter, index) => {
-            filter.color = this.getColor(index); return filter
-          }
-        ),
+        ...Object.values(this.selectedFilters),
         ...this.suggestedMetrics.filter(
-          (metric) => {
+          (metric: Metric) => {
             return !(metric.id in this.selectedFilters)
           }
         ).map(
-          (metric: Metric, index: number) => {
+          (metric: Metric) => {
             return {
               filter: {
                 metric: metric,
                 filterValues: {minValue: 0, maxValue: 5}
               },
-              color: this.getColor(index + Object.keys(this.selectedFilters).length),
               selected: false,
               range: true,
             }
           }
         )
       ]
+    }
+  },
+  watch: {
+    artistsLikeThisName(newValue, oldValue) {
+      if (newValue) {
+        this.selectedFilters = {}
+        this.toggleFiltersPanel(true)
+      } else if (!newValue && oldValue) {
+        this.toggleFiltersPanel(false)
+      }
     }
   }
 });
@@ -221,7 +232,6 @@ export default defineComponent({
     font-size: 1.6pc;
     background-color: var(--white);
     width: calc(var(--searchBarWidth) - 10px);
-    max-width: 590px;
     height: 28px;
     outline: none;
     border-style: none;
@@ -232,8 +242,7 @@ export default defineComponent({
 
   div.searchInputOutline {
     background-color: v-bind(searchOutlineColor);
-    width: var(--searchBarWidth); 
-    max-width: 600px;
+    width: var(--searchBarWidth);
     height: 36px;
   } 
 
@@ -289,6 +298,11 @@ export default defineComponent({
     width: calc(var(--searchBarWidth) + 96px);
     flex-wrap: wrap;
     transition: all 0.1s;
+  }
+
+  span.artistLikeThisName {
+    font-size: 1.5pc;
+    margin-left: 5px;
   }
 
 </style>

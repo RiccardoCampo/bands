@@ -1,9 +1,11 @@
 <template>
   <div style="display: flex; flex-direction: column;">
-  <header-section></header-section>
-  <search-section></search-section>
-  <list-section v-if="listActive"></list-section>
-  <div style="margin-top: 200px;"></div>
+    <header-section></header-section>
+    <demo-banner></demo-banner>
+    <search-section></search-section>
+    <list-section v-if="listActive"></list-section>
+    <error-snack-bar></error-snack-bar>
+    <div style="margin-top: 200px;"></div>
   </div>
 </template>
 
@@ -13,13 +15,17 @@ import HeaderSection from './components/HeaderSection.vue';
 import ListSection from './components/list/ListSection.vue';
 import SearchSection from './components/SearchSection.vue';
 import { usePageStatus } from './store/pageStatus';
+import ErrorSnackBar from './components/ErrorSnackBar.vue';
+import DemoBanner from './components/DemoBanner.vue';
 
 export default {
   name: 'BandsApp',
   components: {
     'header-section': HeaderSection,
+    'demo-banner': DemoBanner,
     'search-section': SearchSection,
     'list-section':  ListSection,
+    'error-snack-bar': ErrorSnackBar
   },
   beforeMount() {
     this.updateSize();

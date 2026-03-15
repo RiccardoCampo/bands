@@ -14,7 +14,7 @@
                 v-if="metricWithValue.filter.metric.type === 'value'"
                 v-model="metricWithValue.filter.filterValues"
                 v-on:update:modelValue="selectMetric(metricWithValue)"
-                :color="metricWithValue.selected ? metricWithValue.color : 'grey'"
+                :color="metricWithValue.selected ? metricWithValue.filter.metric.color : 'grey'"
                 active
                 :range="metricWithValue.range"
                 hideDiscardButton
@@ -23,7 +23,7 @@
               <flag-label
                 v-else
                 :label="metricWithValue.filter.metric.name"
-                :color="metricWithValue.selected ? metricWithValue.color : 'grey'"
+                :color="metricWithValue.selected ? metricWithValue.filter.metric.color : 'grey'"
                 :fontColor="metricWithValue.selected ? 'black' : 'white'"
                 active
                 hideDiscardButton
@@ -54,7 +54,6 @@
 </template>
 
 <script lang="ts">
-import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
 import ValueSlider from './metrics/ValueSlider.vue';
 import FlagLabel from './metrics/FlagLabel.vue';
@@ -64,11 +63,11 @@ import { ScoreFilter } from '@/types/score';
 import { mapActions } from 'pinia';
 import { PropType } from 'vue';
 import { defineComponent } from 'vue';
+import { usePageStatus } from '@/store/pageStatus';
 
 
 export type ScoreFilterWithColor = {
   filter: ScoreFilter,
-  color: string,
   selected: boolean,
   range: boolean
 }
@@ -91,7 +90,7 @@ export default defineComponent({
       "value-slider": ValueSlider,
       "flag-label": FlagLabel,
     },
-    mixins: [ColorsMixin, WithColorMixin],
+    mixins: [WithColorMixin],
     data () {
         return {
           newMetric: {} as NewMetric,
@@ -118,6 +117,7 @@ export default defineComponent({
     },
     methods: {
         ...mapActions(useMetrics, ["addMetric"]),
+        ...mapActions(usePageStatus, ["setError"]),
         editMetric (metricWithValue: ScoreFilterWithColor) {
           if (!metricWithValue.selected) {
             this.selectMetric(metricWithValue)
@@ -137,7 +137,7 @@ export default defineComponent({
         async addNewMetric() {
           if (this.allowNewMetric) {
             this.loading = true
-            await this.addMetric(this.newMetric).finally(() => { this.loading = false })
+            await this.addMetric(this.newMetric).catch((error) => { console.log(error); this.setError("Unable to add metric" + error.message); }).finally(() => { this.loading = false })
 
             this.resetNewMetric()
           }
@@ -180,6 +180,7 @@ div.categoryAndMetricsContainer {
 div.metricContainer {
   display: flex;
   width: v-bind("width");
+  max-width: 90vw;
   margin-left: 10px;
   justify-content: space-between;
 }

@@ -2,33 +2,10 @@ import { ArtistAlreadyExistsError } from '@/exceptions';
 import { Artist } from '@/types/artist';
 import { MetricType } from '@/types/metrics';
 import { ScoreFilter } from '@/types/score';
-import axios, { AxiosError } from 'axios'
+import axios from 'axios'
+import { ArtistResponse, ArtistsPage, ArtistsRepository } from '../artists';
 
 const BASE_URL = `${process.env.VUE_APP_BANDS_API_URL}/artist/`
-
-
-export type ArtistScoreResponse = {
-  id: number
-  metric: string
-  type: string
-  category: string
-  value: number
-}
-
-export type ArtistResponse = {
-  id: number
-  name: string
-  link_url: string | null
-  image_url: string | null
-  rating: number
-  created_at: Date
-  scores: ArtistScoreResponse[]
-}
-
-export type ArtistsPage = {
-  results: ArtistResponse[]
-  next: number | null
-}
 
 export type ArtistCreateRequest = {
   name: string
@@ -45,7 +22,7 @@ export type ArtistUpdateRequest = {
 }
 
 
-export default {
+export class ArtistsAPIRepository implements ArtistsRepository {
   async index (page: number, name: string, scoreFilters: ScoreFilter[]): Promise<ArtistsPage> {
     let queryString = `page=${page}`
 
@@ -61,10 +38,10 @@ export default {
       });
 
     return (await axios.get(`${BASE_URL}?${queryString}`)).data
-  },
+  }
   async retrieve (id: number): Promise<ArtistResponse> {
     return (await axios.get(`${BASE_URL}${id}/`)).data
-  },
+  }
   async create (artist: Artist): Promise<ArtistResponse> {
     try {
       return (await axios.post(BASE_URL, {
@@ -78,7 +55,7 @@ export default {
         throw new ArtistAlreadyExistsError("An artist with this name already exist")
       throw error
     }
-  },
+  }
   async update (artist: Artist): Promise<ArtistResponse> {
     return (await axios.put(`${BASE_URL}${artist.id}/`, {
         name: artist.name,
@@ -86,10 +63,10 @@ export default {
         link_url: artist.linkUrl,
         image_url: artist.imageUrl
       } as ArtistUpdateRequest)).data
-  },
+  }
   async getSimilar (artistId: number): Promise<ArtistResponse[]> {
     return (
       await axios.get(`${BASE_URL}${artistId}/similar/`)
     ).data
   }
-};
+}

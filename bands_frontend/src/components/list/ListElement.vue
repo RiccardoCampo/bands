@@ -25,9 +25,9 @@
         </div>
       </div>
       <div class="scores">
-        <div v-for="score in scores" :key="score.metric.name + score.rerender" class="score">
-          <value-slider v-if="isValue(score)" v-model="score.values" :color="score.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"/>
-          <flag-label v-else style="margin-top: 10px" :label="score.metric.name" :color="score.color" :active="editing" @discardMetric="removeScore(score)"/>
+        <div v-for="score in Object.values(scores).sort((a, b) => a.metric.category.localeCompare(b.metric.category))" :key="score.metric.name + score.rerender" class="score">
+          <value-slider v-if="isValue(score)" v-model="score.values" :color="score.metric.color" :label="score.metric.name" :active="editing" @discardMetric="removeScore(score)"/>
+          <flag-label v-else style="margin-top: 10px" :label="score.metric.name" :color="score.metric.color" :active="editing" @discardMetric="removeScore(score)"/>
         </div>
         <button v-if="editing" class="button edit" style="margin-top: 8px" @click="toggleMetricsPanel" title="Add Score">
           <plus-icon style="margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
@@ -54,7 +54,6 @@
 </template>
 
 <script lang="ts">
-import ColorsMixin from '@/mixins/ColorsMixin.vue';
 import ArtistRating from './ArtistRating.vue';
 import ValueSlider from '../metrics/ValueSlider.vue';
 import FlagLabel from '../metrics/FlagLabel.vue';
@@ -64,9 +63,8 @@ import { usePageStatus } from '@/store/pageStatus';
 import MetricsSelector, { ScoreFilterWithColor } from '../MetricsSelector.vue';
 import { useMetrics } from '@/store/metrics';
 import WithColorMixin from '@/mixins/WithColorMixin.vue';
-import { ArtistAlreadyExistsError } from '@/exceptions';
 import { PropType } from 'vue';
-import { FilterValues, Score } from '@/types/score';
+import { FilterValues, NewScore, Score } from '@/types/score';
 import { MetricType, Metric } from '@/types/metrics';
 import { Artist } from '@/types/artist';
 import { defineComponent } from 'vue';
@@ -77,7 +75,6 @@ type ArtistScore = {
   scoreId?: number
   values: FilterValues,
   metric: Metric
-  color: string
   rerender: boolean
 }
 
@@ -94,7 +91,7 @@ export default defineComponent({
     "flag-label": FlagLabel,
     "metric-selector": MetricsSelector,
   },
-  mixins: [ColorsMixin, WithColorMixin],
+  mixins: [WithColorMixin],
   data () {
     return {
       editing: false,
@@ -112,11 +109,10 @@ export default defineComponent({
     ...mapState(useMetrics, ['metrics']),
     selectionMetrics(): ScoreFilterWithColor[] {
       const currentMetricsIds = Object.keys(this.scores)
-      const scoresLength = this.scores.length
       const newMetrics = this.metrics.filter(
         (metric: Metric) => {return !currentMetricsIds.includes(metric.id.toString())}
       ).map(
-        (metric, index) => {
+        (metric) => {
           return {
             filter: {
               metric,
@@ -125,19 +121,17 @@ export default defineComponent({
                 maxValue: 5,
               },
             },
-            color: this.getColor(index) + scoresLength,
             selected: false,
             range: false,
           };
         }
       )
-      const scores = Object.values(this.scores).map((score, index) => {
+      const scores = Object.values(this.scores).map((score) => {
         return {
           filter: {
             metric: score.metric,
             filterValues: score.values,
           },
-          color: this.getColor(index),
           selected: true,
           range: false,
         }
@@ -146,7 +140,7 @@ export default defineComponent({
     }
   },
   methods: {
-    ...mapActions(usePageStatus, ["hideNewArtist"]),
+    ...mapActions(usePageStatus, ["hideNewArtist", "setError"]),
     ...mapActions(useArtistsList, ["addArtist", "updateArtist"]),
     toggleEdit () {
       if (this.loading)
@@ -169,18 +163,21 @@ export default defineComponent({
     async edit () {
       if (this.loading)
         return
-      this.localArtist.scores = Object.values(this.scores).map(
+      Object.values(this.scores).forEach(
         score => {
           const value = score.metric.type === MetricType.flag ? score.values.minValue : score.values.maxValue
-          return score.scoreId === undefined ? {
-            metricId: score.metric.id,
-            value,
-          } : {
-            id: score.scoreId,
-            metric: score.metric.name,
-            type: score.metric.type,
-            value,
-          }
+          if (score.scoreId === undefined)
+            this.localArtist.newScores.push({
+              metricId: score.metric.id,
+              value,
+            })
+          else
+            this.localArtist.scores.push({
+              id: score.scoreId,
+              metric: score.metric.name,
+              type: score.metric.type,
+              value,
+            })
         }
       )
       this.localArtist.rating = this.rating
@@ -191,9 +188,7 @@ export default defineComponent({
                     .then(() => { this.hideNewArtist() })
                     .catch(
                       (error) => {
-                        if (error instanceof ArtistAlreadyExistsError) {
-                          console.log(error.message)
-                        }
+                        console.log(error); this.setError("Unable to add artist: " + error.message)
                       }
                     )
         }
@@ -208,21 +203,20 @@ export default defineComponent({
     },
     setScores () {
       this.scores = {}
-      this.localArtist.scores.forEach((score, index) => {
-        if ("id" in score) {
-          const metric: Metric = this.metrics.filter(metric => metric.name === score.metric)[0]
-          this.scores[metric.id] = {
-            scoreId: score.id,
-            metric,
-            values: metric.type === MetricType.flag ? {minValue: score.value, maxValue: 0} : {minValue: 0, maxValue: score.value},
-            color: this.getColor(index),
-            rerender: true
-          }
-
-          debounce(() => {
-            this.scores[metric.id].rerender = false
-          }, 300)()
+      const metricsMap: {[key: string]: Metric}  = {}
+      this.metrics.map((metric) => { metricsMap[metric.name] = metric; })
+      this.localArtist.scores.forEach((score) => {
+        const metric: Metric = metricsMap[score.metric]
+        this.scores[metric.id] = {
+          scoreId: score.id,
+          metric,
+          values: metric.type === MetricType.flag ? {minValue: score.value, maxValue: 0} : {minValue: 0, maxValue: score.value},
+          rerender: true
         }
+
+        debounce(() => {
+          this.scores[metric.id].rerender = false
+        }, 300)()
       })
       this.rating = this.localArtist.rating
       this.scoresToRemove = []
@@ -244,7 +238,6 @@ export default defineComponent({
           this.scores[metricId] = {
             values: score.filter.filterValues,
             metric: score.filter.metric,
-            color: this.getColor(Object.keys(this.scores).length - 1),
             rerender: false
           }
         }, 300)()
@@ -272,7 +265,7 @@ export default defineComponent({
     }
   },
   mounted () {
-    const newArtist = {name: "New Artist", scores: [] as Score[], rating: 1}
+    const newArtist = {name: "New Artist", scores: [] as Score[], rating: 1, newScores: [] as NewScore[]}
     this.localArtist = this.new ? newArtist : this.artist ?? newArtist
     this.name = this.localArtist.name
     this.editing = this.new
@@ -295,9 +288,8 @@ div.container {
 }
 @media (max-width: 600px) {
   div.container {
-    column-gap: 0px;
-    column-gap: 30px;
-    grid-template-columns: 90px auto;
+    column-gap: 5vw;
+    grid-template-columns: 25vw 68%;
   }
 }
 
@@ -314,8 +306,8 @@ div.container {
 }
 @media (max-width: 600px) {
   .artistImage {
-    width: 90px;
-    height: 90px;
+    width: 25vw;
+    height: 25vw;
     grid-row-end: 1;
   }
 }
@@ -409,7 +401,7 @@ input.name {
 @media (max-width: 600px) {
   input.name {
     font-size: 2.5pc;
-    width: 330px;
+    width: 56vw;
   }
 }
 
@@ -420,6 +412,11 @@ div.link {
 input.link {
   font-size: 1.5pc;
   width: 340px;
+} @media (max-width: 600px) {
+  input.link {
+    font-size: 1pc;
+    width: 50vw;
+  }
 }
 
 span.link {

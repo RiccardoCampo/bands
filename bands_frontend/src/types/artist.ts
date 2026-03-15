@@ -6,5 +6,6 @@ export type Artist = {
     rating: number
     imageUrl?: string | null
     linkUrl?: string | null
-    scores: Array<Score | NewScore>
+    scores: Array<Score>
+    newScores: Array<NewScore>
 }
