@@ -29,15 +29,10 @@ export default defineComponent({
     }
   },
   computed: {
-    ...mapState(usePageStatus, ['pageSize', 'newArtistActive', 'searchStarted', 'colorOffset', 'artistsLikeThisName']),
+    ...mapState(usePageStatus, ['newArtistActive', 'searchStarted', 'colorOffset', 'artistsLikeThisName']),
     ...mapState(useArtistsList, ['artists', 'page']),
     hasResults(): boolean {
       return this.artists.length > 0 || this.newArtistActive
-    },
-    listHeight (): string { 
-      if (this.pageSize.width >= 600)
-        return this.pageSize.height - 170 + 'px';
-      return this.pageSize.height - 120 +  'px';
     }
   },
   methods: {
@@ -77,8 +72,12 @@ div.listContainer {
   display: flex;
   justify-content: center;
   flex-direction: row;
-  height: v-bind("listHeight");
+  height: 80vh;
   overflow-y: scroll;
+} @media (max-width: 600px) {
+  div.listContainer {
+    height: 84vh;
+  }
 }
 
 div.list {
