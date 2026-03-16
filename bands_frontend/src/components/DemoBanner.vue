@@ -1,14 +1,5 @@
 <template>
     <div v-if="!bannerDismissed" class="banner">
-        <div class="buttons">
-            <button class="button page" @click="changePage">
-                <chevron-up v-if="page == 0" style="rotate: 90deg; margin-top: 1px;" :height="28" :width="28"/>
-                <chevron-down v-if="page == 1" style="rotate: 90deg; margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
-            </button>
-            <button class="button" @click="dismiss" title="Dismiss">
-                <cross-icon style="margin-top: 1px;" :height="28" :width="28"/>
-            </button>
-        </div>
         <div v-if="page == 0" class="page">
             <h1>Ciao, welcome to Bands demo!</h1>
             <span>Bands is meant for music lovers and helps you catalogue and sort out your music tastes. You can add your favorite artists and assign scores to them. You decide which scores, by defining metrics. This is entirely subjective, no magic is involved and you'll need to enter all the information yourself</span><br>
@@ -33,6 +24,15 @@
             <span>I am not using cookies; that's why you will get this banner on each refresh. It's a demo, you'll have to deal with it.</span><br>
             <span>You can spin up your instance of Bands, follow the instructions in the repository, though it requires some technical skills. I might host a multi-user version of the website in the future, but don't wait for that.</span><br>
             <span>I created this as a way to learn frontend development, I did not use AI, the code and UX are far from perfect.</span>
+        </div>
+        <div class="buttons">
+            <button class="button page" @click="changePage">
+                <chevron-up v-if="page == 0" style="rotate: 90deg; margin-top: 1px;" :height="28" :width="28"/>
+                <chevron-down v-if="page == 1" style="rotate: 90deg; margin-top: 1px; margin-left: -2px;" :height="28" :width="28"/>
+            </button>
+            <button class="button" @click="dismiss" title="Dismiss">
+                <cross-icon style="margin-top: 1px;" :height="28" :width="28"/>
+            </button>
         </div>
     </div>
 </template>
@@ -117,21 +117,17 @@ li {
 }
 
 div.buttons {
+    position: sticky;
+    bottom: 0;
     display: flex;
     justify-content: end;
-    margin-bottom: -28px;
-} @media (max-width: 600px) {
-    div.buttons {
-        margin-bottom: 0px;
-    }
 }
 
 button {
     background-color: var(--lightred); 
     color: var(--darkred);
-    border: none;
     height: 36px;
-    transition: all 0.1s;
+    width: 36px;
 }
 button:hover {
     background-color: var(--darkred); 
