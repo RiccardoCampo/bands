@@ -83,7 +83,7 @@ div.banner {
     top: 20vh;
     left: 2vw;
     width: 94vw;
-    max-height: 75vh;
+    max-height: 70vh;
     border: 3px solid var(--darkblue);
   }
 }
