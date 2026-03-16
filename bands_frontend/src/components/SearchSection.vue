@@ -2,7 +2,7 @@
   <div class="searchContainer">
     <div class="search">
       <div class="searchInputOutline">
-        <input class="search" v-model="text" :oninput="getSuggestedFilters" placeholder="type an artist or a metric..." @focus="activateSuggestedMetricsPanel">
+        <input class="search" v-model="text" :oninput="getAndDisplaySuggestedFilters" placeholder="type an artist or a metric..." @focus="activateSuggestedMetricsPanel">
       </div>
 
       <keyboard-events @keyupEnter="searchOnEnter"></keyboard-events>
@@ -93,8 +93,7 @@ export default defineComponent({
       () => {
         this.loading = false
         // Suggested filters won't be displayed if the metrics are loading.
-        if (this.text !== "")
-          this.getSuggestedFilters()
+        this.getSuggestedFilters()
       }
     )
   },
@@ -134,9 +133,12 @@ export default defineComponent({
       }
     },
     getSuggestedFilters() {
+      this.suggestedMetrics = this.metrics.filter((metric: Metric) => { return metric.name.includes(this.text) })
+    },
+    getAndDisplaySuggestedFilters() {
       debounce(
         () => {
-          this.suggestedMetrics = this.metrics.filter((metric: Metric) => { return metric.name.includes(this.text) })
+          this.getSuggestedFilters()
         },
         300
       )()
@@ -168,7 +170,7 @@ export default defineComponent({
     ...mapState(useMetrics, ['metrics']),
     ...mapState(usePageStatus, ['headerMinimized', 'artistsLikeThisName', 'bannerDismissed']),
     showSuggestedMetricsPanel(): boolean {
-      return this.suggestedMetricsPanelActive && this.text !== ""
+      return this.suggestedMetricsPanelActive
     },
     showFiltersPanel(): boolean {
       return !this.showSuggestedMetricsPanel && this.filtersPanelActive
