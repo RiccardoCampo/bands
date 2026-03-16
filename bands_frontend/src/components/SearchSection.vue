@@ -133,7 +133,7 @@ export default defineComponent({
       }
     },
     getSuggestedFilters() {
-      this.suggestedMetrics = this.metrics.filter((metric: Metric) => { return metric.name.includes(this.text) })
+      this.suggestedMetrics = this.metrics.filter((metric: Metric) => { return metric.name.toLowerCase().includes(this.text.trim().toLowerCase()) })
     },
     getAndDisplaySuggestedFilters() {
       debounce(
