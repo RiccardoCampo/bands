@@ -4,7 +4,7 @@
             <span class="label">{{ label }}</span>
         </div>
         <button v-if="active && !hideDiscardButton" class="discard" @click="discard" title="Discard Metric">
-          <cross-icon style="margin-top: 4px; margin-left: -3px;" :height="18" :width="18" iconColor="var(--darkgrey)"/>
+          <cross-icon style="margin-top: 4px;" :height="18" :width="18" iconColor="var(--darkgrey)"/>
         </button>
     </div>
 </template> 
@@ -66,12 +66,9 @@ span.label {
 }
 
 button.discard {
-    border: none;
-    transition: all 0.1s;
     margin-left: auto;
     height: 28px;
     width: 20px;
-    background: none;
 }
 
 button.discard:hover {  

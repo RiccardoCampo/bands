@@ -34,3 +34,13 @@
     font-family: title;
     src: url('~/assets/fonts/zain.ttf');;
 }
+
+button {
+  border: none;
+  transition: all 0.1s;
+  background: none;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  padding-top: 2px;
+}
