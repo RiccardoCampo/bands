@@ -28,6 +28,3 @@ sudo systemcl start bands.service
 
 ## CORS
 You might need to add hosts or origin regexp to allow CORS on your FE. In that case, populate `DJANGO_CORS_ALLOWED_ORIGINS_REGEX` and/or `DJANGO_ALLOWED_HOSTS` (comma separated)
-
-## Building FE too?
-Add a new service to `docker-compose.yml`, similar to the one in `../docker-compose.yml`, add `FRONTEND_APP_PORT` to `.env`.
