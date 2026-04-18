@@ -1,86 +1,24 @@
-# bands
+<p align="center"><img align="center" src="bands_frontend\public\preview.png"></p>
+<p align="center">A web app meant for music lovers which helps you catalogue and sort out your favorite artists.</p>
+<p align="center">Try the demo here: <a href="https://bands-music.netlify.app/">bands-music.netlify.app</a>.</p>
 
-## Dev Setup - Windows
-### Backend
-1. Install uv
-   1. Install Scoop
-   ```commandline
-   Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
-   iex (new-object net.webclient).downloadstring(‘https://get.scoop.sh‘)
-   ```
-   2. Install pipx
-   ```
-   scoop install pipx
-   pipx ensurepath
-   ```
-   5. Install uv
-   ```commandline
-    pipx install uv
-   ``` 
-2. Configure the venv
-   1.
+# Local setup
+1. Download `docker-compose.yml` and `.env.example`
+2. Rename `.env.example` to `.env`
+3. Run `docker compose up`
+4. Browse http://localhost:80
+
+I built images for amd64 and arm32, if they are not working for your machine you need to rebuild them, otherwise ask me to build them for your infrastructure.
+
+# Hosting
+If you want to host Bands somewhere (e.g.: on a Raspberry Pi), you can use a similar approach to the local setup, but you need to build the frontend yourself. The reason is that you need to specify the backend url during the build (set `VUE_APP_BANDS_API_URL` in the frontend `.env`).
+
+Other details you need to consider, using docker for the backend:
+1. To use SSL
+   1. Set `USE_SSL=1` in the `.env` file
+   2. Add this to backend volumes to copy local certiticates to the backend container
       ```commandline
-      uv sync
-      ```
-   2. at this point you might have trouble installing mysqlclient, the easiest way to solve this is to download a pre-compiled version from here: https://pypi.org/project/mysqlclient/#files
-
-3. Spin up the database
-   1. run mysql latest container, name it bands_db
-   2. MYSQL_ROOT_PASSWORD=toor
-   3. Set ports
-   4. log into the db and create the database `bands`
-4. Set env
-```
-cp .env.example to .env
-```
-5. Run the migrations
-```commandline
-python .\manage.py migrate
-```
-
-
-### Backend
-```commandline
-python .\manage.py runserver
-```
-
-
-### Frontend
-1. ```npm install```
-2. add .env with api base url
-```
-VUE_APP_BANDS_API_URL=http://localhost:8000/bands
-```
-3. ```npm run serve```
-
-### DB seeding
-```
-insert into bands.artist (name, spotify_url, image_url, rating, created_at, updated_at)
-values ("test band 1", "", "", 2, "2024-12-28", "2024-12-28")
-
-insert into bands.metric (name, type, category)
-values ("rock", 1, 2),
-("jazz", 1, 2),
-("noisy", 1, 0),
-("calm", 1, 0),
-("male singer", 0, 0)
-
-select *
-from bands.metric
-
-insert into bands.score (artist_id, metric_id, value)
-values (1, 1, 3),
-(1, 5, 1),
-(1, 4, 3)
-```
-
-
-## Pushing Docker images from Windows
-1. Replace `CRLF` with `LF` in all the `entrypoint.sh` files, otherwise they won't be recognized.
-2. run `deploy.bat`
-
-
-## Build with Docker
-
-1. Fill in the .env, start from .env.example
-2. Run `docker-compose up`
+        - ./certificate.pem:/app/certificate.pem
+        - ./privatekey.pem:/app/privatekey.pem
+        ```
+2. You might need to set `DJANGO_ALLOWED_HOSTS` and `DJANGO_CORS_ALLOWED_ORIGINS_REGEX`
